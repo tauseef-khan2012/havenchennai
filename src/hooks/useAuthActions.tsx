@@ -1,6 +1,6 @@
 
 import { useCallback } from 'react';
-import { AuthProvider } from '@supabase/supabase-js';
+import { Provider as AuthProvider } from '@supabase/supabase-js';
 import {
   SignInCredentials,
   PhoneSignInCredentials,
