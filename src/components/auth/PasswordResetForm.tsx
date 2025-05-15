@@ -1,10 +1,20 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Mail } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { passwordResetSchema, PasswordResetFormValues } from '@/schemas/auth';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 
 interface PasswordResetFormProps {
   onSubmit: (email: string) => Promise<void>;
@@ -17,11 +27,15 @@ export const PasswordResetForm: React.FC<PasswordResetFormProps> = ({
   isSubmitting,
   resetSent
 }) => {
-  const [email, setEmail] = useState('');
+  const form = useForm<PasswordResetFormValues>({
+    resolver: zodResolver(passwordResetSchema),
+    defaultValues: {
+      email: '',
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await onSubmit(email);
+  const handleFormSubmit = async (data: PasswordResetFormValues) => {
+    await onSubmit(data.email);
   };
 
   if (resetSent) {
@@ -36,30 +50,40 @@ export const PasswordResetForm: React.FC<PasswordResetFormProps> = ({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="reset-email">Email</Label>
-        <div className="relative">
-          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-          <Input 
-            id="reset-email" 
-            type="email" 
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="your.email@example.com"
-            className="pl-10"
-            required
-            disabled={isSubmitting}
-          />
-        </div>
-      </div>
-      <Button 
-        type="submit" 
-        className="w-full bg-haven-green hover:bg-haven-green/90"
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? 'Sending...' : 'Send Reset Instructions'}
-      </Button>
-    </form>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem className="space-y-2">
+              <FormLabel htmlFor="reset-email">Email</FormLabel>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                <FormControl>
+                  <Input 
+                    id="reset-email" 
+                    type="email" 
+                    placeholder="your.email@example.com"
+                    className="pl-10"
+                    {...field}
+                    disabled={isSubmitting}
+                  />
+                </FormControl>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button 
+          type="submit" 
+          className="w-full bg-haven-green hover:bg-haven-green/90"
+          disabled={isSubmitting || !form.formState.isValid}
+        >
+          {isSubmitting ? 'Sending...' : 'Send Reset Instructions'}
+        </Button>
+      </form>
+    </Form>
   );
 };

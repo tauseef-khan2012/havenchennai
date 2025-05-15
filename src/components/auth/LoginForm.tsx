@@ -2,11 +2,21 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Mail, Lock, Phone, Eye, EyeOff } from 'lucide-react';
 import { SelectCountry } from '@/components/auth/SelectCountry';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { SignInCredentials, PhoneSignInCredentials } from '@/types/auth';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema, phoneLoginSchema, LoginFormValues, PhoneLoginFormValues } from '@/schemas/auth';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 
 interface LoginFormProps {
   onSubmit: (credentials: SignInCredentials | PhoneSignInCredentials) => Promise<void>;
@@ -24,27 +34,38 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   emailConfirmationNeeded
 }) => {
   const [loginMethod, setLoginMethod] = useState<'email' | 'phone'>('email');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [countryCode, setCountryCode] = useState('+1');
-  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (loginMethod === 'email') {
-      await onSubmit({ 
-        email, 
-        password 
-      });
-    } else {
-      await onSubmit({ 
-        phone, 
-        password, 
-        countryCode 
-      });
-    }
+  const emailForm = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  const phoneForm = useForm<PhoneLoginFormValues>({
+    resolver: zodResolver(phoneLoginSchema),
+    defaultValues: {
+      phone: '',
+      password: '',
+      countryCode: '+1',
+    },
+  });
+
+  const handleEmailSubmit = async (data: LoginFormValues) => {
+    await onSubmit({
+      email: data.email,
+      password: data.password
+    });
+  };
+
+  const handlePhoneSubmit = async (data: PhoneLoginFormValues) => {
+    await onSubmit({
+      phone: data.phone,
+      password: data.password,
+      countryCode: data.countryCode
+    });
   };
 
   return (
@@ -71,6 +92,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           variant={loginMethod === 'email' ? "default" : "outline"}
           className={`w-1/2 ${loginMethod === 'email' ? 'bg-haven-green hover:bg-haven-green/90' : ''}`}
           onClick={() => setLoginMethod('email')}
+          disabled={isSubmitting}
         >
           <Mail className="mr-2 h-4 w-4" />
           Email
@@ -80,98 +102,180 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           variant={loginMethod === 'phone' ? "default" : "outline"}
           className={`w-1/2 ${loginMethod === 'phone' ? 'bg-haven-green hover:bg-haven-green/90' : ''}`}
           onClick={() => setLoginMethod('phone')}
+          disabled={isSubmitting}
         >
           <Phone className="mr-2 h-4 w-4" />
           Phone
         </Button>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {loginMethod === 'email' ? (
-          <div className="space-y-2">
-            <Label htmlFor="login-email">Email</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-              <Input 
-                id="login-email" 
-                type="email" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="your.email@example.com"
-                className="pl-10"
-                required
-                disabled={isSubmitting}
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            <Label htmlFor="login-phone">Phone Number</Label>
-            <div className="flex space-x-2">
-              <SelectCountry 
-                value={countryCode} 
-                onChange={setCountryCode}
-                disabled={isSubmitting}
-                className="w-24"
-              />
-              <div className="relative flex-grow">
-                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                <Input 
-                  id="login-phone" 
-                  type="tel" 
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="123456789"
-                  className="pl-10"
-                  required
-                  disabled={isSubmitting}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-        
-        <div className="space-y-2">
-          <div className="flex justify-between">
-            <Label htmlFor="login-password">Password</Label>
-            <button 
-              type="button" 
-              onClick={onResetPassword}
-              className="text-sm text-haven-green hover:underline"
-            >
-              Forgot password?
-            </button>
-          </div>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-            <Input 
-              id="login-password" 
-              type={showPassword ? "text" : "password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 pr-10"
-              required
-              disabled={isSubmitting}
+      {loginMethod === 'email' ? (
+        <Form {...emailForm}>
+          <form onSubmit={emailForm.handleSubmit(handleEmailSubmit)} className="space-y-4">
+            <FormField
+              control={emailForm.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <FormLabel htmlFor="login-email">Email</FormLabel>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                    <FormControl>
+                      <Input 
+                        id="login-email" 
+                        type="email" 
+                        placeholder="your.email@example.com"
+                        className="pl-10"
+                        {...field}
+                        disabled={isSubmitting}
+                      />
+                    </FormControl>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            <button
-              type="button"
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              onClick={() => setShowPassword(!showPassword)}
-              tabIndex={-1}
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
-        </div>
+            
+            <FormField
+              control={emailForm.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <div className="flex justify-between">
+                    <FormLabel htmlFor="login-password">Password</FormLabel>
+                    <button
+                      type="button"
+                      onClick={onResetPassword}
+                      className="text-sm text-haven-green hover:underline"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                    <FormControl>
+                      <Input 
+                        id="login-password" 
+                        type={showPassword ? "text" : "password"}
+                        className="pl-10 pr-10"
+                        {...field}
+                        disabled={isSubmitting}
+                      />
+                    </FormControl>
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      onClick={() => setShowPassword(!showPassword)}
+                      tabIndex={-1}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <Button 
-          type="submit" 
-          className="w-full bg-haven-green hover:bg-haven-green/90"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Logging in...' : 'Login'}
-        </Button>
-      </form>
+            <Button 
+              type="submit" 
+              className="w-full bg-haven-green hover:bg-haven-green/90"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Logging in...' : 'Login'}
+            </Button>
+          </form>
+        </Form>
+      ) : (
+        <Form {...phoneForm}>
+          <form onSubmit={phoneForm.handleSubmit(handlePhoneSubmit)} className="space-y-4">
+            <FormField
+              control={phoneForm.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <FormLabel htmlFor="login-phone">Phone Number</FormLabel>
+                  <div className="flex space-x-2">
+                    <FormField
+                      control={phoneForm.control}
+                      name="countryCode"
+                      render={({ field: countryField }) => (
+                        <SelectCountry 
+                          value={countryField.value} 
+                          onChange={countryField.onChange}
+                          disabled={isSubmitting}
+                          className="w-24"
+                        />
+                      )}
+                    />
+                    <div className="relative flex-grow">
+                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                      <FormControl>
+                        <Input 
+                          id="login-phone" 
+                          type="tel" 
+                          placeholder="123456789"
+                          className="pl-10"
+                          {...field}
+                          disabled={isSubmitting}
+                        />
+                      </FormControl>
+                    </div>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={phoneForm.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <div className="flex justify-between">
+                    <FormLabel htmlFor="login-phone-password">Password</FormLabel>
+                    <button 
+                      type="button" 
+                      onClick={onResetPassword}
+                      className="text-sm text-haven-green hover:underline"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                    <FormControl>
+                      <Input 
+                        id="login-phone-password" 
+                        type={showPassword ? "text" : "password"}
+                        className="pl-10 pr-10"
+                        {...field}
+                        disabled={isSubmitting}
+                      />
+                    </FormControl>
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                      onClick={() => setShowPassword(!showPassword)}
+                      tabIndex={-1}
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button 
+              type="submit" 
+              className="w-full bg-haven-green hover:bg-haven-green/90"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Logging in...' : 'Login'}
+            </Button>
+          </form>
+        </Form>
+      )}
     </div>
   );
 };

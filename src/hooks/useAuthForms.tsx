@@ -26,24 +26,13 @@ export const useAuthForms = () => {
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
+    // Reset states when changing tabs
+    setEmailConfirmationNeeded(false);
+    setPasswordResetSent(false);
   };
 
   const handleLogin = async (credentials: SignInCredentials | PhoneSignInCredentials) => {
-    if ('email' in credentials && !credentials.password) {
-      toast({
-        title: "Error",
-        description: "Please enter both email and password.",
-        variant: "destructive"
-      });
-      return;
-    } else if ('phone' in credentials && !credentials.password) {
-      toast({
-        title: "Error",
-        description: "Please enter both phone and password.",
-        variant: "destructive"
-      });
-      return;
-    }
+    // Validation is now handled by react-hook-form with zod
     
     setIsSubmitting(true);
     try {
@@ -78,23 +67,7 @@ export const useAuthForms = () => {
   };
 
   const handleSignup = async (credentials: SignUpCredentials) => {
-    if (!credentials.fullName || !credentials.email || !credentials.password) {
-      toast({
-        title: "Error",
-        description: "Please fill out all required fields.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    if (credentials.password.length < 6) {
-      toast({
-        title: "Error",
-        description: "Password must be at least 6 characters long.",
-        variant: "destructive"
-      });
-      return;
-    }
+    // Validation is now handled by react-hook-form with zod
     
     setIsSubmitting(true);
     try {
@@ -118,14 +91,7 @@ export const useAuthForms = () => {
   };
 
   const handleResetPassword = async (email: string) => {
-    if (!email) {
-      toast({
-        title: "Error",
-        description: "Please enter your email address.",
-        variant: "destructive"
-      });
-      return;
-    }
+    // Validation is now handled by react-hook-form with zod
     
     setIsSubmitting(true);
     try {
