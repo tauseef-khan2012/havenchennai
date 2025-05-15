@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
@@ -14,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider as RadixTooltipProvider, // Import with alias
+  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
@@ -130,8 +129,7 @@ const SidebarProvider = React.forwardRef<
 
     return (
       <SidebarContext.Provider value={contextValue}>
-        {/* Using RadixTooltipProvider instead of TooltipProvider */}
-        <RadixTooltipProvider delayDuration={0}>
+        <TooltipProvider delayDuration={0}>
           <div
             style={
               {
@@ -149,7 +147,7 @@ const SidebarProvider = React.forwardRef<
           >
             {children}
           </div>
-        </RadixTooltipProvider>
+        </TooltipProvider>
       </SidebarContext.Provider>
     )
   }
