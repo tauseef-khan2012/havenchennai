@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -13,19 +13,10 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
-// Sample user data that would come from Supabase
-const userData = {
-  id: '1',
-  name: 'Emma Wilson',
-  email: 'emma.wilson@example.com',
-  avatar: null,
-  phone: '(555) 123-4567',
-  address: '123 Main St, Anytown, CA 94000',
-  joinedDate: 'January 15, 2023'
-};
-
-// Sample booking data that would come from Supabase
+// Sample booking data that would come from Supabase (will be replaced with real data later)
 const bookingsData = [
   {
     id: 'b1',
@@ -63,26 +54,62 @@ const bookingsData = [
 ];
 
 const Dashboard = () => {
-  const [name, setName] = useState(userData.name);
-  const [email, setEmail] = useState(userData.email);
-  const [phone, setPhone] = useState(userData.phone);
-  const [address, setAddress] = useState(userData.address);
+  const { user, profile, signOut, refreshProfile } = useAuth();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const { toast } = useToast();
 
-  const handleProfileUpdate = (e: React.FormEvent) => {
+  // Initialize form with profile data
+  useEffect(() => {
+    if (profile) {
+      setName(profile.full_name || '');
+      setEmail(profile.email || '');
+      setPhone(profile.phone_number || '');
+    }
+  }, [profile]);
+
+  const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Here you would connect to Supabase to update the user profile
-    toast({
-      title: "Success!",
-      description: "Your profile has been updated successfully.",
-    });
+    if (!user) return;
+    
+    setIsUpdating(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: name,
+          phone_number: phone,
+        })
+        .eq('id', user.id);
+      
+      if (error) throw error;
+      
+      await refreshProfile();
+      
+      toast({
+        title: "Success!",
+        description: "Your profile has been updated successfully.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "An error occurred while updating your profile.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
-  const handlePasswordChange = (e: React.FormEvent) => {
+  const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!currentPassword || !newPassword || !confirmPassword) {
@@ -103,16 +130,32 @@ const Dashboard = () => {
       return;
     }
     
-    // Here you would connect to Supabase to update the password
-    toast({
-      title: "Success!",
-      description: "Your password has been changed successfully.",
-    });
-    
-    // Reset password fields
-    setCurrentPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
+    setIsUpdatingPassword(true);
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Success!",
+        description: "Your password has been changed successfully.",
+      });
+      
+      // Reset password fields
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "An error occurred while changing your password.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsUpdatingPassword(false);
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -133,6 +176,22 @@ const Dashboard = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+  if (!user || !profile) {
+    return (
+      <>
+        <Navbar />
+        <main className="py-16 bg-haven-beige bg-opacity-10 min-h-screen">
+          <div className="container-custom">
+            <div className="text-center">
+              <h1 className="font-serif text-3xl font-bold mb-4">Loading your profile...</h1>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
   return (
     <>
       <Navbar />
@@ -141,17 +200,20 @@ const Dashboard = () => {
           <div className="flex flex-col md:flex-row items-center md:items-start md:justify-between mb-8">
             <div className="flex flex-col md:flex-row items-center gap-4 mb-4 md:mb-0">
               <Avatar className="w-16 h-16">
-                <AvatarImage src={userData.avatar || undefined} alt={userData.name} />
                 <AvatarFallback className="bg-haven-green text-white text-lg">
-                  {userData.name.split(' ').map(n => n[0]).join('')}
+                  {profile.full_name?.split(' ').map((n: string) => n[0]).join('') || user.email?.[0].toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="text-center md:text-left">
-                <h1 className="font-serif text-3xl font-bold">{userData.name}</h1>
-                <p className="text-gray-600">Member since {userData.joinedDate}</p>
+                <h1 className="font-serif text-3xl font-bold">{profile.full_name}</h1>
+                <p className="text-gray-600">Member since {new Date(profile.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</p>
               </div>
             </div>
-            <Button variant="outline" className="text-haven-green border-haven-green hover:bg-haven-green hover:text-white">
+            <Button 
+              variant="outline" 
+              className="text-haven-green border-haven-green hover:bg-haven-green hover:text-white"
+              onClick={signOut}
+            >
               Log Out
             </Button>
           </div>
@@ -253,6 +315,7 @@ const Dashboard = () => {
                           value={name} 
                           onChange={(e) => setName(e.target.value)} 
                           required
+                          disabled={isUpdating}
                         />
                       </div>
                       <div className="space-y-2">
@@ -261,9 +324,10 @@ const Dashboard = () => {
                           id="email" 
                           type="email" 
                           value={email} 
-                          onChange={(e) => setEmail(e.target.value)} 
+                          disabled
                           required
                         />
+                        <p className="text-sm text-gray-500">Email cannot be changed</p>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="phone">Phone Number</Label>
@@ -271,32 +335,18 @@ const Dashboard = () => {
                           id="phone" 
                           value={phone} 
                           onChange={(e) => setPhone(e.target.value)}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="address">Address</Label>
-                        <Textarea 
-                          id="address" 
-                          value={address} 
-                          onChange={(e) => setAddress(e.target.value)}
+                          disabled={isUpdating}
                         />
                       </div>
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="profile-photo">Profile Photo</Label>
-                      <div className="flex items-center gap-4">
-                        <Avatar className="w-16 h-16">
-                          <AvatarImage src={userData.avatar || undefined} alt={userData.name} />
-                          <AvatarFallback className="bg-haven-green text-white text-lg">
-                            {userData.name.split(' ').map(n => n[0]).join('')}
-                          </AvatarFallback>
-                        </Avatar>
-                        <Input id="profile-photo" type="file" />
-                      </div>
-                    </div>
-                    
-                    <Button type="submit" className="btn-primary">Save Changes</Button>
+                    <Button 
+                      type="submit" 
+                      className="btn-primary"
+                      disabled={isUpdating}
+                    >
+                      {isUpdating ? 'Saving...' : 'Save Changes'}
+                    </Button>
                   </form>
                 </CardContent>
               </Card>
@@ -321,6 +371,7 @@ const Dashboard = () => {
                             value={currentPassword}
                             onChange={(e) => setCurrentPassword(e.target.value)}
                             required
+                            disabled={isUpdatingPassword}
                           />
                         </div>
                         <div className="space-y-2">
@@ -331,6 +382,7 @@ const Dashboard = () => {
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             required
+                            disabled={isUpdatingPassword}
                           />
                         </div>
                         <div className="space-y-2">
@@ -341,10 +393,17 @@ const Dashboard = () => {
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required
+                            disabled={isUpdatingPassword}
                           />
                         </div>
                       </div>
-                      <Button type="submit" className="btn-primary">Update Password</Button>
+                      <Button 
+                        type="submit" 
+                        className="btn-primary"
+                        disabled={isUpdatingPassword}
+                      >
+                        {isUpdatingPassword ? 'Updating...' : 'Update Password'}
+                      </Button>
                     </form>
                     
                     <Separator />

@@ -1,11 +1,14 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu } from 'lucide-react';
+import { Menu, UserRound } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, profile, signOut } = useAuth();
 
   return (
     <nav className="bg-white bg-opacity-95 sticky top-0 z-50 shadow-sm">
@@ -21,9 +24,23 @@ const Navbar = () => {
           <Link to="/stay" className="text-haven-dark hover:text-haven-green transition-colors">Stay</Link>
           <Link to="/experiences" className="text-haven-dark hover:text-haven-green transition-colors">Experiences</Link>
           <Link to="/packages" className="text-haven-dark hover:text-haven-green transition-colors">Packages</Link>
-          <Link to="/login">
-            <Button variant="outline" className="ml-4">Login</Button>
-          </Link>
+          
+          {user ? (
+            <div className="flex items-center space-x-4">
+              <Link to="/dashboard" className="flex items-center space-x-2">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-haven-green text-white">
+                    {profile?.full_name?.split(' ').map((n: string) => n[0]).join('') || user.email?.[0].toUpperCase() || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-haven-dark hover:text-haven-green transition-colors">My Account</span>
+              </Link>
+            </div>
+          ) : (
+            <Link to="/login">
+              <Button variant="outline" className="ml-4">Login</Button>
+            </Link>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -48,9 +65,21 @@ const Navbar = () => {
             <Link to="/stay" className="text-haven-dark hover:text-haven-green transition-colors py-2 border-b border-gray-100" onClick={() => setIsMenuOpen(false)}>Stay</Link>
             <Link to="/experiences" className="text-haven-dark hover:text-haven-green transition-colors py-2 border-b border-gray-100" onClick={() => setIsMenuOpen(false)}>Experiences</Link>
             <Link to="/packages" className="text-haven-dark hover:text-haven-green transition-colors py-2 border-b border-gray-100" onClick={() => setIsMenuOpen(false)}>Packages</Link>
-            <Link to="/login" className="w-full" onClick={() => setIsMenuOpen(false)}>
-              <Button variant="outline" className="w-full">Login</Button>
-            </Link>
+            
+            {user ? (
+              <>
+                <Link to="/dashboard" className="text-haven-dark hover:text-haven-green transition-colors py-2 border-b border-gray-100" onClick={() => setIsMenuOpen(false)}>
+                  My Account
+                </Link>
+                <Button variant="outline" className="w-full" onClick={() => { signOut(); setIsMenuOpen(false); }}>
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Link to="/login" className="w-full" onClick={() => setIsMenuOpen(false)}>
+                <Button variant="outline" className="w-full">Login</Button>
+              </Link>
+            )}
           </div>
         </div>
       )}

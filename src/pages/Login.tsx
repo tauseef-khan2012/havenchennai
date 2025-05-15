@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Login = () => {
   const [loginEmail, setLoginEmail] = useState('');
@@ -17,10 +18,17 @@ const Login = () => {
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
-  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeTab, setActiveTab] = useState('login');
   const { toast } = useToast();
+  const { user, signIn, signUp } = useAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
+  // Redirect if already logged in
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!loginEmail || !loginPassword) {
@@ -32,17 +40,18 @@ const Login = () => {
       return;
     }
     
-    // Here you would connect to Supabase for authentication
-    toast({
-      title: "Success!",
-      description: "You've been logged in successfully.",
-    });
-    
-    // Redirect to user dashboard
-    navigate('/dashboard');
+    setIsSubmitting(true);
+    try {
+      await signIn(loginEmail, loginPassword);
+      // No need to navigate or show toast here as it's handled in the signIn function
+    } catch (error) {
+      // Error handling is done in signIn function
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!signupName || !signupEmail || !signupPassword || !signupConfirmPassword) {
@@ -63,22 +72,24 @@ const Login = () => {
       return;
     }
     
-    // Here you would connect to Supabase for user creation
-    toast({
-      title: "Success!",
-      description: "Your account has been created. You can now log in.",
-    });
-    
-    // Reset form and switch to login tab
-    setSignupName('');
-    setSignupEmail('');
-    setSignupPassword('');
-    setSignupConfirmPassword('');
-    
-    // Set login form with the email they just registered with
-    setLoginEmail(signupEmail);
-    
-    // Switch to login tab (this would be handled by setting the active tab state)
+    setIsSubmitting(true);
+    try {
+      await signUp(signupEmail, signupPassword, signupName);
+      
+      // Reset form and switch to login tab
+      setSignupName('');
+      setSignupEmail('');
+      setSignupPassword('');
+      setSignupConfirmPassword('');
+      
+      // Set login form with the email they just registered with
+      setLoginEmail(signupEmail);
+      setActiveTab('login');
+    } catch (error) {
+      // Error handling is done in signUp function
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -86,7 +97,7 @@ const Login = () => {
       <Navbar />
       <main className="py-16 bg-haven-beige bg-opacity-10 min-h-screen">
         <div className="container-custom max-w-md">
-          <Tabs defaultValue="login" className="w-full">
+          <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-8">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -109,6 +120,7 @@ const Login = () => {
                         onChange={(e) => setLoginEmail(e.target.value)}
                         placeholder="your.email@example.com"
                         required
+                        disabled={isSubmitting}
                       />
                     </div>
                     <div className="space-y-2">
@@ -119,6 +131,7 @@ const Login = () => {
                         value={loginPassword}
                         onChange={(e) => setLoginPassword(e.target.value)}
                         required
+                        disabled={isSubmitting}
                       />
                     </div>
                     <div className="text-right">
@@ -128,7 +141,13 @@ const Login = () => {
                     </div>
                   </CardContent>
                   <CardFooter>
-                    <Button type="submit" className="w-full btn-primary">Login</Button>
+                    <Button 
+                      type="submit" 
+                      className="w-full btn-primary"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'Logging in...' : 'Login'}
+                    </Button>
                   </CardFooter>
                 </form>
               </Card>
@@ -151,6 +170,7 @@ const Login = () => {
                         onChange={(e) => setSignupName(e.target.value)}
                         placeholder="John Doe"
                         required
+                        disabled={isSubmitting}
                       />
                     </div>
                     <div className="space-y-2">
@@ -162,6 +182,7 @@ const Login = () => {
                         onChange={(e) => setSignupEmail(e.target.value)}
                         placeholder="your.email@example.com"
                         required
+                        disabled={isSubmitting}
                       />
                     </div>
                     <div className="space-y-2">
@@ -172,6 +193,7 @@ const Login = () => {
                         value={signupPassword}
                         onChange={(e) => setSignupPassword(e.target.value)}
                         required
+                        disabled={isSubmitting}
                       />
                     </div>
                     <div className="space-y-2">
@@ -182,11 +204,18 @@ const Login = () => {
                         value={signupConfirmPassword}
                         onChange={(e) => setSignupConfirmPassword(e.target.value)}
                         required
+                        disabled={isSubmitting}
                       />
                     </div>
                   </CardContent>
                   <CardFooter className="flex flex-col space-y-4">
-                    <Button type="submit" className="w-full btn-primary">Sign Up</Button>
+                    <Button 
+                      type="submit" 
+                      className="w-full btn-primary"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'Creating Account...' : 'Sign Up'}
+                    </Button>
                     <p className="text-sm text-gray-600 text-center">
                       By signing up, you agree to our <Link to="#" className="text-haven-green hover:underline">Terms of Service</Link> and <Link to="#" className="text-haven-green hover:underline">Privacy Policy</Link>.
                     </p>
