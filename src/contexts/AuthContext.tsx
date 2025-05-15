@@ -1,9 +1,9 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { Session, User } from '@supabase/supabase-js';
+import { Session, User, Provider } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 type AuthContextType = {
   session: Session | null;
@@ -11,10 +11,13 @@ type AuthContextType = {
   profile: any | null;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, fullName: string) => Promise<void>;
+  signInWithPhone: (phone: string, password: string) => Promise<void>;
+  signInWithProvider: (provider: Provider) => Promise<void>;
+  signUp: (email: string, password: string, fullName: string, phoneNumber?: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   resendConfirmationEmail: (email: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -119,7 +122,60 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       navigate('/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
-      // Error toast is already shown above
+      throw error;
+    }
+  };
+
+  const signInWithPhone = async (phone: string, password: string) => {
+    try {
+      // Using email/password sign-in but with a phone number as the "email"
+      const { data, error } = await supabase.auth.signInWithPassword({
+        phone,
+        password,
+      });
+
+      if (error) {
+        toast({
+          title: "Login failed",
+          description: error.message || "Invalid phone number or password.",
+          variant: "destructive",
+        });
+        throw error;
+      }
+
+      toast({
+        title: "Success!",
+        description: "You've been logged in successfully.",
+      });
+
+      navigate('/dashboard');
+    } catch (error: any) {
+      console.error('Phone login error:', error);
+      throw error;
+    }
+  };
+
+  const signInWithProvider = async (provider: Provider) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+
+      if (error) {
+        toast({
+          title: "Login failed",
+          description: error.message || `An error occurred during ${provider} login.`,
+          variant: "destructive",
+        });
+        throw error;
+      }
+
+      // No need for toast or navigation here as OAuth will redirect
+    } catch (error: any) {
+      console.error(`${provider} login error:`, error);
       throw error;
     }
   };
@@ -146,7 +202,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string, fullName: string) => {
+  const resetPassword = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Reset instructions sent",
+        description: "If an account with that email exists, you will receive password reset instructions.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "An error occurred while processing your request. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const signUp = async (email: string, password: string, fullName: string, phoneNumber?: string) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -154,6 +231,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         options: {
           data: {
             full_name: fullName,
+            phone_number: phoneNumber,
             registration_source: 'website',
           },
         },
@@ -203,10 +281,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         profile,
         isLoading,
         signIn,
+        signInWithPhone,
+        signInWithProvider,
         signUp,
         signOut,
         refreshProfile,
         resendConfirmationEmail,
+        resetPassword,
       }}
     >
       {children}
