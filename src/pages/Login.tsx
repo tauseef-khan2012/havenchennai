@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
@@ -11,7 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { Mail, Lock, Phone, Eye, EyeOff, Google, Facebook, Microsoft } from 'lucide-react';
+import { Mail, Lock, Phone, Eye, EyeOff, Facebook } from 'lucide-react';
+import { GoogleIcon } from '@/components/icons/GoogleIcon';
+import { MicrosoftIcon } from '@/components/icons/MicrosoftIcon';
 import { SelectCountry } from '@/components/auth/SelectCountry';
 import { Provider } from '@supabase/supabase-js';
 
@@ -357,7 +358,7 @@ const Login = () => {
                       onClick={() => handleSocialLogin('google')}
                       disabled={isSubmitting}
                     >
-                      <Google className="mr-2 h-4 w-4" />
+                      <GoogleIcon className="mr-2 h-4 w-4" />
                       Continue with Google
                     </Button>
                     <Button 
@@ -377,7 +378,7 @@ const Login = () => {
                       onClick={() => handleSocialLogin('azure')}
                       disabled={isSubmitting}
                     >
-                      <Microsoft className="mr-2 h-4 w-4" />
+                      <MicrosoftIcon className="mr-2 h-4 w-4" />
                       Continue with Microsoft
                     </Button>
                   </div>
