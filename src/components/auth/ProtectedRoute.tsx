@@ -1,6 +1,7 @@
 
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { Loader2 } from 'lucide-react';
 
 type ProtectedRouteProps = {
   children: React.ReactNode;
@@ -11,8 +12,12 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const location = useLocation();
 
   if (isLoading) {
-    // You might want to add a loading spinner here
-    return <div className="h-screen flex items-center justify-center">Loading...</div>;
+    return (
+      <div className="h-screen flex flex-col items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin mb-4" />
+        <p className="text-gray-600">Loading your profile...</p>
+      </div>
+    );
   }
 
   if (!user) {
