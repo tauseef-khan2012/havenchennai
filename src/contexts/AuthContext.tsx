@@ -14,6 +14,7 @@ type AuthContextType = {
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  resendConfirmationEmail: (email: string) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,6 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
+        console.log("Auth state changed:", event);
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         
@@ -92,7 +94,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        if (error.message === 'Email not confirmed') {
+          toast({
+            title: "Email not confirmed",
+            description: "Please check your inbox and confirm your email before logging in.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Login failed",
+            description: error.message || "An error occurred during login.",
+            variant: "destructive",
+          });
+        }
+        throw error;
+      }
 
       toast({
         title: "Success!",
@@ -101,12 +118,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       navigate('/dashboard');
     } catch (error: any) {
+      console.error('Login error:', error);
+      // Error toast is already shown above
+      throw error;
+    }
+  };
+
+  const resendConfirmationEmail = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+      });
+
+      if (error) throw error;
+
       toast({
-        title: "Login failed",
-        description: error.message || "An error occurred during login.",
+        title: "Confirmation email sent",
+        description: "Please check your inbox and follow the link to confirm your email.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Failed to resend confirmation",
+        description: error.message || "An error occurred. Please try again.",
         variant: "destructive",
       });
-      throw error;
     }
   };
 
@@ -127,7 +163,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       toast({
         title: "Account created!",
-        description: "Your account has been created successfully. You can now log in.",
+        description: "Please check your email to confirm your account before logging in.",
       });
     } catch (error: any) {
       toast({
@@ -170,6 +206,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signUp,
         signOut,
         refreshProfile,
+        resendConfirmationEmail,
       }}
     >
       {children}

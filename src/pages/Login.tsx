@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -20,8 +21,9 @@ const Login = () => {
   const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState('login');
+  const [emailConfirmationNeeded, setEmailConfirmationNeeded] = useState(false);
   const { toast } = useToast();
-  const { user, signIn, signUp } = useAuth();
+  const { user, signIn, signUp, resendConfirmationEmail } = useAuth();
 
   // Redirect if already logged in
   if (user) {
@@ -44,11 +46,28 @@ const Login = () => {
     try {
       await signIn(loginEmail, loginPassword);
       // No need to navigate or show toast here as it's handled in the signIn function
-    } catch (error) {
+    } catch (error: any) {
+      // Check if the error is related to email confirmation
+      if (error.message === 'Email not confirmed') {
+        setEmailConfirmationNeeded(true);
+      }
       // Error handling is done in signIn function
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleResendConfirmation = async () => {
+    if (!loginEmail) {
+      toast({
+        title: "Error",
+        description: "Please enter your email address.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    await resendConfirmationEmail(loginEmail);
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -85,6 +104,8 @@ const Login = () => {
       // Set login form with the email they just registered with
       setLoginEmail(signupEmail);
       setActiveTab('login');
+      // Show email confirmation alert
+      setEmailConfirmationNeeded(true);
     } catch (error) {
       // Error handling is done in signUp function
     } finally {
@@ -109,6 +130,23 @@ const Login = () => {
                   <CardTitle className="font-serif text-2xl">Welcome Back</CardTitle>
                   <CardDescription>Log in to manage your bookings and experiences.</CardDescription>
                 </CardHeader>
+                {emailConfirmationNeeded && (
+                  <div className="px-6">
+                    <Alert className="mb-4">
+                      <AlertDescription>
+                        Please confirm your email before logging in.
+                        <Button 
+                          variant="link" 
+                          className="p-0 h-auto font-normal hover:underline text-haven-green ml-1"
+                          onClick={handleResendConfirmation}
+                          disabled={isSubmitting}
+                        >
+                          Resend confirmation email
+                        </Button>
+                      </AlertDescription>
+                    </Alert>
+                  </div>
+                )}
                 <form onSubmit={handleLogin}>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
