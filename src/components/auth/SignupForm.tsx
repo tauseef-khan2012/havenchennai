@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,15 +5,10 @@ import { Label } from '@/components/ui/label';
 import { Link } from 'react-router-dom';
 import { Mail, Lock, Phone, Eye, EyeOff } from 'lucide-react';
 import { SelectCountry } from '@/components/auth/SelectCountry';
+import { SignUpCredentials } from '@/types/auth';
 
 interface SignupFormProps {
-  onSubmit: (data: {
-    name: string;
-    email: string;
-    password: string;
-    phone?: string;
-    countryCode?: string;
-  }) => Promise<void>;
+  onSubmit: (credentials: SignUpCredentials) => Promise<void>;
   isSubmitting: boolean;
 }
 
@@ -34,11 +28,10 @@ export const SignupForm: React.FC<SignupFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await onSubmit({
-      name,
       email,
       password,
-      phone: phone || undefined,
-      countryCode: phone ? countryCode : undefined
+      fullName: name,
+      phoneNumber: phone ? `${countryCode}${phone}` : undefined
     });
   };
 

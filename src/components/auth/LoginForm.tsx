@@ -6,9 +6,10 @@ import { Label } from '@/components/ui/label';
 import { Mail, Lock, Phone, Eye, EyeOff } from 'lucide-react';
 import { SelectCountry } from '@/components/auth/SelectCountry';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { SignInCredentials, PhoneSignInCredentials } from '@/types/auth';
 
 interface LoginFormProps {
-  onSubmit: (data: { email?: string; phone?: string; password: string; countryCode?: string }) => Promise<void>;
+  onSubmit: (credentials: SignInCredentials | PhoneSignInCredentials) => Promise<void>;
   onResetPassword: () => void;
   onResendConfirmation: () => void;
   isSubmitting: boolean;
@@ -33,9 +34,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     e.preventDefault();
     
     if (loginMethod === 'email') {
-      await onSubmit({ email, password });
+      await onSubmit({ 
+        email, 
+        password 
+      });
     } else {
-      await onSubmit({ phone, password, countryCode });
+      await onSubmit({ 
+        phone, 
+        password, 
+        countryCode 
+      });
     }
   };
 

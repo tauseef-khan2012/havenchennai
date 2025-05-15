@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
@@ -12,6 +11,11 @@ import { LoginForm } from '@/components/auth/LoginForm';
 import { SignupForm } from '@/components/auth/SignupForm';
 import { PasswordResetForm } from '@/components/auth/PasswordResetForm';
 import { SocialLoginButtons } from '@/components/auth/SocialLoginButtons';
+import { 
+  SignInCredentials, 
+  PhoneSignInCredentials, 
+  SignUpCredentials 
+} from '@/types/auth';
 
 const Login = () => {
   const [activeTab, setActiveTab] = useState('login');
@@ -34,16 +38,18 @@ const Login = () => {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const handleLogin = async ({ email, phone, password, countryCode }: { 
-    email?: string; 
-    phone?: string; 
-    password: string;
-    countryCode?: string;
-  }) => {
-    if ((email && !password) || (phone && !password)) {
+  const handleLogin = async (credentials: SignInCredentials | PhoneSignInCredentials) => {
+    if ('email' in credentials && !credentials.password) {
       toast({
         title: "Error",
-        description: "Please enter both email/phone and password.",
+        description: "Please enter both email and password.",
+        variant: "destructive"
+      });
+      return;
+    } else if ('phone' in credentials && !credentials.password) {
+      toast({
+        title: "Error",
+        description: "Please enter both phone and password.",
         variant: "destructive"
       });
       return;
@@ -51,11 +57,10 @@ const Login = () => {
     
     setIsSubmitting(true);
     try {
-      if (email) {
-        await signIn(email, password);
-      } else if (phone && countryCode) {
-        const fullPhoneNumber = `${countryCode}${phone}`;
-        await signInWithPhone(fullPhoneNumber, password);
+      if ('email' in credentials) {
+        await signIn(credentials);
+      } else {
+        await signInWithPhone(credentials);
       }
     } catch (error: any) {
       // Check if the error is related to email confirmation
@@ -84,14 +89,8 @@ const Login = () => {
     await resendConfirmationEmail(email);
   };
 
-  const handleSignup = async ({ name, email, password, phone, countryCode }: {
-    name: string;
-    email: string;
-    password: string;
-    phone?: string;
-    countryCode?: string;
-  }) => {
-    if (!name || !email || !password) {
+  const handleSignup = async (credentials: SignUpCredentials) => {
+    if (!credentials.fullName || !credentials.email || !credentials.password) {
       toast({
         title: "Error",
         description: "Please fill out all required fields.",
@@ -100,7 +99,7 @@ const Login = () => {
       return;
     }
     
-    if (password.length < 6) {
+    if (credentials.password.length < 6) {
       toast({
         title: "Error",
         description: "Password must be at least 6 characters long.",
@@ -111,12 +110,7 @@ const Login = () => {
     
     setIsSubmitting(true);
     try {
-      let fullPhoneNumber = undefined;
-      if (phone && countryCode) {
-        fullPhoneNumber = `${countryCode}${phone}`;
-      }
-      
-      await signUp(email, password, name, fullPhoneNumber);
+      await signUp(credentials);
       
       // Set login form with the email they just registered with
       // and switch to login tab
@@ -131,7 +125,7 @@ const Login = () => {
     }
   };
 
-  const handleSocialLogin = async (provider: Provider) => {
+  const handleSocialLogin = async (provider: any) => {
     try {
       await signInWithProvider(provider);
     } catch (error) {

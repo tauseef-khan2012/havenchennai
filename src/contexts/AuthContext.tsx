@@ -1,262 +1,202 @@
 
-import { createContext, useContext, useEffect, useState } from 'react';
-import { Session, User, Provider } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import {
+  AuthState,
+  AuthUser,
+  AuthSession,
+  AuthProvider,
+  UserProfile,
+  SignInCredentials,
+  PhoneSignInCredentials,
+  SignUpCredentials,
+  AuthError
+} from '@/types/auth';
+import * as authService from '@/services/authService';
 
-type AuthContextType = {
-  session: Session | null;
-  user: User | null;
-  profile: any | null;
-  isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signInWithPhone: (phone: string, password: string) => Promise<void>;
-  signInWithProvider: (provider: Provider) => Promise<void>;
-  signUp: (email: string, password: string, fullName: string, phoneNumber?: string) => Promise<void>;
+interface AuthContextType extends AuthState {
+  signIn: (credentials: SignInCredentials) => Promise<void>;
+  signInWithPhone: (credentials: PhoneSignInCredentials) => Promise<void>;
+  signInWithProvider: (provider: AuthProvider) => Promise<void>;
+  signUp: (credentials: SignUpCredentials) => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   resendConfirmationEmail: (email: string) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
-};
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const initialState: AuthState = {
+  session: null,
+  user: null,
+  profile: null,
+  isLoading: true,
+  error: null
+};
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<any | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [state, setState] = useState<AuthState>(initialState);
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  const updateState = useCallback((newState: Partial<AuthState>) => {
+    setState(prevState => ({ ...prevState, ...newState }));
+  }, []);
+
+  const handleError = useCallback((error: AuthError, title: string) => {
+    console.error(`Auth error (${title}):`, error);
+    toast({
+      title,
+      description: error.message || "An error occurred",
+      variant: "destructive",
+    });
+    updateState({ error });
+  }, [toast, updateState]);
+
+  const refreshProfile = useCallback(async () => {
+    if (!state.user) return;
+    
+    try {
+      const profile = await authService.fetchUserProfile(state.user.id);
+      updateState({ profile });
+    } catch (error) {
+      console.error('Error refreshing profile:', error);
+    }
+  }, [state.user, updateState]);
+
+  // Initialize auth state
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, currentSession) => {
+      async (event, currentSession) => {
         console.log("Auth state changed:", event);
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
+        
+        updateState({
+          session: currentSession,
+          user: currentSession?.user ?? null,
+        });
         
         // Fetch profile data if user exists
         if (currentSession?.user) {
           setTimeout(() => {
-            fetchProfile(currentSession.user.id);
+            authService.fetchUserProfile(currentSession.user.id)
+              .then(profile => updateState({ profile }))
+              .catch(error => console.error('Error fetching profile:', error));
           }, 0);
         } else {
-          setProfile(null);
+          updateState({ profile: null });
         }
       }
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      
-      if (currentSession?.user) {
-        fetchProfile(currentSession.user.id);
-      }
-      setIsLoading(false);
-    });
+    authService.getCurrentSession()
+      .then(({ session }) => {
+        updateState({
+          session,
+          user: session?.user ?? null,
+          isLoading: false
+        });
+        
+        if (session?.user) {
+          authService.fetchUserProfile(session.user.id)
+            .then(profile => updateState({ profile }))
+            .catch(error => console.error('Error fetching profile:', error));
+        }
+      })
+      .catch(error => {
+        console.error('Error getting session:', error);
+        updateState({ isLoading: false });
+      });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [updateState]);
 
-  const fetchProfile = async (userId: string) => {
+  const signIn = async (credentials: SignInCredentials) => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (error) {
-        console.error('Error fetching profile:', error);
-        return;
-      }
-
-      setProfile(data);
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-    }
-  };
-
-  const refreshProfile = async () => {
-    if (user) {
-      await fetchProfile(user.id);
-    }
-  };
-
-  const signIn = async (email: string, password: string) => {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        if (error.message === 'Email not confirmed') {
-          toast({
-            title: "Email not confirmed",
-            description: "Please check your inbox and confirm your email before logging in.",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Login failed",
-            description: error.message || "An error occurred during login.",
-            variant: "destructive",
-          });
-        }
-        throw error;
-      }
-
+      updateState({ isLoading: true, error: null });
+      await authService.signInWithEmail(credentials);
+      
       toast({
         title: "Success!",
         description: "You've been logged in successfully.",
       });
-
+      
       navigate('/dashboard');
     } catch (error: any) {
-      console.error('Login error:', error);
+      if (error.message === 'Email not confirmed') {
+        toast({
+          title: "Email not confirmed",
+          description: "Please check your inbox and confirm your email before logging in.",
+          variant: "destructive",
+        });
+      } else {
+        handleError(error, "Login failed");
+      }
       throw error;
+    } finally {
+      updateState({ isLoading: false });
     }
   };
 
-  const signInWithPhone = async (phone: string, password: string) => {
+  const signInWithPhone = async (credentials: PhoneSignInCredentials) => {
     try {
-      // Using email/password sign-in but with a phone number as the "email"
-      const { data, error } = await supabase.auth.signInWithPassword({
-        phone,
-        password,
-      });
-
-      if (error) {
-        toast({
-          title: "Login failed",
-          description: error.message || "Invalid phone number or password.",
-          variant: "destructive",
-        });
-        throw error;
-      }
-
+      updateState({ isLoading: true, error: null });
+      await authService.signInWithPhone(credentials);
+      
       toast({
         title: "Success!",
         description: "You've been logged in successfully.",
       });
-
+      
       navigate('/dashboard');
     } catch (error: any) {
-      console.error('Phone login error:', error);
+      handleError(error, "Login failed");
       throw error;
+    } finally {
+      updateState({ isLoading: false });
     }
   };
 
-  const signInWithProvider = async (provider: Provider) => {
+  const signInWithProvider = async (provider: AuthProvider) => {
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-        },
-      });
-
-      if (error) {
-        toast({
-          title: "Login failed",
-          description: error.message || `An error occurred during ${provider} login.`,
-          variant: "destructive",
-        });
-        throw error;
-      }
-
-      // No need for toast or navigation here as OAuth will redirect
+      updateState({ isLoading: true, error: null });
+      await authService.signInWithProvider(provider);
+      // No toast or navigate here as OAuth will redirect
     } catch (error: any) {
-      console.error(`${provider} login error:`, error);
+      handleError(error, "Login failed");
       throw error;
+    } finally {
+      updateState({ isLoading: false });
     }
   };
 
-  const resendConfirmationEmail = async (email: string) => {
+  const signUp = async (credentials: SignUpCredentials) => {
     try {
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email: email,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Confirmation email sent",
-        description: "Please check your inbox and follow the link to confirm your email.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Failed to resend confirmation",
-        description: error.message || "An error occurred. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const resetPassword = async (email: string) => {
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Reset instructions sent",
-        description: "If an account with that email exists, you will receive password reset instructions.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "An error occurred while processing your request. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const signUp = async (email: string, password: string, fullName: string, phoneNumber?: string) => {
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-            phone_number: phoneNumber,
-            registration_source: 'website',
-          },
-        },
-      });
-
-      if (error) throw error;
-
+      updateState({ isLoading: true, error: null });
+      await authService.signUp(credentials);
+      
       toast({
         title: "Account created!",
         description: "Please check your email to confirm your account before logging in.",
       });
     } catch (error: any) {
-      toast({
-        title: "Sign up failed",
-        description: error.message || "An error occurred during sign up.",
-        variant: "destructive",
-      });
+      handleError(error, "Sign up failed");
       throw error;
+    } finally {
+      updateState({ isLoading: false });
     }
   };
 
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      updateState({ isLoading: true, error: null });
+      await authService.signOut();
       
       toast({
         title: "Logged out",
@@ -265,31 +205,58 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       navigate('/');
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "An error occurred during logout.",
-        variant: "destructive",
-      });
+      handleError(error, "Logout failed");
+    } finally {
+      updateState({ isLoading: false });
     }
   };
 
+  const resendConfirmationEmail = async (email: string) => {
+    try {
+      updateState({ isLoading: true, error: null });
+      await authService.resendConfirmationEmail(email);
+      
+      toast({
+        title: "Confirmation email sent",
+        description: "Please check your inbox and follow the link to confirm your email.",
+      });
+    } catch (error: any) {
+      handleError(error, "Failed to resend confirmation");
+    } finally {
+      updateState({ isLoading: false });
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    try {
+      updateState({ isLoading: true, error: null });
+      await authService.resetPassword(email);
+      
+      toast({
+        title: "Reset instructions sent",
+        description: "If an account with that email exists, you will receive password reset instructions.",
+      });
+    } catch (error: any) {
+      handleError(error, "Password reset failed");
+    } finally {
+      updateState({ isLoading: false });
+    }
+  };
+
+  const value = {
+    ...state,
+    signIn,
+    signInWithPhone,
+    signInWithProvider,
+    signUp,
+    signOut,
+    refreshProfile,
+    resendConfirmationEmail,
+    resetPassword,
+  };
+
   return (
-    <AuthContext.Provider
-      value={{
-        session,
-        user,
-        profile,
-        isLoading,
-        signIn,
-        signInWithPhone,
-        signInWithProvider,
-        signUp,
-        signOut,
-        refreshProfile,
-        resendConfirmationEmail,
-        resetPassword,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
