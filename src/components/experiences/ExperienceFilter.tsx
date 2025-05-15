@@ -1,5 +1,4 @@
 
-import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
@@ -8,12 +7,12 @@ interface ExperienceFilterProps {
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
   searchTerm: string;
-  setSearchTerm: (term: string) => void;
+  setSearchTerm: (searchTerm: string) => void;
 }
 
-const ExperienceFilter = ({ 
-  categories, 
-  selectedCategory, 
+const ExperienceFilter = ({
+  categories,
+  selectedCategory,
   setSelectedCategory,
   searchTerm,
   setSearchTerm

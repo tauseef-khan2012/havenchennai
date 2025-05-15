@@ -1,7 +1,7 @@
 
 import { Button } from '@/components/ui/button';
-import { Experience } from '@/data/experiencesData';
 import ExperienceCard from './ExperienceCard';
+import { Experience } from '@/data/experiencesData';
 
 interface ExperiencesListProps {
   experiences: Experience[];
@@ -27,7 +27,10 @@ const ExperiencesList = ({ experiences, clearFilters }: ExperiencesListProps) =>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {experiences.map(experience => (
-              <ExperienceCard key={experience.id} experience={experience} />
+              <ExperienceCard 
+                key={experience.id} 
+                experience={experience} 
+              />
             ))}
           </div>
         )}
