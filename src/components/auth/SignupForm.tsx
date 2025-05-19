@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +17,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface SignupFormProps {
   onSubmit: (credentials: SignUpCredentials) => Promise<void>;
@@ -38,6 +40,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({
       countryCode: '+1',
       password: '',
       confirmPassword: '',
+      acceptTerms: false,
     },
   });
   
@@ -64,8 +67,9 @@ export const SignupForm: React.FC<SignupFormProps> = ({
       email: data.email,
       password: data.password,
       fullName: data.fullName,
-      phone: data.phone, // Changed from phoneNumber to phone
-      countryCode: data.countryCode
+      phone: data.phone,
+      countryCode: data.countryCode,
+      acceptTerms: data.acceptTerms
     });
   };
 
@@ -228,6 +232,30 @@ export const SignupForm: React.FC<SignupFormProps> = ({
           )}
         />
 
+        <FormField
+          control={form.control}
+          name="acceptTerms"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 mt-4">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  disabled={isSubmitting}
+                  id="accept-terms"
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel htmlFor="accept-terms" className="font-normal">
+                  I agree to the <Link to="#" className="text-haven-green hover:underline">Terms of Service</Link> and{" "}
+                  <Link to="#" className="text-haven-green hover:underline">Privacy Policy</Link>
+                </FormLabel>
+                <FormMessage />
+              </div>
+            </FormItem>
+          )}
+        />
+
         <Button 
           type="submit" 
           className="w-full bg-haven-green hover:bg-haven-green/90"
@@ -235,9 +263,6 @@ export const SignupForm: React.FC<SignupFormProps> = ({
         >
           {isSubmitting ? 'Creating Account...' : 'Sign Up'}
         </Button>
-        <p className="text-sm text-gray-600 text-center">
-          By signing up, you agree to our <Link to="#" className="text-haven-green hover:underline">Terms of Service</Link> and <Link to="#" className="text-haven-green hover:underline">Privacy Policy</Link>.
-        </p>
       </form>
     </Form>
   );
