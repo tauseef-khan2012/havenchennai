@@ -98,9 +98,11 @@ export async function resetPassword(email: string) {
     });
 
     if (error) throw createAuthError(error.message, error);
+    return true;
   } catch (error: any) {
     console.error('Reset password error:', error);
     throw createAuthError(error.message, error);
+    return false;
   }
 }
 
@@ -118,17 +120,19 @@ export async function resendConfirmationEmail(email: string) {
   }
 }
 
-// Update the OTP functions to better handle phone authentication
+// Update the OTP functions to properly handle phone authentication
 export async function sendOtpToPhone(phone: string) {
   try {
-    const { error } = await supabase.auth.signInWithOtp({
+    const { data, error } = await supabase.auth.signInWithOtp({
       phone,
     });
 
     if (error) throw createAuthError(error.message, error);
+    return true;
   } catch (error: any) {
     console.error('Send OTP error:', error);
     throw createAuthError(error.message, error);
+    return false;
   }
 }
 
@@ -141,10 +145,11 @@ export async function verifyOtp(phone: string, otp: string) {
     });
 
     if (error) throw createAuthError(error.message, error);
-    return data;
+    return true;
   } catch (error: any) {
     console.error('Verify OTP error:', error);
     throw createAuthError(error.message, error);
+    return false;
   }
 }
 

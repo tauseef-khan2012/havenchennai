@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useForm } from 'react-hook-form';
@@ -20,8 +20,8 @@ import {
 } from '@/components/ui/input-otp';
 
 interface OtpVerificationFormProps {
-  onSubmit: (otp: string) => Promise<void>;
-  onResendOtp: () => Promise<void>;
+  onSubmit: (otp: string) => Promise<boolean>;
+  onResendOtp: () => Promise<boolean>;
   isSubmitting: boolean;
   contactMethod: string;
   verificationType: 'phone' | 'email';
@@ -34,6 +34,7 @@ export const OtpVerificationForm: React.FC<OtpVerificationFormProps> = ({
   contactMethod,
   verificationType
 }) => {
+  const [resendCooldown, setResendCooldown] = useState(0);
   const form = useForm<VerifyOtpFormValues>({
     resolver: zodResolver(verifyOtpSchema),
     defaultValues: {
@@ -41,8 +42,27 @@ export const OtpVerificationForm: React.FC<OtpVerificationFormProps> = ({
     },
   });
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (resendCooldown > 0) {
+      interval = setInterval(() => {
+        setResendCooldown(prev => Math.max(0, prev - 1));
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resendCooldown]);
+
   const handleFormSubmit = async (data: VerifyOtpFormValues) => {
     await onSubmit(data.otp);
+  };
+
+  const handleResend = async () => {
+    if (resendCooldown > 0) return;
+    
+    const success = await onResendOtp();
+    if (success) {
+      setResendCooldown(60); // 60 second cooldown
+    }
   };
 
   return (
@@ -90,10 +110,12 @@ export const OtpVerificationForm: React.FC<OtpVerificationFormProps> = ({
             type="button"
             variant="ghost"
             className="text-sm"
-            onClick={async () => await onResendOtp()}
-            disabled={isSubmitting}
+            onClick={handleResend}
+            disabled={isSubmitting || resendCooldown > 0}
           >
-            Didn't receive a code? Resend
+            {resendCooldown > 0 
+              ? `Resend code in ${resendCooldown}s` 
+              : "Didn't receive a code? Resend"}
           </Button>
         </div>
       </form>

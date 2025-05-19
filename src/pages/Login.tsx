@@ -39,7 +39,7 @@ const Login = () => {
           <LoginTabContent
             onLogin={handleLogin}
             onSendOtp={handleSendOtp}
-            onVerifyOtp={handleVerifyOtp}
+            onVerifyOtp={(phone, otp) => handleVerifyOtp(phone, otp)}
             onSocialLogin={handleSocialLogin}
             onResetPassword={() => handleTabChange('reset')}
             onResendConfirmation={handleResendConfirmation}
@@ -57,7 +57,7 @@ const Login = () => {
         }
         resetPasswordTab={
           <ResetPasswordTabContent
-            onResetPassword={handleResetPassword}
+            onResetPassword={(email) => handleResetPassword(email)}
             onLogin={() => handleTabChange('login')}
             isSubmitting={isSubmitting}
             resetSent={passwordResetSent}

@@ -9,7 +9,7 @@ import { Provider } from '@supabase/supabase-js';
 interface LoginTabContentProps {
   onLogin: (credentials: SignInCredentials) => Promise<void>;
   onSendOtp: (phone: string) => Promise<boolean>;
-  onVerifyOtp: (phone: string, otp: string) => Promise<void>;
+  onVerifyOtp: (phone: string, otp: string) => Promise<boolean>;
   onSocialLogin: (provider: Provider) => Promise<void>;
   onResetPassword: () => void;
   onResendConfirmation: () => void;

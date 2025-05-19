@@ -12,14 +12,16 @@ export function useAuthVerification(
   const signInWithOtp = useCallback(async (phone: string) => {
     try {
       updateState({ isLoading: true, error: null });
-      await authService.sendOtpToPhone(phone);
+      const result = await authService.sendOtpToPhone(phone);
       
-      toast({
-        title: "OTP Sent",
-        description: "A verification code has been sent to your phone number.",
-      });
+      if (result) {
+        toast({
+          title: "OTP Sent",
+          description: "A verification code has been sent to your phone number.",
+        });
+      }
       
-      return true;
+      return result;
     } catch (error: any) {
       handleError(error, "Failed to send verification code");
       return false;
@@ -31,15 +33,18 @@ export function useAuthVerification(
   const verifyOtp = useCallback(async (phone: string, otp: string) => {
     try {
       updateState({ isLoading: true, error: null });
-      await authService.verifyOtp(phone, otp);
+      const result = await authService.verifyOtp(phone, otp);
       
-      toast({
-        title: "Verification successful",
-        description: "Your phone number has been verified successfully.",
-      });
+      if (result) {
+        toast({
+          title: "Verification successful",
+          description: "Your phone number has been verified successfully.",
+        });
+        
+        navigate('/dashboard');
+      }
       
-      navigate('/dashboard');
-      return true;
+      return result;
     } catch (error: any) {
       handleError(error, "OTP verification failed");
       return false;
@@ -51,13 +56,16 @@ export function useAuthVerification(
   const resetPassword = useCallback(async (email: string) => {
     try {
       updateState({ isLoading: true, error: null });
-      await authService.resetPassword(email);
+      const result = await authService.resetPassword(email);
       
-      toast({
-        title: "Reset instructions sent",
-        description: "If an account with that email exists, you will receive password reset instructions.",
-      });
-      return true;
+      if (result) {
+        toast({
+          title: "Reset instructions sent",
+          description: "If an account with that email exists, you will receive password reset instructions.",
+        });
+      }
+      
+      return result;
     } catch (error: any) {
       handleError(error, "Password reset failed");
       return false;

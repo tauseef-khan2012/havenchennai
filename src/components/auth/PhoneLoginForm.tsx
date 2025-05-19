@@ -6,7 +6,7 @@ import { SelectCountry } from '@/components/auth/SelectCountry';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { phoneLoginSchema } from '@/schemas/auth';
+import { phoneLoginSchema, PhoneLoginFormValues } from '@/schemas/auth';
 import {
   Form,
   FormControl,
@@ -20,13 +20,8 @@ import { Input } from '@/components/ui/input';
 
 interface PhoneLoginFormProps {
   onSendOtp: (phone: string) => Promise<boolean>;
-  onVerifyOtp: (phone: string, otp: string) => Promise<void>;
+  onVerifyOtp: (phone: string, otp: string) => Promise<boolean>;
   isSubmitting: boolean;
-}
-
-interface PhoneFormValues {
-  phone: string;
-  countryCode: string;
 }
 
 export const PhoneLoginForm: React.FC<PhoneLoginFormProps> = ({
@@ -37,7 +32,7 @@ export const PhoneLoginForm: React.FC<PhoneLoginFormProps> = ({
   const [showOtpForm, setShowOtpForm] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
 
-  const form = useForm<PhoneFormValues>({
+  const form = useForm<PhoneLoginFormValues>({
     resolver: zodResolver(phoneLoginSchema),
     defaultValues: {
       phone: '',
@@ -45,7 +40,7 @@ export const PhoneLoginForm: React.FC<PhoneLoginFormProps> = ({
     },
   });
 
-  const handlePhoneSubmit = async (data: PhoneFormValues) => {
+  const handlePhoneSubmit = async (data: PhoneLoginFormValues) => {
     const fullPhone = `${data.countryCode}${data.phone}`;
     setPhoneNumber(fullPhone);
     
@@ -60,14 +55,15 @@ export const PhoneLoginForm: React.FC<PhoneLoginFormProps> = ({
   };
 
   const handleVerifyOtp = async (otp: string) => {
-    await onVerifyOtp(phoneNumber, otp);
+    return await onVerifyOtp(phoneNumber, otp);
   };
 
   const handleResendOtp = async () => {
     try {
-      await onSendOtp(phoneNumber);
+      return await onSendOtp(phoneNumber);
     } catch (error) {
       console.error('Error resending OTP:', error);
+      return false;
     }
   };
 
