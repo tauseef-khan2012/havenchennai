@@ -12,7 +12,7 @@ import {
 interface AuthContextType extends AuthState {
   signIn: (credentials: SignInCredentials) => Promise<void>;
   signInWithOtp: (phone: string) => Promise<boolean>;
-  verifyOtp: (phone: string, otp: string) => Promise<boolean>;
+  verifyOtp: (phone: string, otp: string) => Promise<boolean>; // Changed to match Promise<boolean>
   signInWithProvider: (provider: ProviderType) => Promise<void>;
   signUp: (credentials: SignUpCredentials) => Promise<void>;
   signOut: () => Promise<void>;

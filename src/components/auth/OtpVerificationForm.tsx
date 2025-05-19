@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/input-otp';
 
 interface OtpVerificationFormProps {
-  onSubmit: (otp: string) => Promise<boolean>;
+  onSubmit: (otp: string) => Promise<boolean>; // Changed to match Promise<boolean>
   onResendOtp: () => Promise<boolean>;
   isSubmitting: boolean;
   contactMethod: string;

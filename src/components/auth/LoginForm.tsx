@@ -21,7 +21,7 @@ import { PhoneLoginForm } from '@/components/auth/PhoneLoginForm';
 interface LoginFormProps {
   onSubmit: (credentials: SignInCredentials) => Promise<void>;
   onSendOtp: (phone: string) => Promise<boolean>;
-  onVerifyOtp: (phone: string, otp: string) => Promise<void>;
+  onVerifyOtp: (phone: string, otp: string) => Promise<boolean>; // Changed to match Promise<boolean>
   onResetPassword: () => void;
   onResendConfirmation: () => void;
   isSubmitting: boolean;

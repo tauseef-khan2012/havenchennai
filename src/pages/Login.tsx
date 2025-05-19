@@ -39,7 +39,7 @@ const Login = () => {
           <LoginTabContent
             onLogin={handleLogin}
             onSendOtp={handleSendOtp}
-            onVerifyOtp={(phone, otp) => handleVerifyOtp(phone, otp)}
+            onVerifyOtp={(phone, otp) => handleVerifyOtp(phone, otp)} // Returns boolean now
             onSocialLogin={handleSocialLogin}
             onResetPassword={() => handleTabChange('reset')}
             onResendConfirmation={handleResendConfirmation}
