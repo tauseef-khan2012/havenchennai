@@ -39,7 +39,6 @@ const Login = () => {
           <LoginTabContent
             onLogin={handleLogin}
             onSendOtp={handleSendOtp}
-            // Fix: Make sure we're properly handling the Promise<boolean> return type
             onVerifyOtp={handleVerifyOtp}
             onSocialLogin={handleSocialLogin}
             onResetPassword={() => handleTabChange('reset')}
