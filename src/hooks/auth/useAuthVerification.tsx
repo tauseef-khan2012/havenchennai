@@ -1,0 +1,71 @@
+
+import { useCallback } from 'react';
+import { AuthError } from '@/types/auth';
+import * as authService from '@/services/authService';
+
+export function useAuthVerification(
+  updateState: (state: any) => void,
+  handleError: (error: AuthError, title: string) => void,
+  navigate: (path: string) => void,
+  toast: any
+) {
+  const signInWithOtp = useCallback(async (phone: string) => {
+    try {
+      updateState({ isLoading: true, error: null });
+      await authService.sendOtpToPhone(phone);
+      
+      toast({
+        title: "OTP Sent",
+        description: "A verification code has been sent to your phone number.",
+      });
+      
+      return true;
+    } catch (error: any) {
+      handleError(error, "Failed to send verification code");
+      throw error;
+    } finally {
+      updateState({ isLoading: false });
+    }
+  }, [updateState, handleError, toast]);
+
+  const verifyOtp = useCallback(async (phone: string, otp: string) => {
+    try {
+      updateState({ isLoading: true, error: null });
+      await authService.verifyOtp(phone, otp);
+      
+      toast({
+        title: "Verification successful",
+        description: "Your phone number has been verified successfully.",
+      });
+      
+      navigate('/dashboard');
+    } catch (error: any) {
+      handleError(error, "OTP verification failed");
+      throw error;
+    } finally {
+      updateState({ isLoading: false });
+    }
+  }, [updateState, handleError, navigate, toast]);
+
+  const resetPassword = useCallback(async (email: string) => {
+    try {
+      updateState({ isLoading: true, error: null });
+      await authService.resetPassword(email);
+      
+      toast({
+        title: "Reset instructions sent",
+        description: "If an account with that email exists, you will receive password reset instructions.",
+      });
+    } catch (error: any) {
+      handleError(error, "Password reset failed");
+    } finally {
+      updateState({ isLoading: false });
+    }
+  }, [updateState, handleError, toast]);
+
+  return {
+    signInWithOtp,
+    verifyOtp,
+    resetPassword
+  };
+}

@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { 
   AuthProvider, 
@@ -12,7 +13,7 @@ export async function signInWithEmail({ email, password, rememberMe = false }: S
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
-      // Remove options.expiresIn as it's not supported in the type
+      // expiresIn removed as it's not supported in the type
     });
 
     if (error) throw createAuthError(error.message, error);
@@ -28,7 +29,7 @@ export async function signInWithPhone({ phone, password, rememberMe = false }: P
     const { data, error } = await supabase.auth.signInWithPassword({
       phone,
       password,
-      // Remove options.expiresIn as it's not supported in the type
+      // expiresIn removed as it's not supported in the type
     });
 
     if (error) throw createAuthError(error.message, error);
