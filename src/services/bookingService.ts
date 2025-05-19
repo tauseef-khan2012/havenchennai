@@ -257,7 +257,7 @@ export const createPropertyBooking = async (
   propertyDetails: PropertyBookingDetails,
   priceBreakdown: PriceBreakdown,
   guests?: GuestInfo[],
-  sourcePlatform?: string,
+  sourcePlatform?: ChannelType,
   sourceBookingId?: string
 ): Promise<{ bookingId: UUID, bookingReference: string }> => {
   // Generate booking reference
@@ -334,7 +334,7 @@ export const createExperienceBooking = async (
   userId: UUID,
   experienceDetails: ExperienceBookingDetails,
   priceBreakdown: PriceBreakdown,
-  sourcePlatform?: ChannelType | undefined,
+  sourcePlatform?: ChannelType,
   sourceBookingId?: string
 ): Promise<{ bookingId: UUID, bookingReference: string }> => {
   // Generate booking reference
