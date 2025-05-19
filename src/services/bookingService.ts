@@ -379,7 +379,9 @@ export const createPropertyBooking = async (
             booking_reference: `${bookingReference}-EXP${addon.instanceId.substring(0, 4)}`,
             booking_status: 'Pending Payment',
             payment_status: 'Unpaid',
-            property_booking_id: booking.id
+            // Fix: This field 'property_booking_id' doesn't exist in the table schema
+            // We'll use a note in the special_requests field instead
+            special_requests: `Add-on for property booking: ${booking.id}`
           });
 
         if (addonError) {
