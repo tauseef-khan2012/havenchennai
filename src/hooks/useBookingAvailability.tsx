@@ -8,7 +8,7 @@ import {
 import {
   checkPropertyAvailability,
   checkExperienceInstanceAvailability
-} from '@/services/bookingService';
+} from '@/services/availabilityService';
 
 /**
  * Hook for checking availability of properties and experience instances

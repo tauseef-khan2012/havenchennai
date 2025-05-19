@@ -6,7 +6,7 @@ import {
   BookingType,
   PriceBreakdown
 } from '@/types/booking';
-import { calculateBookingPrice } from '@/services/bookingService';
+import { calculateBookingPrice } from '@/services/priceService';
 
 /**
  * Hook for calculating booking prices
