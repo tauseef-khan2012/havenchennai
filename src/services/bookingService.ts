@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { 
   UUID, 
@@ -7,7 +6,8 @@ import {
   BookingData,
   PropertyBookingDetails,
   ExperienceBookingDetails,
-  GuestInfo
+  GuestInfo,
+  ChannelType
 } from '@/types/booking';
 import { generateBookingReference, calculateNights, applyDiscount, calculateTax } from '@/utils/bookingUtils';
 
@@ -62,7 +62,7 @@ export const checkExperienceInstanceAvailability = async (
 
     if (error) {
       console.error('Error checking experience instance availability:', error);
-      throw new Error(`Error checking experience availability: ${error.message}`);
+      throw new Error('Error checking experience availability: Experience instance not found');
     }
 
     if (!instance) {
@@ -334,7 +334,7 @@ export const createExperienceBooking = async (
   userId: UUID,
   experienceDetails: ExperienceBookingDetails,
   priceBreakdown: PriceBreakdown,
-  sourcePlatform?: string,
+  sourcePlatform?: ChannelType | undefined,
   sourceBookingId?: string
 ): Promise<{ bookingId: UUID, bookingReference: string }> => {
   // Generate booking reference
