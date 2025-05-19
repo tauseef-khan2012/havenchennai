@@ -39,7 +39,8 @@ const Login = () => {
           <LoginTabContent
             onLogin={handleLogin}
             onSendOtp={handleSendOtp}
-            onVerifyOtp={(phone, otp) => handleVerifyOtp(phone, otp)} // Returns boolean now
+            // Fix: Make sure we're properly handling the Promise<boolean> return type
+            onVerifyOtp={handleVerifyOtp}
             onSocialLogin={handleSocialLogin}
             onResetPassword={() => handleTabChange('reset')}
             onResendConfirmation={handleResendConfirmation}

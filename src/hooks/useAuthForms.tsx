@@ -54,7 +54,8 @@ export const useAuthForms = () => {
     }
   };
 
-  const handleVerifyOtp = async (phone: string, otp: string) => {
+  // Updated to explicitly return the boolean result from verifyOtp
+  const handleVerifyOtp = async (phone: string, otp: string): Promise<boolean> => {
     setIsSubmitting(true);
     try {
       return await verifyOtp(phone, otp);
