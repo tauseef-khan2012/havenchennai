@@ -6,13 +6,11 @@ import {
   AuthState,
   AuthProvider as ProviderType,
   SignInCredentials,
-  PhoneSignInCredentials,
   SignUpCredentials,
 } from '@/types/auth';
 
 interface AuthContextType extends AuthState {
   signIn: (credentials: SignInCredentials) => Promise<void>;
-  signInWithPhone: (credentials: PhoneSignInCredentials) => Promise<void>;
   signInWithOtp: (phone: string) => Promise<boolean>;
   verifyOtp: (phone: string, otp: string) => Promise<void>;
   signInWithProvider: (provider: ProviderType) => Promise<void>;
@@ -31,7 +29,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   
   const {
     signIn,
-    signInWithPhone,
     signInWithOtp,
     verifyOtp,
     signInWithProvider,
@@ -45,7 +42,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value: AuthContextType = {
     ...state,
     signIn,
-    signInWithPhone,
     signInWithOtp,
     verifyOtp,
     signInWithProvider,

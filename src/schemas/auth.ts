@@ -31,7 +31,6 @@ export const loginSchema = z.object({
 
 export const phoneLoginSchema = z.object({
   phone: z.string().min(5, 'Please enter a valid phone number'),
-  password: z.string().min(6, 'Password must be at least 6 characters long'),
   countryCode: z.string(),
   rememberMe: z.boolean().optional().default(false),
 });

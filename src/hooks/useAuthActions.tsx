@@ -11,7 +11,7 @@ export function useAuthActions(
   toast: any,
   refreshProfile: () => Promise<void>
 ) {
-  const { signIn, signInWithPhone, signInWithProvider } = useAuthLogin(
+  const { signIn, signInWithProvider } = useAuthLogin(
     updateState,
     handleError,
     navigate,
@@ -40,7 +40,6 @@ export function useAuthActions(
 
   return {
     signIn,
-    signInWithPhone,
     signInWithOtp,
     verifyOtp,
     signInWithProvider,

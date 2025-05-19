@@ -2,11 +2,7 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { 
-  SignInCredentials, 
-  PhoneSignInCredentials, 
-  SignUpCredentials 
-} from '@/types/auth';
+import { SignInCredentials, SignUpCredentials } from '@/types/auth';
 import { Provider } from '@supabase/supabase-js';
 
 export const useAuthForms = () => {
@@ -17,7 +13,8 @@ export const useAuthForms = () => {
   const { toast } = useToast();
   const { 
     signIn, 
-    signInWithPhone,
+    signInWithOtp,
+    verifyOtp,
     signInWithProvider, 
     signUp, 
     resendConfirmationEmail,
@@ -31,20 +28,38 @@ export const useAuthForms = () => {
     setPasswordResetSent(false);
   };
 
-  const handleLogin = async (credentials: SignInCredentials | PhoneSignInCredentials) => {
-    // Validation is now handled by react-hook-form with zod
-    
+  const handleLogin = async (credentials: SignInCredentials) => {
     setIsSubmitting(true);
     try {
-      if ('email' in credentials) {
-        await signIn(credentials);
-      } else {
-        await signInWithPhone(credentials);
-      }
+      await signIn(credentials);
     } catch (error: any) {
       if (error.message === 'Email not confirmed') {
         setEmailConfirmationNeeded(true);
       }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSendOtp = async (phone: string) => {
+    setIsSubmitting(true);
+    try {
+      const result = await signInWithOtp(phone);
+      return result;
+    } catch (error) {
+      // Error handling is done in signInWithOtp function
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleVerifyOtp = async (phone: string, otp: string) => {
+    setIsSubmitting(true);
+    try {
+      await verifyOtp(phone, otp);
+    } catch (error) {
+      // Error handling is done in verifyOtp function
     } finally {
       setIsSubmitting(false);
     }
@@ -67,8 +82,6 @@ export const useAuthForms = () => {
   };
 
   const handleSignup = async (credentials: SignUpCredentials) => {
-    // Validation is now handled by react-hook-form with zod
-    
     setIsSubmitting(true);
     try {
       await signUp(credentials);
@@ -91,8 +104,6 @@ export const useAuthForms = () => {
   };
 
   const handleResetPassword = async (email: string) => {
-    // Validation is now handled by react-hook-form with zod
-    
     setIsSubmitting(true);
     try {
       await resetPassword(email);
@@ -109,6 +120,8 @@ export const useAuthForms = () => {
     passwordResetSent,
     handleTabChange,
     handleLogin,
+    handleSendOtp,
+    handleVerifyOtp,
     handleResendConfirmation,
     handleSignup,
     handleSocialLogin,

@@ -3,11 +3,13 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { SocialLoginButtons } from '@/components/auth/SocialLoginButtons';
-import { SignInCredentials, PhoneSignInCredentials } from '@/types/auth';
+import { SignInCredentials } from '@/types/auth';
 import { Provider } from '@supabase/supabase-js';
 
 interface LoginTabContentProps {
-  onLogin: (credentials: SignInCredentials | PhoneSignInCredentials) => Promise<void>;
+  onLogin: (credentials: SignInCredentials) => Promise<void>;
+  onSendOtp: (phone: string) => Promise<boolean>;
+  onVerifyOtp: (phone: string, otp: string) => Promise<void>;
   onSocialLogin: (provider: Provider) => Promise<void>;
   onResetPassword: () => void;
   onResendConfirmation: () => void;
@@ -18,6 +20,8 @@ interface LoginTabContentProps {
 
 export const LoginTabContent: React.FC<LoginTabContentProps> = ({
   onLogin,
+  onSendOtp,
+  onVerifyOtp,
   onSocialLogin,
   onResetPassword,
   onResendConfirmation,
@@ -34,6 +38,8 @@ export const LoginTabContent: React.FC<LoginTabContentProps> = ({
       <CardContent>
         <LoginForm 
           onSubmit={onLogin}
+          onSendOtp={onSendOtp}
+          onVerifyOtp={onVerifyOtp}
           onResetPassword={onResetPassword}
           onResendConfirmation={onResendConfirmation}
           isSubmitting={isSubmitting}

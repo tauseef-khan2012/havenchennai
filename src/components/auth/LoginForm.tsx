@@ -3,12 +3,11 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Mail, Lock, Phone, Eye, EyeOff } from 'lucide-react';
-import { SelectCountry } from '@/components/auth/SelectCountry';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { SignInCredentials, PhoneSignInCredentials } from '@/types/auth';
+import { SignInCredentials } from '@/types/auth';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, phoneLoginSchema, LoginFormValues, PhoneLoginFormValues } from '@/schemas/auth';
+import { loginSchema, LoginFormValues } from '@/schemas/auth';
 import {
   Form,
   FormControl,
@@ -17,9 +16,12 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { PhoneLoginForm } from '@/components/auth/PhoneLoginForm';
 
 interface LoginFormProps {
-  onSubmit: (credentials: SignInCredentials | PhoneSignInCredentials) => Promise<void>;
+  onSubmit: (credentials: SignInCredentials) => Promise<void>;
+  onSendOtp: (phone: string) => Promise<boolean>;
+  onVerifyOtp: (phone: string, otp: string) => Promise<void>;
   onResetPassword: () => void;
   onResendConfirmation: () => void;
   isSubmitting: boolean;
@@ -28,6 +30,8 @@ interface LoginFormProps {
 
 export const LoginForm: React.FC<LoginFormProps> = ({
   onSubmit,
+  onSendOtp,
+  onVerifyOtp,
   onResetPassword,
   onResendConfirmation,
   isSubmitting,
@@ -44,27 +48,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     },
   });
 
-  const phoneForm = useForm<PhoneLoginFormValues>({
-    resolver: zodResolver(phoneLoginSchema),
-    defaultValues: {
-      phone: '',
-      password: '',
-      countryCode: '+1',
-    },
-  });
-
   const handleEmailSubmit = async (data: LoginFormValues) => {
     await onSubmit({
       email: data.email,
       password: data.password
-    });
-  };
-
-  const handlePhoneSubmit = async (data: PhoneLoginFormValues) => {
-    await onSubmit({
-      phone: data.phone,
-      password: data.password,
-      countryCode: data.countryCode
     });
   };
 
@@ -186,95 +173,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           </form>
         </Form>
       ) : (
-        <Form {...phoneForm}>
-          <form onSubmit={phoneForm.handleSubmit(handlePhoneSubmit)} className="space-y-4">
-            <FormField
-              control={phoneForm.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem className="space-y-2">
-                  <FormLabel htmlFor="login-phone">Phone Number</FormLabel>
-                  <div className="flex space-x-2">
-                    <FormField
-                      control={phoneForm.control}
-                      name="countryCode"
-                      render={({ field: countryField }) => (
-                        <SelectCountry 
-                          value={countryField.value} 
-                          onChange={countryField.onChange}
-                          disabled={isSubmitting}
-                          className="w-24"
-                        />
-                      )}
-                    />
-                    <div className="relative flex-grow">
-                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                      <FormControl>
-                        <Input 
-                          id="login-phone" 
-                          type="tel" 
-                          placeholder="123456789"
-                          className="pl-10"
-                          {...field}
-                          disabled={isSubmitting}
-                        />
-                      </FormControl>
-                    </div>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={phoneForm.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem className="space-y-2">
-                  <div className="flex justify-between">
-                    <FormLabel htmlFor="login-phone-password">Password</FormLabel>
-                    <button 
-                      type="button" 
-                      onClick={onResetPassword}
-                      className="text-sm text-haven-green hover:underline"
-                    >
-                      Forgot password?
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                    <FormControl>
-                      <Input 
-                        id="login-phone-password" 
-                        type={showPassword ? "text" : "password"}
-                        className="pl-10 pr-10"
-                        {...field}
-                        disabled={isSubmitting}
-                      />
-                    </FormControl>
-                    <button
-                      type="button"
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                      onClick={() => setShowPassword(!showPassword)}
-                      tabIndex={-1}
-                    >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <Button 
-              type="submit" 
-              className="w-full bg-haven-green hover:bg-haven-green/90"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? 'Logging in...' : 'Login'}
-            </Button>
-          </form>
-        </Form>
+        <PhoneLoginForm
+          onSendOtp={onSendOtp}
+          onVerifyOtp={onVerifyOtp}
+          isSubmitting={isSubmitting}
+        />
       )}
     </div>
   );

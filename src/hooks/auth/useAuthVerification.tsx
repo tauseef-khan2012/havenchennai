@@ -22,7 +22,7 @@ export function useAuthVerification(
       return true;
     } catch (error: any) {
       handleError(error, "Failed to send verification code");
-      throw error;
+      return false;
     } finally {
       updateState({ isLoading: false });
     }
@@ -39,9 +39,10 @@ export function useAuthVerification(
       });
       
       navigate('/dashboard');
+      return true;
     } catch (error: any) {
       handleError(error, "OTP verification failed");
-      throw error;
+      return false;
     } finally {
       updateState({ isLoading: false });
     }
@@ -56,8 +57,10 @@ export function useAuthVerification(
         title: "Reset instructions sent",
         description: "If an account with that email exists, you will receive password reset instructions.",
       });
+      return true;
     } catch (error: any) {
       handleError(error, "Password reset failed");
+      return false;
     } finally {
       updateState({ isLoading: false });
     }

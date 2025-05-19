@@ -14,19 +14,12 @@ export interface UserProfile {
   last_login_at?: string;
   created_at?: string;
   updated_at?: string;
-  roles?: string[]; // Added roles property to fix the error
+  roles?: string[];
 }
 
 export type SignInCredentials = {
   email: string;
   password: string;
-  rememberMe?: boolean;
-};
-
-export type PhoneSignInCredentials = {
-  phone: string;
-  password: string;
-  countryCode: string;
   rememberMe?: boolean;
 };
 

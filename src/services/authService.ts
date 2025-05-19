@@ -13,7 +13,6 @@ export async function signInWithEmail({ email, password, rememberMe = false }: S
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
-      // expiresIn removed as it's not supported in the type
     });
 
     if (error) throw createAuthError(error.message, error);
@@ -29,7 +28,6 @@ export async function signInWithPhone({ phone, password, rememberMe = false }: P
     const { data, error } = await supabase.auth.signInWithPassword({
       phone,
       password,
-      // expiresIn removed as it's not supported in the type
     });
 
     if (error) throw createAuthError(error.message, error);
@@ -57,7 +55,7 @@ export async function signInWithProvider(provider: AuthProvider) {
   }
 }
 
-export async function signUp({ email, password, fullName, phone, countryCode }: SignUpCredentials) {
+export async function signUp({ email, password, fullName, phone, countryCode, acceptTerms }: SignUpCredentials) {
   try {
     // Format phone number with country code if both are provided
     const phoneNumber = phone && countryCode ? `${countryCode}${phone}` : undefined;
@@ -120,6 +118,7 @@ export async function resendConfirmationEmail(email: string) {
   }
 }
 
+// Update the OTP functions to better handle phone authentication
 export async function sendOtpToPhone(phone: string) {
   try {
     const { error } = await supabase.auth.signInWithOtp({
