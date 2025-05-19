@@ -30,9 +30,13 @@ const Login = () => {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // Using a wrapper function to convert Promise<boolean> to Promise<void>
+  // Using wrapper functions to convert Promise<boolean> to Promise<void>
   const handleVerifyOtpWrapper = async (phone: string, otp: string): Promise<void> => {
     await handleVerifyOtp(phone, otp);
+  };
+  
+  const handleResetPasswordWrapper = async (email: string): Promise<void> => {
+    await handleResetPassword(email);
   };
 
   return (
@@ -62,7 +66,7 @@ const Login = () => {
         }
         resetPasswordTab={
           <ResetPasswordTabContent
-            onResetPassword={(email) => handleResetPassword(email)}
+            onResetPassword={handleResetPasswordWrapper}
             onLogin={() => handleTabChange('login')}
             isSubmitting={isSubmitting}
             resetSent={passwordResetSent}

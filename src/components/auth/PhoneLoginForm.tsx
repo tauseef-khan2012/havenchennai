@@ -20,7 +20,7 @@ import { Input } from '@/components/ui/input';
 
 interface PhoneLoginFormProps {
   onSendOtp: (phone: string) => Promise<boolean>;
-  onVerifyOtp: (phone: string, otp: string) => Promise<void>; // Changed to match the expected type
+  onVerifyOtp: (phone: string, otp: string) => Promise<void>;
   isSubmitting: boolean;
 }
 
