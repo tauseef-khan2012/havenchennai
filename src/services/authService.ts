@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { 
   AuthProvider, 
@@ -13,11 +12,7 @@ export async function signInWithEmail({ email, password, rememberMe = false }: S
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
-      options: {
-        // Set session duration based on remember me option
-        // 60 seconds * 60 minutes * 24 hours * (rememberMe ? 30 days : 1 day)
-        expiresIn: 60 * 60 * 24 * (rememberMe ? 30 : 1)
-      }
+      // Remove options.expiresIn as it's not supported in the type
     });
 
     if (error) throw createAuthError(error.message, error);
@@ -33,10 +28,7 @@ export async function signInWithPhone({ phone, password, rememberMe = false }: P
     const { data, error } = await supabase.auth.signInWithPassword({
       phone,
       password,
-      options: {
-        // Set session duration based on remember me option
-        expiresIn: 60 * 60 * 24 * (rememberMe ? 30 : 1)
-      }
+      // Remove options.expiresIn as it's not supported in the type
     });
 
     if (error) throw createAuthError(error.message, error);

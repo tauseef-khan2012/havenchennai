@@ -14,6 +14,7 @@ export interface UserProfile {
   last_login_at?: string;
   created_at?: string;
   updated_at?: string;
+  roles?: string[]; // Added roles property to fix the error
 }
 
 export type SignInCredentials = {

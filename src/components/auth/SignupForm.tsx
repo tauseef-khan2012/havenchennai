@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -65,7 +64,8 @@ export const SignupForm: React.FC<SignupFormProps> = ({
       email: data.email,
       password: data.password,
       fullName: data.fullName,
-      phoneNumber: data.phone ? `${data.countryCode}${data.phone}` : undefined
+      phone: data.phone, // Changed from phoneNumber to phone
+      countryCode: data.countryCode
     });
   };
 
