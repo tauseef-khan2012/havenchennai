@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { 
   UUID, 
@@ -83,7 +84,8 @@ export const checkExperienceInstanceAvailability = async (
 export const calculatePropertyBookingPrice = async (
   propertyId: UUID,
   checkInDate: Date,
-  checkOutDate: Date
+  checkOutDate: Date,
+  selectedAddonExperiences?: {instanceId: UUID, attendees: number}[]
 ): Promise<PriceBreakdown> => {
   try {
     // Get property details
@@ -114,7 +116,54 @@ export const calculatePropertyBookingPrice = async (
     
     // Add cleaning fee
     const cleaningFee = property.cleaning_fee || 0;
-    const subtotal = discountedBasePrice + cleaningFee;
+    
+    // Calculate addon experiences cost if any
+    let addonExperiencesTotal = 0;
+    
+    if (selectedAddonExperiences && selectedAddonExperiences.length > 0) {
+      const instanceIds = selectedAddonExperiences.map(addon => addon.instanceId);
+      
+      const { data: experienceInstances, error: experiencesError } = await supabase
+        .from('experience_instances')
+        .select(`
+          id,
+          price_per_person_override,
+          flat_fee_price_override,
+          experience:experience_id (
+            price_per_person,
+            flat_fee_price
+          )
+        `)
+        .in('id', instanceIds);
+      
+      if (experiencesError) {
+        console.error('Error fetching addon experiences:', experiencesError);
+        throw new Error('Error calculating price: Could not fetch addon experiences');
+      }
+      
+      if (experienceInstances) {
+        for (const instance of experienceInstances) {
+          const addon = selectedAddonExperiences.find(a => a.instanceId === instance.id);
+          
+          if (addon) {
+            if (instance.flat_fee_price_override !== null) {
+              // Use flat fee price override
+              addonExperiencesTotal += instance.flat_fee_price_override;
+            } else if (instance.experience?.flat_fee_price !== null) {
+              // Use experience flat fee price
+              addonExperiencesTotal += instance.experience.flat_fee_price;
+            } else {
+              // Use per person price (from override or experience)
+              const pricePerPerson = instance.price_per_person_override ?? instance.experience?.price_per_person ?? 0;
+              addonExperiencesTotal += pricePerPerson * addon.attendees;
+            }
+          }
+        }
+      }
+    }
+    
+    // Calculate subtotal
+    const subtotal = discountedBasePrice + cleaningFee + addonExperiencesTotal;
     
     // Apply 5% tax
     const taxAmount = (subtotal * TAX_PERCENTAGE) / 100;
@@ -130,6 +179,7 @@ export const calculatePropertyBookingPrice = async (
       taxPercentage: TAX_PERCENTAGE,
       taxAmount,
       cleaningFee,
+      addonExperiencesTotal: addonExperiencesTotal > 0 ? addonExperiencesTotal : undefined,
       totalAmountDue,
       currency: property.currency
     };
@@ -218,6 +268,7 @@ export const calculateBookingPrice = async (
     checkInDate?: Date;
     checkOutDate?: Date;
     numberOfAttendees?: number;
+    selectedAddonExperiences?: {instanceId: UUID, attendees: number}[];
   }
 ): Promise<PriceBreakdown> => {
   try {
@@ -229,7 +280,8 @@ export const calculateBookingPrice = async (
       return calculatePropertyBookingPrice(
         bookingDetails.propertyId,
         bookingDetails.checkInDate,
-        bookingDetails.checkOutDate
+        bookingDetails.checkOutDate,
+        bookingDetails.selectedAddonExperiences
       );
     } else if (bookingDetails.type === 'experience') {
       if (!bookingDetails.instanceId || !bookingDetails.numberOfAttendees) {
@@ -258,7 +310,8 @@ export const createPropertyBooking = async (
   priceBreakdown: PriceBreakdown,
   guests?: GuestInfo[],
   sourcePlatform?: ChannelType,
-  sourceBookingId?: string
+  sourceBookingId?: string,
+  selectedAddonExperiences?: {instanceId: UUID, attendees: number}[]
 ): Promise<{ bookingId: UUID, bookingReference: string }> => {
   // Generate booking reference
   const bookingReference = generateBookingReference();
@@ -310,6 +363,40 @@ export const createPropertyBooking = async (
       if (guestsError) {
         console.error('Error adding guest information:', guestsError);
         // Continue despite guest info error, as the main booking was created
+      }
+    }
+    
+    // If addon experiences are selected, create experience bookings for each
+    if (selectedAddonExperiences && selectedAddonExperiences.length > 0 && booking) {
+      for (const addon of selectedAddonExperiences) {
+        // Create experience booking linked to the property booking
+        const { error: addonError } = await supabase
+          .from('experience_bookings')
+          .insert({
+            user_id: userId,
+            experience_instance_id: addon.instanceId,
+            number_of_attendees: addon.attendees,
+            booking_reference: `${bookingReference}-EXP${addon.instanceId.substring(0, 4)}`,
+            booking_status: 'Pending Payment',
+            payment_status: 'Unpaid',
+            property_booking_id: booking.id
+          });
+
+        if (addonError) {
+          console.error('Error adding addon experience booking:', addonError);
+          // Continue despite addon error, as the main booking was created
+        } else {
+          // Update the current_attendees in the experience_instance
+          const { error: updateError } = await supabase.rpc('increment_experience_attendees', {
+            instance_id: addon.instanceId,
+            attendees_count: addon.attendees
+          });
+
+          if (updateError) {
+            console.error('Error updating experience instance attendees:', updateError);
+            // Continue despite update error, as the bookings were created
+          }
+        }
       }
     }
 
@@ -395,7 +482,9 @@ export const createExperienceBooking = async (
  * Creates a booking based on the booking type
  */
 export const createBooking = async (
-  bookingData: BookingData
+  bookingData: BookingData & {
+    selectedAddonExperiences?: {instanceId: UUID, attendees: number}[]
+  }
 ): Promise<{ bookingId: UUID, bookingReference: string }> => {
   try {
     if (bookingData.type === 'property') {
@@ -409,7 +498,8 @@ export const createBooking = async (
         bookingData.priceBreakdown,
         bookingData.guests,
         bookingData.sourcePlatform,
-        bookingData.sourceBookingId
+        bookingData.sourceBookingId,
+        bookingData.selectedAddonExperiences
       );
     } else if (bookingData.type === 'experience') {
       if (!bookingData.experience) {

@@ -27,6 +27,7 @@ export interface PriceBreakdown {
   taxPercentage: number;
   taxAmount: number;
   cleaningFee?: number;
+  addonExperiencesTotal?: number;
   totalAmountDue: number;
   currency: string;
 }

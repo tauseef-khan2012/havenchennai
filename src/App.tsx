@@ -14,6 +14,8 @@ import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import BookingPage from "./pages/BookingPage";
+import BookingConfirmationPage from "./components/booking/BookingConfirmationPage";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
@@ -30,6 +32,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/stay" element={<Stay />} />
+            <Route path="/booking" element={<BookingPage />} />
+            <Route path="/booking/confirmation" element={<BookingConfirmationPage />} />
             <Route path="/experiences" element={<Experiences />} />
             <Route path="/experiences/:id" element={<ExperienceDetail />} />
             <Route path="/packages" element={<Packages />} />

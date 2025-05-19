@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ const Stay = () => {
   const [checkOutDate, setCheckOutDate] = useState('');
   const [guests, setGuests] = useState(1);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleBooking = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,11 +28,12 @@ const Stay = () => {
       return;
     }
     
-    // Here you would connect to Supabase to create a booking
-    toast({
-      title: "Success!",
-      description: "Your booking request has been submitted. We'll contact you shortly to confirm.",
-    });
+    // Since we don't have multiple properties in the database yet,
+    // we'll hardcode a sample property ID for demonstration
+    const samplePropertyId = "d290f1ee-6c54-4b01-90e6-d701748f0851";
+    
+    // Navigate to the booking page with property ID
+    navigate(`/booking?propertyId=${samplePropertyId}`);
   };
 
   const containerFeatures = [
