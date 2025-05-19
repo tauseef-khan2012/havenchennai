@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { UUID, BookingType } from '@/types/booking';
@@ -10,7 +10,7 @@ import {
 } from '@/services/paymentService';
 
 /**
- * Hook for processing payments for bookings
+ * Hook for processing payments for bookings with improved error handling
  */
 export const useBookingPayment = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +20,7 @@ export const useBookingPayment = () => {
   /**
    * Process payment for a booking
    */
-  const processPayment = async (
+  const processPayment = useCallback(async (
     bookingId: UUID,
     bookingType: BookingType,
     amount: number,
@@ -39,16 +39,33 @@ export const useBookingPayment = () => {
     setIsLoading(true);
     
     try {
+      // Validate input
+      if (!bookingId || !bookingType || amount <= 0 || !currency || !bookingReference) {
+        throw new Error('Invalid payment details');
+      }
+
+      // Ensure user has necessary details
+      const userName = user.user_metadata?.full_name || 'Guest';
+      const userEmail = user.email || '';
+      
+      if (!userEmail) {
+        throw new Error('User email not available');
+      }
+      
       // Initiate payment with Razorpay
       const { orderId, razorpayKey } = await initiatePayment({
         bookingId,
         bookingType,
         amount,
         currency,
-        userEmail: user.email || '',
-        userName: user.user_metadata?.full_name || 'Guest',
+        userEmail,
+        userName,
         bookingReference
       });
+      
+      if (!orderId || !razorpayKey) {
+        throw new Error('Failed to initialize payment');
+      }
       
       // Open Razorpay payment UI
       const options = {
@@ -59,8 +76,8 @@ export const useBookingPayment = () => {
         description: `Booking ${bookingReference}`,
         order_id: orderId,
         prefill: {
-          name: user.user_metadata?.full_name || 'Guest',
-          email: user.email || '',
+          name: userName,
+          email: userEmail,
           contact: user.user_metadata?.phone_number || ''
         },
         notes: {
@@ -78,11 +95,15 @@ export const useBookingPayment = () => {
       const paymentSuccess = true;
       
       if (paymentSuccess) {
+        // Generate mock payment ID for testing
+        const mockPaymentId = 'pay_' + Math.random().toString(36).substring(7);
+        const mockSignature = 'sig_' + Math.random().toString(36).substring(7);
+        
         // Verify and record payment (in real implementation, this would come from Razorpay callback)
         await verifyPayment({
-          razorpayPaymentId: 'pay_' + Math.random().toString(36).substring(7),
+          razorpayPaymentId: mockPaymentId,
           razorpayOrderId: orderId,
-          razorpaySignature: 'sig_' + Math.random().toString(36).substring(7),
+          razorpaySignature: mockSignature,
           bookingId,
           bookingType
         });
@@ -113,16 +134,18 @@ export const useBookingPayment = () => {
       }
     } catch (error) {
       console.error('Error processing payment:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
       toast({
-        title: 'Error',
-        description: 'Failed to process payment. Please try again.',
+        title: 'Payment error',
+        description: `Failed to process payment: ${errorMessage}`,
         variant: 'destructive'
       });
       return false;
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user, toast]);
 
   return {
     isLoading,

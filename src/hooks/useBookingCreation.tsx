@@ -1,19 +1,18 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { 
   UUID, 
   BookingType,
-  GuestInfo,
-  PriceBreakdown
+  GuestInfo
 } from '@/types/booking';
 import { createBooking } from '@/services/bookingService';
 import { useBookingAvailability } from './useBookingAvailability';
 import { useBookingPrice } from './useBookingPrice';
 
 /**
- * Hook for creating bookings
+ * Hook for creating bookings with improved error handling
  */
 export const useBookingCreation = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -23,9 +22,9 @@ export const useBookingCreation = () => {
   const { calculatePrice } = useBookingPrice();
 
   /**
-   * Create a booking
+   * Create a booking with comprehensive validation
    */
-  const makeBooking = async (
+  const makeBooking = useCallback(async (
     type: BookingType,
     details: {
       propertyId?: UUID;
@@ -52,31 +51,37 @@ export const useBookingCreation = () => {
     setIsLoading(true);
     
     try {
+      // Validate input parameters based on booking type
+      if (type === 'property' && (!details.propertyId || !details.checkInDate || !details.checkOutDate)) {
+        throw new Error('Missing required property booking details');
+      } else if (type === 'experience' && (!details.instanceId || !details.numberOfAttendees)) {
+        throw new Error('Missing required experience booking details');
+      }
+
       // Check availability first
       let isAvailable = false;
       
-      if (type === 'property' && details.propertyId && details.checkInDate && details.checkOutDate) {
-        isAvailable = await checkAvailability(
-          'property',
-          {
-            propertyId: details.propertyId,
-            checkInDate: details.checkInDate,
-            checkOutDate: details.checkOutDate
-          }
-        );
-      } else if (type === 'experience' && details.instanceId && details.numberOfAttendees) {
-        isAvailable = await checkAvailability(
-          'experience',
-          {
-            instanceId: details.instanceId,
-            numberOfAttendees: details.numberOfAttendees
-          }
-        );
+      if (type === 'property') {
+        isAvailable = await checkAvailability('property', {
+          propertyId: details.propertyId,
+          checkInDate: details.checkInDate,
+          checkOutDate: details.checkOutDate
+        });
       } else {
-        throw new Error('Invalid booking details');
+        isAvailable = await checkAvailability('experience', {
+          instanceId: details.instanceId,
+          numberOfAttendees: details.numberOfAttendees
+        });
       }
       
       if (!isAvailable) {
+        toast({
+          title: type === 'property' ? 'Property Unavailable' : 'Experience Unavailable',
+          description: type === 'property' 
+            ? 'The property is not available for the selected dates.'
+            : 'Not enough capacity for the selected experience.',
+          variant: 'destructive'
+        });
         return null;
       }
       
@@ -134,16 +139,18 @@ export const useBookingCreation = () => {
       return bookingResult;
     } catch (error) {
       console.error('Error creating booking:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
       toast({
         title: 'Error',
-        description: 'Failed to create booking. Please try again.',
+        description: `Failed to create booking: ${errorMessage}`,
         variant: 'destructive'
       });
       return null;
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user, checkAvailability, calculatePrice, toast]);
 
   return {
     isLoading,

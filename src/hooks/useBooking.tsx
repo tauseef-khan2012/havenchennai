@@ -1,9 +1,10 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useBookingAvailability } from './useBookingAvailability';
 import { useBookingPrice } from './useBookingPrice';
 import { useBookingCreation } from './useBookingCreation';
 import { useBookingPayment } from './useBookingPayment';
+import { UUID, BookingType, GuestInfo, PriceBreakdown } from '@/types/booking';
 
 /**
  * Combined hook for booking functionality
@@ -21,6 +22,56 @@ export const useBooking = () => {
                     price.isLoading || 
                     creation.isLoading || 
                     payment.isLoading;
+  
+  // Define memoized wrapper functions to ensure consistent API
+  const checkAvailability = useCallback(
+    (type: BookingType, details: {
+      propertyId?: UUID;
+      checkInDate?: Date;
+      checkOutDate?: Date;
+      instanceId?: UUID;
+      numberOfAttendees?: number;
+    }) => availability.checkAvailability(type, details),
+    [availability]
+  );
+  
+  const calculatePrice = useCallback(
+    (type: BookingType, details: {
+      propertyId?: UUID;
+      checkInDate?: Date;
+      checkOutDate?: Date;
+      instanceId?: UUID;
+      numberOfAttendees?: number;
+      selectedAddonExperiences?: {instanceId: UUID, attendees: number}[];
+    }) => price.calculatePrice(type, details),
+    [price]
+  );
+  
+  const makeBooking = useCallback(
+    (type: BookingType, details: {
+      propertyId?: UUID;
+      checkInDate?: Date;
+      checkOutDate?: Date;
+      numberOfGuests?: number;
+      specialRequests?: string;
+      customerNotes?: string;
+      instanceId?: UUID;
+      numberOfAttendees?: number;
+      guests?: GuestInfo[];
+      selectedAddonExperiences?: {instanceId: UUID, attendees: number}[];
+    }) => creation.makeBooking(type, details),
+    [creation]
+  );
+  
+  const processPayment = useCallback(
+    (bookingId: UUID,
+    bookingType: BookingType,
+    amount: number,
+    currency: string,
+    bookingReference: string) => 
+      payment.processPayment(bookingId, bookingType, amount, currency, bookingReference),
+    [payment]
+  );
 
   // Return a unified API that exposes all functionality while hiding implementation details
   return {
@@ -29,16 +80,16 @@ export const useBooking = () => {
     
     // Availability checking
     isAvailable: availability.isAvailable,
-    checkAvailability: availability.checkAvailability,
+    checkAvailability,
     
     // Price calculation
     priceBreakdown: price.priceBreakdown,
-    calculatePrice: price.calculatePrice,
+    calculatePrice,
     
     // Booking creation
-    makeBooking: creation.makeBooking,
+    makeBooking,
     
     // Payment processing
-    processPayment: payment.processPayment
+    processPayment
   };
 };
