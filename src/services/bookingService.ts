@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { 
   UUID, 
@@ -376,12 +375,14 @@ export const createPropertyBooking = async (
             user_id: userId,
             experience_instance_id: addon.instanceId,
             number_of_attendees: addon.attendees,
+            total_amount_due: 0, // This will be updated with the actual amount later
             booking_reference: `${bookingReference}-EXP${addon.instanceId.substring(0, 4)}`,
             booking_status: 'Pending Payment',
             payment_status: 'Unpaid',
             // Fix: This field 'property_booking_id' doesn't exist in the table schema
             // We'll use a note in the special_requests field instead
-            special_requests: `Add-on for property booking: ${booking.id}`
+            special_requests: `Add-on for property booking: ${booking.id}`,
+            currency: priceBreakdown.currency
           });
 
         if (addonError) {
