@@ -10,36 +10,35 @@ import { useBookingPayment } from './useBookingPayment';
  * This serves as a facade for all the specialized booking hooks
  */
 export const useBooking = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  // Initialize all specialized booking hooks
+  const availability = useBookingAvailability();
+  const price = useBookingPrice();
+  const creation = useBookingCreation();
+  const payment = useBookingPayment();
   
-  const { 
-    isAvailable,
-    checkAvailability 
-  } = useBookingAvailability();
-  
-  const {
-    priceBreakdown,
-    calculatePrice
-  } = useBookingPrice();
-  
-  const { 
-    makeBooking 
-  } = useBookingCreation();
-  
-  const { 
-    processPayment 
-  } = useBookingPayment();
+  // Compute combined loading state
+  const isLoading = availability.isLoading || 
+                    price.isLoading || 
+                    creation.isLoading || 
+                    payment.isLoading;
 
+  // Return a unified API that exposes all functionality while hiding implementation details
   return {
-    isLoading: isLoading || useBookingAvailability().isLoading || 
-               useBookingPrice().isLoading || 
-               useBookingCreation().isLoading || 
-               useBookingPayment().isLoading,
-    priceBreakdown,
-    isAvailable,
-    checkAvailability,
-    calculatePrice,
-    makeBooking,
-    processPayment
+    // Loading state
+    isLoading,
+    
+    // Availability checking
+    isAvailable: availability.isAvailable,
+    checkAvailability: availability.checkAvailability,
+    
+    // Price calculation
+    priceBreakdown: price.priceBreakdown,
+    calculatePrice: price.calculatePrice,
+    
+    // Booking creation
+    makeBooking: creation.makeBooking,
+    
+    // Payment processing
+    processPayment: payment.processPayment
   };
 };
