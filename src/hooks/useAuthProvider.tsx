@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -6,7 +5,6 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   AuthState,
   SignInCredentials,
-  PhoneSignInCredentials,
   SignUpCredentials,
   AuthError,
 } from '@/types/auth';

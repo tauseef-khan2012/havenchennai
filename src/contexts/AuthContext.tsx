@@ -12,14 +12,14 @@ import {
 interface AuthContextType extends AuthState {
   signIn: (credentials: SignInCredentials) => Promise<void>;
   signInWithOtp: (phone: string) => Promise<boolean>;
-  verifyOtp: (phone: string, otp: string) => Promise<void>;
+  verifyOtp: (phone: string, otp: string) => Promise<boolean>;
   signInWithProvider: (provider: ProviderType) => Promise<void>;
   signUp: (credentials: SignUpCredentials) => Promise<void>;
   signOut: () => Promise<void>;
   refreshSession: () => Promise<boolean>;
   refreshProfile: () => Promise<void>;
   resendConfirmationEmail: (email: string) => Promise<void>;
-  resetPassword: (email: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

@@ -23,6 +23,12 @@ export type SignInCredentials = {
   rememberMe?: boolean;
 };
 
+export type PhoneSignInCredentials = {
+  phone: string;
+  password: string;
+  rememberMe?: boolean;
+};
+
 export type SignUpCredentials = {
   email: string;
   password: string;

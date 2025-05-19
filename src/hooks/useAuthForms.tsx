@@ -57,9 +57,10 @@ export const useAuthForms = () => {
   const handleVerifyOtp = async (phone: string, otp: string) => {
     setIsSubmitting(true);
     try {
-      await verifyOtp(phone, otp);
+      return await verifyOtp(phone, otp);
     } catch (error) {
       // Error handling is done in verifyOtp function
+      return false;
     } finally {
       setIsSubmitting(false);
     }
@@ -106,8 +107,11 @@ export const useAuthForms = () => {
   const handleResetPassword = async (email: string) => {
     setIsSubmitting(true);
     try {
-      await resetPassword(email);
-      setPasswordResetSent(true);
+      const result = await resetPassword(email);
+      if (result) {
+        setPasswordResetSent(true);
+      }
+      return result;
     } finally {
       setIsSubmitting(false);
     }
