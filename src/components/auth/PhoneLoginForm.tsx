@@ -20,7 +20,7 @@ import { Input } from '@/components/ui/input';
 
 interface PhoneLoginFormProps {
   onSendOtp: (phone: string) => Promise<boolean>;
-  onVerifyOtp: (phone: string, otp: string) => Promise<boolean>;
+  onVerifyOtp: (phone: string, otp: string) => Promise<void>; // Changed to match the expected type
   isSubmitting: boolean;
 }
 
@@ -54,8 +54,14 @@ export const PhoneLoginForm: React.FC<PhoneLoginFormProps> = ({
     }
   };
 
-  const handleVerifyOtp = async (otp: string) => {
-    return await onVerifyOtp(phoneNumber, otp);
+  const handleVerifyOtp = async (otp: string): Promise<boolean> => {
+    try {
+      await onVerifyOtp(phoneNumber, otp);
+      return true; // Assuming successful verification
+    } catch (error) {
+      console.error('Error verifying OTP:', error);
+      return false;
+    }
   };
 
   const handleResendOtp = async () => {

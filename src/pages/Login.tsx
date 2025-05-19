@@ -30,6 +30,11 @@ const Login = () => {
     return <Navigate to="/dashboard" replace />;
   }
 
+  // Using a wrapper function to convert Promise<boolean> to Promise<void>
+  const handleVerifyOtpWrapper = async (phone: string, otp: string): Promise<void> => {
+    await handleVerifyOtp(phone, otp);
+  };
+
   return (
     <LoginLayout>
       <AuthTabs
@@ -39,7 +44,7 @@ const Login = () => {
           <LoginTabContent
             onLogin={handleLogin}
             onSendOtp={handleSendOtp}
-            onVerifyOtp={handleVerifyOtp}
+            onVerifyOtp={handleVerifyOtpWrapper}
             onSocialLogin={handleSocialLogin}
             onResetPassword={() => handleTabChange('reset')}
             onResendConfirmation={handleResendConfirmation}

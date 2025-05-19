@@ -28,7 +28,7 @@ export const useAuthForms = () => {
     setPasswordResetSent(false);
   };
 
-  const handleLogin = async (credentials: SignInCredentials) => {
+  const handleLogin = async (credentials: SignInCredentials): Promise<void> => {
     setIsSubmitting(true);
     try {
       await signIn(credentials);
@@ -41,7 +41,7 @@ export const useAuthForms = () => {
     }
   };
 
-  const handleSendOtp = async (phone: string) => {
+  const handleSendOtp = async (phone: string): Promise<boolean> => {
     setIsSubmitting(true);
     try {
       const result = await signInWithOtp(phone);
@@ -54,7 +54,6 @@ export const useAuthForms = () => {
     }
   };
 
-  // Updated to explicitly return the boolean result from verifyOtp
   const handleVerifyOtp = async (phone: string, otp: string): Promise<boolean> => {
     setIsSubmitting(true);
     try {
