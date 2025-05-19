@@ -13,9 +13,12 @@ import {
 interface AuthContextType extends AuthState {
   signIn: (credentials: SignInCredentials) => Promise<void>;
   signInWithPhone: (credentials: PhoneSignInCredentials) => Promise<void>;
+  signInWithOtp: (phone: string) => Promise<boolean>;
+  verifyOtp: (phone: string, otp: string) => Promise<void>;
   signInWithProvider: (provider: ProviderType) => Promise<void>;
   signUp: (credentials: SignUpCredentials) => Promise<void>;
   signOut: () => Promise<void>;
+  refreshSession: () => Promise<boolean>;
   refreshProfile: () => Promise<void>;
   resendConfirmationEmail: (email: string) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -29,21 +32,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const {
     signIn,
     signInWithPhone,
+    signInWithOtp,
+    verifyOtp,
     signInWithProvider,
     signUp,
     signOut,
     resendConfirmationEmail,
-    resetPassword
+    resetPassword,
+    refreshSession: refreshSessionAction
   } = useAuthActions(updateState, handleError, navigate, toast, refreshProfile);
 
   const value: AuthContextType = {
     ...state,
     signIn,
     signInWithPhone,
+    signInWithOtp,
+    verifyOtp,
     signInWithProvider,
     signUp,
     signOut,
     refreshProfile,
+    refreshSession: refreshSessionAction,
     resendConfirmationEmail,
     resetPassword,
   };

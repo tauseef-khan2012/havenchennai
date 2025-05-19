@@ -19,19 +19,23 @@ export interface UserProfile {
 export type SignInCredentials = {
   email: string;
   password: string;
+  rememberMe?: boolean;
 };
 
 export type PhoneSignInCredentials = {
   phone: string;
   password: string;
   countryCode: string;
+  rememberMe?: boolean;
 };
 
 export type SignUpCredentials = {
   email: string;
   password: string;
   fullName: string;
-  phoneNumber?: string;
+  phone?: string;
+  countryCode?: string;
+  acceptTerms: boolean;
 };
 
 export interface AuthError extends Error {
@@ -45,4 +49,5 @@ export type AuthState = {
   profile: UserProfile | null;
   isLoading: boolean;
   error: AuthError | null;
+  isInitialized: boolean;
 };

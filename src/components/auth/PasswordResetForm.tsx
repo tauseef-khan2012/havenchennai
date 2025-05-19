@@ -68,6 +68,7 @@ export const PasswordResetForm: React.FC<PasswordResetFormProps> = ({
                     className="pl-10"
                     {...field}
                     disabled={isSubmitting}
+                    autoComplete="email"
                   />
                 </FormControl>
               </div>

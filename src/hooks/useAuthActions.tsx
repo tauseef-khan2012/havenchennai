@@ -62,6 +62,44 @@ export function useAuthActions(
     }
   }, [updateState, handleError, navigate, toast]);
 
+  const signInWithOtp = useCallback(async (phone: string) => {
+    try {
+      updateState({ isLoading: true, error: null });
+      await authService.sendOtpToPhone(phone);
+      
+      toast({
+        title: "OTP Sent",
+        description: "A verification code has been sent to your phone number.",
+      });
+      
+      return true;
+    } catch (error: any) {
+      handleError(error, "Failed to send verification code");
+      throw error;
+    } finally {
+      updateState({ isLoading: false });
+    }
+  }, [updateState, handleError, toast]);
+
+  const verifyOtp = useCallback(async (phone: string, otp: string) => {
+    try {
+      updateState({ isLoading: true, error: null });
+      await authService.verifyOtp(phone, otp);
+      
+      toast({
+        title: "Verification successful",
+        description: "Your phone number has been verified successfully.",
+      });
+      
+      navigate('/dashboard');
+    } catch (error: any) {
+      handleError(error, "OTP verification failed");
+      throw error;
+    } finally {
+      updateState({ isLoading: false });
+    }
+  }, [updateState, handleError, navigate, toast]);
+
   const signInWithProvider = useCallback(async (provider: AuthProvider) => {
     try {
       updateState({ isLoading: true, error: null });
@@ -142,13 +180,34 @@ export function useAuthActions(
     }
   }, [updateState, handleError, toast]);
 
+  const refreshSession = useCallback(async () => {
+    try {
+      updateState({ isLoading: true, error: null });
+      const { session } = await authService.refreshSession();
+      
+      if (session) {
+        updateState({ session, user: session.user });
+        return true;
+      }
+      return false;
+    } catch (error: any) {
+      handleError(error, "Session refresh failed");
+      return false;
+    } finally {
+      updateState({ isLoading: false });
+    }
+  }, [updateState, handleError]);
+
   return {
     signIn,
     signInWithPhone,
+    signInWithOtp,
+    verifyOtp,
     signInWithProvider,
     signUp,
     signOut,
     resendConfirmationEmail,
-    resetPassword
+    resetPassword,
+    refreshSession
   };
 }

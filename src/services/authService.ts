@@ -8,11 +8,16 @@ import {
   AuthError
 } from '@/types/auth';
 
-export async function signInWithEmail({ email, password }: SignInCredentials) {
+export async function signInWithEmail({ email, password, rememberMe = false }: SignInCredentials) {
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
+      options: {
+        // Set session duration based on remember me option
+        // 60 seconds * 60 minutes * 24 hours * (rememberMe ? 30 days : 1 day)
+        expiresIn: 60 * 60 * 24 * (rememberMe ? 30 : 1)
+      }
     });
 
     if (error) throw createAuthError(error.message, error);
@@ -23,11 +28,15 @@ export async function signInWithEmail({ email, password }: SignInCredentials) {
   }
 }
 
-export async function signInWithPhone({ phone, password }: PhoneSignInCredentials) {
+export async function signInWithPhone({ phone, password, rememberMe = false }: PhoneSignInCredentials) {
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
       phone,
       password,
+      options: {
+        // Set session duration based on remember me option
+        expiresIn: 60 * 60 * 24 * (rememberMe ? 30 : 1)
+      }
     });
 
     if (error) throw createAuthError(error.message, error);
@@ -55,11 +64,15 @@ export async function signInWithProvider(provider: AuthProvider) {
   }
 }
 
-export async function signUp({ email, password, fullName, phoneNumber }: SignUpCredentials) {
+export async function signUp({ email, password, fullName, phone, countryCode }: SignUpCredentials) {
   try {
+    // Format phone number with country code if both are provided
+    const phoneNumber = phone && countryCode ? `${countryCode}${phone}` : undefined;
+    
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      phone: phoneNumber,
       options: {
         data: {
           full_name: fullName,
@@ -114,10 +127,50 @@ export async function resendConfirmationEmail(email: string) {
   }
 }
 
+export async function sendOtpToPhone(phone: string) {
+  try {
+    const { error } = await supabase.auth.signInWithOtp({
+      phone,
+    });
+
+    if (error) throw createAuthError(error.message, error);
+  } catch (error: any) {
+    console.error('Send OTP error:', error);
+    throw createAuthError(error.message, error);
+  }
+}
+
+export async function verifyOtp(phone: string, otp: string) {
+  try {
+    const { data, error } = await supabase.auth.verifyOtp({
+      phone,
+      token: otp,
+      type: 'sms',
+    });
+
+    if (error) throw createAuthError(error.message, error);
+    return data;
+  } catch (error: any) {
+    console.error('Verify OTP error:', error);
+    throw createAuthError(error.message, error);
+  }
+}
+
 export async function getCurrentSession() {
   const { data, error } = await supabase.auth.getSession();
   if (error) throw createAuthError(error.message, error);
   return data;
+}
+
+export async function refreshSession() {
+  try {
+    const { data, error } = await supabase.auth.refreshSession();
+    if (error) throw createAuthError(error.message, error);
+    return data;
+  } catch (error: any) {
+    console.error('Session refresh error:', error);
+    throw createAuthError(error.message, error);
+  }
 }
 
 export async function fetchUserProfile(userId: string) {
