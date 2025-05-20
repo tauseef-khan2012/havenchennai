@@ -52,7 +52,7 @@ export const useBookingPayment = () => {
         throw new Error('User email not available');
       }
       
-      // Initiate payment with Razorpay
+      // Initiate payment with payment gateway
       const { orderId, razorpayKey } = await initiatePayment({
         bookingId,
         bookingType,
@@ -67,7 +67,7 @@ export const useBookingPayment = () => {
         throw new Error('Failed to initialize payment');
       }
       
-      // Open Razorpay payment UI
+      // Configure payment options
       const options = {
         key: razorpayKey,
         amount: amount * 100, // In paise

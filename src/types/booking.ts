@@ -15,7 +15,8 @@ export type PaymentStatus =
   | 'Paid' 
   | 'Partially Paid' 
   | 'Refunded' 
-  | 'Failed';
+  | 'Failed'
+  | 'Successful';
 
 export type ChannelType = 'airbnb' | 'booking.com' | 'agoda' | 'direct';
 
@@ -61,6 +62,7 @@ export interface BookingData {
   priceBreakdown: PriceBreakdown;
   property?: PropertyBookingDetails;
   experience?: ExperienceBookingDetails;
+  selectedAddonExperiences?: {instanceId: UUID, attendees: number}[];
 }
 
 export interface PaymentInitiationData {
@@ -87,4 +89,14 @@ export interface PaymentFailureData {
   errorDescription?: string;
   bookingId: UUID;
   bookingType: BookingType;
+}
+
+export interface PaymentRecord {
+  bookingId: UUID;
+  bookingType: BookingType;
+  amount: number;
+  currency: string;
+  transactionId: string;
+  paymentMethod: string;
+  paymentStatus: PaymentStatus;
 }

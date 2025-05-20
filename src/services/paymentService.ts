@@ -5,18 +5,23 @@ import {
   BookingType,
   PaymentInitiationData,
   PaymentConfirmationData,
-  PaymentFailureData
+  PaymentFailureData,
+  PaymentRecord
 } from '@/types/booking';
 
-// This function would typically call a backend API/Edge Function
-// that would securely create a Razorpay order
-export const initiatePayment = async (paymentData: PaymentInitiationData): Promise<{
+/**
+ * Initiates a payment with the payment gateway
+ * @param paymentData Payment initiation data
+ * @returns Order ID and gateway API key
+ */
+export const initiatePayment = async (
+  paymentData: PaymentInitiationData
+): Promise<{
   orderId: string;
   razorpayKey: string;
 }> => {
   try {
-    // In a production environment, this should be a call to a Supabase Edge Function
-    // that securely creates a Razorpay order with your API key
+    // Call Supabase Edge Function to create Razorpay order
     const { data, error } = await supabase.functions.invoke('create-razorpay-order', {
       body: {
         bookingId: paymentData.bookingId,
@@ -38,7 +43,7 @@ export const initiatePayment = async (paymentData: PaymentInitiationData): Promi
     }
 
     if (!data || !data.orderId) {
-      throw new Error('Failed to create payment order');
+      throw new Error('Failed to create payment order: No order ID returned');
     }
 
     return {
@@ -47,12 +52,19 @@ export const initiatePayment = async (paymentData: PaymentInitiationData): Promi
     };
   } catch (error) {
     console.error('Error in initiatePayment:', error);
-    throw error;
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    throw new Error(`Payment initiation failed: ${errorMessage}`);
   }
 };
 
-// This function would verify payment and update booking status
-export const verifyPayment = async (paymentData: PaymentConfirmationData): Promise<boolean> => {
+/**
+ * Verifies a payment after successful processing
+ * @param paymentData Payment confirmation data
+ * @returns Success status
+ */
+export const verifyPayment = async (
+  paymentData: PaymentConfirmationData
+): Promise<boolean> => {
   try {
     // Call Supabase Edge Function to verify the payment
     const { data, error } = await supabase.functions.invoke('verify-razorpay-payment', {
@@ -70,15 +82,25 @@ export const verifyPayment = async (paymentData: PaymentConfirmationData): Promi
       throw new Error(`Failed to verify payment: ${error.message}`);
     }
 
+    if (!data || data.success === undefined) {
+      throw new Error('Invalid response from payment verification');
+    }
+
     return data.success;
   } catch (error) {
     console.error('Error in verifyPayment:', error);
-    throw error;
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    throw new Error(`Payment verification failed: ${errorMessage}`);
   }
 };
 
-// This function would be called when a payment fails
-export const handlePaymentFailure = async (failureData: PaymentFailureData): Promise<void> => {
+/**
+ * Handles a payment failure
+ * @param failureData Payment failure data
+ */
+export const handlePaymentFailure = async (
+  failureData: PaymentFailureData
+): Promise<void> => {
   try {
     // Call Supabase Edge Function to handle payment failure
     const { error } = await supabase.functions.invoke('handle-razorpay-failure', {
@@ -91,21 +113,31 @@ export const handlePaymentFailure = async (failureData: PaymentFailureData): Pro
     }
   } catch (error) {
     console.error('Error in handlePaymentFailure:', error);
-    throw error;
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    throw new Error(`Failed to record payment failure: ${errorMessage}`);
   }
 };
 
-// Record a payment in the database
+/**
+ * Records a payment in the database
+ * @param paymentRecord Payment record data
+ * @returns Payment record ID
+ */
 export const recordPayment = async (
-  bookingId: UUID,
-  bookingType: BookingType,
-  amount: number,
-  currency: string,
-  transactionId: string,
-  paymentMethod: string,
-  paymentStatus: string
+  paymentRecord: PaymentRecord
 ): Promise<UUID> => {
   try {
+    const { 
+      bookingId, 
+      bookingType, 
+      amount, 
+      currency, 
+      transactionId, 
+      paymentMethod, 
+      paymentStatus 
+    } = paymentRecord;
+
+    // Insert payment record
     const { data, error } = await supabase
       .from('payments')
       .insert({
@@ -126,6 +158,10 @@ export const recordPayment = async (
       throw new Error(`Failed to record payment: ${error.message}`);
     }
 
+    if (!data || !data.id) {
+      throw new Error('Failed to record payment: No payment ID returned');
+    }
+
     // Update the booking with payment information
     const table = bookingType === 'property' ? 'bookings' : 'experience_bookings';
     const { error: updateError } = await supabase
@@ -140,12 +176,72 @@ export const recordPayment = async (
 
     if (updateError) {
       console.error('Error updating booking with payment info:', updateError);
-      // Continue despite update error, as payment is recorded
+      // We don't throw here since the payment is recorded successfully
+      // but we do log the error
     }
 
     return data.id;
   } catch (error) {
     console.error('Error in recordPayment:', error);
-    throw error;
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    throw new Error(`Failed to record payment: ${errorMessage}`);
+  }
+};
+
+/**
+ * Gets payment details by ID
+ * @param paymentId Payment ID
+ * @returns Payment details
+ */
+export const getPaymentDetails = async (paymentId: UUID): Promise<any> => {
+  try {
+    const { data, error } = await supabase
+      .from('payments')
+      .select('*')
+      .eq('id', paymentId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching payment details:', error);
+      throw new Error(`Failed to fetch payment: ${error.message}`);
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error in getPaymentDetails:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    throw new Error(`Failed to get payment details: ${errorMessage}`);
+  }
+};
+
+/**
+ * Gets payments for a booking
+ * @param bookingId Booking ID
+ * @param bookingType Type of booking
+ * @returns List of payments
+ */
+export const getBookingPayments = async (
+  bookingId: UUID,
+  bookingType: BookingType
+): Promise<any[]> => {
+  try {
+    const column = bookingType === 'property' ? 'booking_id' : 'experience_booking_id';
+    
+    const { data, error } = await supabase
+      .from('payments')
+      .select('*')
+      .eq(column, bookingId)
+      .order('processed_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching booking payments:', error);
+      throw new Error(`Failed to fetch payments: ${error.message}`);
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Error in getBookingPayments:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    throw new Error(`Failed to get booking payments: ${errorMessage}`);
   }
 };
