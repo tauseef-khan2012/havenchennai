@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { 
   UUID, 
@@ -44,8 +45,8 @@ export const createPropertyBooking = async (
         currency: priceBreakdown.currency,
         booking_status: 'Pending Payment',
         payment_status: 'Unpaid',
-        source_platform: sourcePlatform,
-        source_booking_id: sourceBookingId
+        source_platform: sourcePlatform || null,
+        source_booking_id: sourceBookingId || null
       })
       .select('id')
       .single();

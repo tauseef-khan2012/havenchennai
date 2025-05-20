@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -101,7 +102,7 @@ const BookingStep_Payment: React.FC<BookingStepPaymentProps> = ({
   return (
     <Card className="p-4">
       <h2 className="text-lg font-semibold mb-4">Payment Details</h2>
-      <PriceSummary breakdown={priceBreakdown} />
+      <PriceSummary priceBreakdown={priceBreakdown} />
       <div className="flex justify-between mt-6">
         <Button variant="outline" onClick={onBack}>
           Back
