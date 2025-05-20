@@ -13,7 +13,7 @@ import { CalendarIcon } from 'lucide-react';
 import { checkPropertyAvailability } from '@/services/bookingService';
 import { UUID } from '@/types/booking';
 
-interface PropertyBookingStep1Props {
+export interface PropertyBookingStep1Props {
   propertyId: UUID;
   onNext: (data: { 
     checkInDate: Date; 

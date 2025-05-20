@@ -56,7 +56,7 @@ export const createExperienceBooking = async (
       {
         instance_id: experienceDetails.instanceId,
         attendees_count: experienceDetails.numberOfAttendees
-      } as { instance_id: string; attendees_count: number }
+      }
     );
 
     if (updateError) {

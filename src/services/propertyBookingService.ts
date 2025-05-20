@@ -102,7 +102,7 @@ export const createPropertyBooking = async (
             {
               instance_id: addon.instanceId,
               attendees_count: addon.attendees
-            } as { instance_id: string; attendees_count: number }
+            }
           );
 
           if (updateError) {

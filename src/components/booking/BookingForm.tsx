@@ -215,15 +215,18 @@ export const BookingForm = ({
       case 0:
         return type === 'property' ? (
           <PropertyBookingStep1_DatesGuests
-            checkInDate={checkInDate}
-            checkOutDate={checkOutDate}
-            guestCount={guestCount}
+            propertyId={propertyId as UUID}
             maxGuests={maxGuests}
-            onComplete={handlePropertyStep1Complete}
-            onCalculatePrice={handleCalculatePrice}
-            priceBreakdown={priceBreakdown}
-            isLoading={isLoading}
-            onContinue={handleContinue}
+            onNext={(data) => {
+              // Handle the data from PropertyBookingStep1_DatesGuests
+              setCheckInDate(data.checkInDate.toISOString());
+              setCheckOutDate(data.checkOutDate.toISOString());
+              setGuestCount(data.numberOfGuests);
+              if (data.specialRequests) {
+                setSpecialRequests(data.specialRequests);
+              }
+              handleContinue();
+            }}
           />
         ) : (
           <ExperienceBookingStep1_Attendees
@@ -293,8 +296,7 @@ export const BookingForm = ({
             guests={guests}
             selectedAddonExperiences={[]}
             onBack={() => setFormStep(2)}
-            onSuccess={bookingInfo.bookingId}
-            onPayment={handlePayment}
+            onSuccess={handlePayment}
             isLoading={isLoading}
           />
         ) : null;
