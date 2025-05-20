@@ -1,12 +1,11 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBooking } from '@/hooks/useBooking';
 import { Card } from '@/components/ui/card';
 import { PriceSummary } from '@/components/booking/PriceSummary';
-import { PropertyBookingStep1_DatesGuests } from '@/components/booking/PropertyBookingStep1_DatesGuests';
-import { PropertyBookingStep2_Addons } from '@/components/booking/PropertyBookingStep2_Addons';
+import PropertyBookingStep1_DatesGuests from '@/components/booking/PropertyBookingStep1_DatesGuests';
+import PropertyBookingStep2_Addons from '@/components/booking/PropertyBookingStep2_Addons';
 import ExperienceBookingStep1_Attendees from '@/components/booking/ExperienceBookingStep1_Attendees';
 import ExperienceBookingStep2_Requests from '@/components/booking/ExperienceBookingStep2_Requests';
 import BookingStep_GuestInfo from '@/components/booking/BookingStep_GuestInfo';
@@ -276,7 +275,25 @@ export const BookingForm = ({
       case 3:
         return bookingInfo ? (
           <BookingStep_Payment
-            bookingInfo={bookingInfo}
+            bookingType={type}
+            priceBreakdown={bookingInfo.priceBreakdown}
+            propertyDetails={type === 'property' ? {
+              propertyId: propertyId as UUID,
+              checkInDate: new Date(checkInDate),
+              checkOutDate: new Date(checkOutDate),
+              numberOfGuests: guestCount,
+              specialRequests,
+              customerNotes: specialRequests
+            } : undefined}
+            experienceDetails={type === 'experience' ? {
+              instanceId: instanceId as UUID,
+              numberOfAttendees: attendeeCount,
+              specialRequests
+            } : undefined}
+            guests={guests}
+            selectedAddonExperiences={[]}
+            onBack={() => setFormStep(2)}
+            onSuccess={bookingInfo.bookingId}
             onPayment={handlePayment}
             isLoading={isLoading}
           />

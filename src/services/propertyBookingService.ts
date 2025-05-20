@@ -90,17 +90,20 @@ export const createPropertyBooking = async (
             payment_status: 'Unpaid',
             special_requests: `Add-on for property booking: ${booking.id}`,
             currency: priceBreakdown.currency
-          } as any); // Using type assertion to bypass TypeScript error
+          });
 
         if (addonError) {
           console.error('Error adding addon experience booking:', addonError);
           // Continue despite addon error, as the main booking was created
         } else {
           // Update the current_attendees in the experience_instance
-          const { error: updateError } = await supabase.rpc('increment_experience_attendees', {
-            instance_id: addon.instanceId,
-            attendees_count: addon.attendees
-          } as any); // Using type assertion to bypass TypeScript error
+          const { error: updateError } = await supabase.rpc(
+            'increment_experience_attendees',
+            {
+              instance_id: addon.instanceId,
+              attendees_count: addon.attendees
+            } as { instance_id: string; attendees_count: number }
+          );
 
           if (updateError) {
             console.error('Error updating experience instance attendees:', updateError);

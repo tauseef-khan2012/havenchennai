@@ -12,7 +12,7 @@ import { createBooking } from '@/services/bookingService';
 import { initiatePayment } from '@/services/paymentService';
 import { Spinner } from '@/components/ui/spinner';
 
-interface BookingStepPaymentProps {
+export interface BookingStepPaymentProps {
   bookingType: BookingType;
   priceBreakdown: PriceBreakdown;
   propertyDetails?: {
@@ -34,7 +34,9 @@ interface BookingStepPaymentProps {
     attendees: number;
   }[];
   onBack: () => void;
-  onSuccess: (bookingId: UUID, bookingReference: string) => void;
+  onSuccess: UUID;
+  onPayment: () => Promise<void>;
+  isLoading: boolean;
 }
 
 const BookingStep_Payment: React.FC<BookingStepPaymentProps> = ({
@@ -45,76 +47,17 @@ const BookingStep_Payment: React.FC<BookingStepPaymentProps> = ({
   guests,
   selectedAddonExperiences,
   onBack,
-  onSuccess
+  onSuccess,
+  onPayment,
+  isLoading
 }) => {
   const { toast } = useToast();
   const { user } = useAuth();
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [isRazorpayLoaded, setIsRazorpayLoaded] = useState(false);
-
+  
   // Calculate nights for property bookings
   const nights = propertyDetails 
     ? calculateNights(propertyDetails.checkInDate, propertyDetails.checkOutDate) 
     : undefined;
-
-  const handlePayment = async () => {
-    if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to complete your booking.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    setIsProcessing(true);
-    
-    try {
-      // 1. Create the booking
-      const bookingData = {
-        type: bookingType,
-        userId: user.id,
-        property: propertyDetails,
-        experience: experienceDetails,
-        priceBreakdown,
-        guests,
-        selectedAddonExperiences
-      };
-      
-      const { bookingId, bookingReference } = await createBooking(bookingData);
-      
-      // 2. Initiate payment
-      const { orderId, razorpayKey } = await initiatePayment({
-        bookingId,
-        bookingType,
-        amount: priceBreakdown.totalAmountDue,
-        currency: priceBreakdown.currency,
-        userEmail: user.email || '',
-        userName: user.user_metadata?.full_name || 'Guest',
-        bookingReference
-      });
-      
-      // 3. Show Razorpay checkout
-      // In a real implementation, this would use the Razorpay JS SDK
-      // For now, we'll mock success
-      toast({
-        title: "Payment processed successfully",
-        description: "Your booking has been confirmed.",
-      });
-      
-      // Redirect to success
-      onSuccess(bookingId, bookingReference);
-    } catch (error) {
-      console.error('Error processing payment:', error);
-      toast({
-        title: "Payment failed",
-        description: "There was an error processing your payment. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
 
   return (
     <Card className="w-full">
@@ -179,15 +122,15 @@ const BookingStep_Payment: React.FC<BookingStepPaymentProps> = ({
             </p>
             
             <div className="flex justify-between">
-              <Button variant="outline" onClick={onBack} disabled={isProcessing}>
+              <Button variant="outline" onClick={onBack} disabled={isLoading}>
                 Back
               </Button>
               <Button 
-                onClick={handlePayment} 
-                disabled={isProcessing || !user}
+                onClick={onPayment} 
+                disabled={isLoading || !user}
                 className="bg-haven-green hover:bg-haven-green/90"
               >
-                {isProcessing ? (
+                {isLoading ? (
                   <>
                     <Spinner className="mr-2" />
                     Processing...

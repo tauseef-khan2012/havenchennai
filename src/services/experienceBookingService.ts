@@ -51,10 +51,13 @@ export const createExperienceBooking = async (
     }
 
     // Update the current_attendees in the experience_instance
-    const { error: updateError } = await supabase.rpc('increment_experience_attendees', {
-      instance_id: experienceDetails.instanceId,
-      attendees_count: experienceDetails.numberOfAttendees
-    } as any); // Using type assertion to bypass TypeScript error
+    const { error: updateError } = await supabase.rpc(
+      'increment_experience_attendees', 
+      {
+        instance_id: experienceDetails.instanceId,
+        attendees_count: experienceDetails.numberOfAttendees
+      } as { instance_id: string; attendees_count: number }
+    );
 
     if (updateError) {
       console.error('Error updating experience instance attendees:', updateError);
