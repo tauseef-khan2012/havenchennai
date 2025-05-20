@@ -296,7 +296,10 @@ export const BookingForm = ({
             guests={guests}
             selectedAddonExperiences={[]}
             onBack={() => setFormStep(2)}
-            onSuccess={handlePayment}
+            onSuccess={(bookingId, bookingReference) => {
+              // Handle the success callback
+              handlePayment();
+            }}
             isLoading={isLoading}
           />
         ) : null;
