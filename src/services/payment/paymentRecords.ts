@@ -8,14 +8,17 @@ import { PaymentRecord, UUID, BookingType, PaymentStatus } from '@/types/booking
  */
 export const recordPayment = async (paymentRecord: PaymentRecord): Promise<void> => {
   try {
+    // Determine which booking ID field to use based on booking type
+    const bookingIdField = paymentRecord.bookingType === 'property' ? 'booking_id' : 'experience_booking_id';
+    
     const { error } = await supabase.from('payments').insert({
-      booking_id: paymentRecord.bookingId,
-      booking_type: paymentRecord.bookingType,
+      [bookingIdField]: paymentRecord.bookingId,
       amount: paymentRecord.amount,
       currency: paymentRecord.currency,
       transaction_id: paymentRecord.transactionId,
       payment_method: paymentRecord.paymentMethod,
-      status: paymentRecord.paymentStatus
+      payment_status: paymentRecord.paymentStatus,
+      payment_gateway: 'Razorpay' // Adding a default value
     });
 
     if (error) {

@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { PaymentRecord, UUID, BookingType } from '@/types/booking';
+import { PaymentRecord, UUID, BookingType, PaymentStatus } from '@/types/booking';
 
 /**
  * Gets details for a specific payment
@@ -24,14 +24,15 @@ export const getPaymentDetails = async (transactionId: string): Promise<PaymentR
       return null;
     }
 
+    // Map database fields to our PaymentRecord type
     return {
-      bookingId: data.booking_id,
-      bookingType: data.booking_type as BookingType,
+      bookingId: data.booking_id || data.experience_booking_id || '',
+      bookingType: data.booking_id ? 'property' : 'experience',
       amount: data.amount,
       currency: data.currency,
       transactionId: data.transaction_id,
-      paymentMethod: data.payment_method,
-      paymentStatus: data.status
+      paymentMethod: data.payment_method || '',
+      paymentStatus: (data.payment_status as PaymentStatus) || 'Unpaid'
     };
   } catch (error) {
     console.error('Error in getPaymentDetails:', error);
@@ -51,11 +52,13 @@ export const getBookingPayments = async (
   bookingType: BookingType
 ): Promise<PaymentRecord[]> => {
   try {
+    // Select the correct booking ID field based on the booking type
+    const idField = bookingType === 'property' ? 'booking_id' : 'experience_booking_id';
+    
     const { data, error } = await supabase
       .from('payments')
       .select('*')
-      .eq('booking_id', bookingId)
-      .eq('booking_type', bookingType);
+      .eq(idField, bookingId);
 
     if (error) {
       console.error('Error getting booking payments:', error);
@@ -66,14 +69,15 @@ export const getBookingPayments = async (
       return [];
     }
 
+    // Map database records to our PaymentRecord type
     return data.map(item => ({
-      bookingId: item.booking_id,
-      bookingType: item.booking_type as BookingType,
+      bookingId: item.booking_id || item.experience_booking_id || '',
+      bookingType: item.booking_id ? 'property' : 'experience',
       amount: item.amount,
       currency: item.currency,
       transactionId: item.transaction_id,
-      paymentMethod: item.payment_method,
-      paymentStatus: item.status
+      paymentMethod: item.payment_method || '',
+      paymentStatus: (item.payment_status as PaymentStatus) || 'Unpaid'
     }));
   } catch (error) {
     console.error('Error in getBookingPayments:', error);
