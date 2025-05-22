@@ -7,7 +7,7 @@ import {
   initiatePayment, 
   verifyPayment, 
   handlePaymentFailure 
-} from '@/services/paymentService';
+} from '@/services/payment';
 
 /**
  * Hook for processing payments for bookings with improved error handling
