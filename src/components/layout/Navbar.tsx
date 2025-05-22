@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
@@ -10,7 +9,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-  const { session } = useAuthSession();
+  const { user } = useAuthSession();
   
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
@@ -39,7 +38,7 @@ const Navbar = () => {
     >
       <div className="container-custom mx-auto px-4 flex justify-between items-center">
         <Link to="/" className="font-serif text-2xl font-bold text-haven-dark">
-          LakeHaven
+          Haven
         </Link>
         
         {/* Desktop Navigation */}
@@ -90,7 +89,7 @@ const Navbar = () => {
             About Us
           </Link>
           
-          {session ? (
+          {user ? (
             <Link to="/dashboard">
               <Button variant="outline" className="border-haven-teal text-haven-teal">
                 Dashboard
@@ -176,7 +175,7 @@ const Navbar = () => {
             </Link>
             
             <div className="flex flex-col space-y-2 pt-2 border-t border-gray-100">
-              {session ? (
+              {user ? (
                 <Link to="/dashboard" className="w-full">
                   <Button variant="outline" className="w-full border-haven-teal text-haven-teal">
                     Dashboard
