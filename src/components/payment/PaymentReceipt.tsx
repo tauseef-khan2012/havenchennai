@@ -3,6 +3,8 @@ import React from 'react';
 import { format } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import { FileText, Download } from 'lucide-react';
 import PaymentStatusBadge from './PaymentStatusBadge';
 import { formatCurrency } from '@/utils/formatters';
 import { PaymentStatus } from '@/types/booking';
@@ -16,6 +18,8 @@ interface PaymentDetailsProps {
   paymentMethod?: string;
   paymentDate?: Date | string;
   paymentGateway?: string;
+  bookingReference?: string;
+  onDownload?: () => void;
 }
 
 export const PaymentReceipt = ({
@@ -27,6 +31,8 @@ export const PaymentReceipt = ({
   paymentMethod,
   paymentDate,
   paymentGateway,
+  bookingReference,
+  onDownload,
 }: PaymentDetailsProps) => {
   const formattedDate = paymentDate 
     ? typeof paymentDate === 'string' 
@@ -36,11 +42,24 @@ export const PaymentReceipt = ({
 
   return (
     <Card className="shadow-md">
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-2 flex flex-row items-center justify-between">
         <CardTitle className="text-lg font-medium">Payment Receipt</CardTitle>
+        {onDownload && (
+          <Button variant="outline" size="sm" onClick={onDownload} className="h-8">
+            <Download className="h-4 w-4 mr-1" />
+            <span className="hidden sm:inline">Download</span>
+          </Button>
+        )}
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
+          {bookingReference && (
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">Booking Reference</span>
+              <span className="font-medium">{bookingReference}</span>
+            </div>
+          )}
+          
           <div className="flex justify-between">
             <span className="text-sm text-muted-foreground">Payment Status</span>
             <PaymentStatusBadge status={status} />
@@ -87,6 +106,15 @@ export const PaymentReceipt = ({
               <span className="font-medium text-xs truncate max-w-[180px]" title={paymentId}>
                 {paymentId}
               </span>
+            </div>
+          )}
+          
+          {status === 'Paid' && (
+            <div className="mt-4 text-center">
+              <Button variant="outline" size="sm" className="w-full">
+                <FileText className="h-4 w-4 mr-2" />
+                View Full Invoice
+              </Button>
             </div>
           )}
         </div>

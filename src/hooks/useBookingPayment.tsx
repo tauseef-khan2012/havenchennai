@@ -154,25 +154,7 @@ export const useBookingPayment = () => {
         }
       };
       
-      // For development, we'll use a mock successful payment
-      // In production, this would use the Razorpay JS SDK
-      
-      // Mock a payment success for development
-      const mockPaymentId = 'pay_' + Math.random().toString(36).substring(7);
-      const mockSignature = 'sig_' + Math.random().toString(36).substring(7);
-      
-      const success = await handlePaymentSuccess(
-        mockPaymentId,
-        orderId,
-        mockSignature,
-        bookingId,
-        bookingType
-      );
-      
-      return success;
-      
-      // In production, this would open the Razorpay payment dialog
-      /*
+      // Use production Razorpay integration
       const razorpay = useRazorpayPayment({
         onSuccess: async (paymentId, orderId, signature) => {
           return await handlePaymentSuccess(paymentId, orderId, signature, bookingId, bookingType);
@@ -182,8 +164,18 @@ export const useBookingPayment = () => {
         }
       });
       
+      // Check if Razorpay is ready before processing payment
+      if (!razorpay.isReady) {
+        toast({
+          title: 'Payment gateway not ready',
+          description: 'Please try again in a few moments.',
+          variant: 'destructive'
+        });
+        return false;
+      }
+      
       razorpay.processPayment(options);
-      */
+      return true;
       
     } catch (error) {
       console.error('Error processing payment:', error);

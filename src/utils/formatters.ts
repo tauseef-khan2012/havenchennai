@@ -1,71 +1,34 @@
 
+import { format } from 'date-fns';
+
 /**
- * Formats a currency amount with the given currency code
+ * Format a currency value
  * @param amount The amount to format
- * @param currencyCode The currency code (e.g. 'USD', 'INR')
+ * @param currency The currency code (default: INR)
  * @returns Formatted currency string
  */
-export const formatCurrency = (amount: number, currencyCode: string = 'USD'): string => {
-  return new Intl.NumberFormat('en-US', {
+export const formatCurrency = (amount: number, currency: string = 'INR'): string => {
+  return new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency: currencyCode,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
+    currency,
+    maximumFractionDigits: 0,
   }).format(amount);
 };
 
 /**
- * Formats a date to a readable string
- * @param date Date to format
- * @param format Format style ('short', 'medium', 'long', 'full')
+ * Format a date in a human-readable format
+ * @param date The date to format
  * @returns Formatted date string
  */
-export const formatDate = (
-  date: Date | string, 
-  format: 'short' | 'medium' | 'long' | 'full' = 'medium'
-): string => {
-  const dateObj = date instanceof Date ? date : new Date(date);
-  
-  const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: format === 'short' ? 'short' : 'long',
-    day: 'numeric'
-  };
-  
-  return dateObj.toLocaleDateString('en-US', options);
+export const formatDate = (date: Date): string => {
+  return format(date, 'dd MMM yyyy');
 };
 
 /**
- * Formats a date range to a readable string
- * @param startDate Start date
- * @param endDate End date
- * @param format Format style ('short', 'medium', 'long', 'full')
- * @returns Formatted date range string
+ * Format a date with time in a human-readable format
+ * @param date The date to format
+ * @returns Formatted date and time string
  */
-export const formatDateRange = (
-  startDate: Date | string, 
-  endDate: Date | string,
-  format: 'short' | 'medium' | 'long' | 'full' = 'medium'
-): string => {
-  const start = startDate instanceof Date ? startDate : new Date(startDate);
-  const end = endDate instanceof Date ? endDate : new Date(endDate);
-  
-  // If same year, don't repeat the year
-  if (start.getFullYear() === end.getFullYear()) {
-    const startOptions: Intl.DateTimeFormatOptions = {
-      month: format === 'short' ? 'short' : 'long',
-      day: 'numeric'
-    };
-    
-    const endOptions: Intl.DateTimeFormatOptions = {
-      month: format === 'short' ? 'short' : 'long',
-      day: 'numeric',
-      year: 'numeric'
-    };
-    
-    return `${start.toLocaleDateString('en-US', startOptions)} - ${end.toLocaleDateString('en-US', endOptions)}`;
-  }
-  
-  // Different years, show full dates
-  return `${formatDate(start, format)} - ${formatDate(end, format)}`;
+export const formatDateTime = (date: Date): string => {
+  return format(date, 'dd MMM yyyy, h:mm a');
 };
