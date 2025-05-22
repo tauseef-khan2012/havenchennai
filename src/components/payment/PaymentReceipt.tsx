@@ -1,75 +1,96 @@
 
 import React from 'react';
+import { format } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { PaymentStatusBadge } from './PaymentStatusBadge';
-import { PaymentRecord } from '@/types/booking';
+import PaymentStatusBadge from './PaymentStatusBadge';
+import { formatCurrency } from '@/utils/formatters';
+import { PaymentStatus } from '@/types/booking';
 
-interface PaymentReceiptProps {
-  payment: PaymentRecord;
-  showBookingDetails?: boolean;
+interface PaymentDetailsProps {
+  paymentId?: string;
+  transactionId?: string;
+  amount?: number;
+  currency?: string;
+  status?: PaymentStatus;
+  paymentMethod?: string;
+  paymentDate?: Date | string;
+  paymentGateway?: string;
 }
 
-const PaymentReceipt: React.FC<PaymentReceiptProps> = ({ 
-  payment,
-  showBookingDetails = true
-}) => {
-  // Format date from ISO string
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+export const PaymentReceipt = ({
+  paymentId,
+  transactionId,
+  amount,
+  currency = 'INR',
+  status = 'Unpaid',
+  paymentMethod,
+  paymentDate,
+  paymentGateway,
+}: PaymentDetailsProps) => {
+  const formattedDate = paymentDate 
+    ? typeof paymentDate === 'string' 
+      ? format(new Date(paymentDate), 'PPP')
+      : format(paymentDate, 'PPP')
+    : 'Not processed';
 
   return (
-    <Card className="w-full">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-xl font-serif">Payment Receipt</CardTitle>
-        <PaymentStatusBadge status={payment.paymentStatus} />
+    <Card className="shadow-md">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg font-medium">Payment Receipt</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm text-gray-500">Transaction ID</p>
-            <p className="font-medium">{payment.transactionId}</p>
+      <CardContent>
+        <div className="space-y-3">
+          <div className="flex justify-between">
+            <span className="text-sm text-muted-foreground">Payment Status</span>
+            <PaymentStatusBadge status={status} />
           </div>
-          <div>
-            <p className="text-sm text-gray-500">Amount</p>
-            <p className="font-medium">
-              {payment.amount} {payment.currency}
-            </p>
+          
+          <div className="flex justify-between">
+            <span className="text-sm text-muted-foreground">Amount</span>
+            <span className="font-medium">{formatCurrency(amount || 0, currency)}</span>
           </div>
-        </div>
-        
-        <div>
-          <p className="text-sm text-gray-500">Payment Method</p>
-          <p className="font-medium">{payment.paymentMethod || 'Not specified'}</p>
-        </div>
-        
-        {showBookingDetails && (
-          <>
-            <Separator />
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-500">Booking ID</p>
-                <p className="font-medium">{payment.bookingId}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Booking Type</p>
-                <p className="font-medium capitalize">{payment.bookingType}</p>
-              </div>
+          
+          <div className="flex justify-between">
+            <span className="text-sm text-muted-foreground">Date</span>
+            <span className="font-medium">{formattedDate}</span>
+          </div>
+          
+          <Separator />
+          
+          {paymentMethod && (
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">Method</span>
+              <span className="font-medium">{paymentMethod}</span>
             </div>
-          </>
-        )}
+          )}
+          
+          {paymentGateway && (
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">Gateway</span>
+              <span className="font-medium">{paymentGateway}</span>
+            </div>
+          )}
+          
+          {transactionId && (
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">Transaction ID</span>
+              <span className="font-medium text-xs truncate max-w-[180px]" title={transactionId}>
+                {transactionId}
+              </span>
+            </div>
+          )}
+          
+          {paymentId && (
+            <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">Payment ID</span>
+              <span className="font-medium text-xs truncate max-w-[180px]" title={paymentId}>
+                {paymentId}
+              </span>
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
 };
-
-export default PaymentReceipt;
