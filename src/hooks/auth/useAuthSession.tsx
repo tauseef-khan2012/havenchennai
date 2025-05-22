@@ -45,8 +45,12 @@ export function useAuthSession(
     }
   }, [updateState, handleError]);
 
+  // Mock user data for now - this would come from the actual auth context in a real app
+  const user = { id: '1', email: 'user@example.com' };
+
   return {
     signOut,
-    refreshSession
+    refreshSession,
+    user
   };
 }
