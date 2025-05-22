@@ -8,6 +8,10 @@ import {
   AuthError
 } from '@/types/auth';
 
+// Cache user profiles to reduce database queries
+const profileCache = new Map<string, any>();
+const CACHE_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
+
 export async function signInWithEmail({ email, password, rememberMe = false }: SignInCredentials) {
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -85,6 +89,8 @@ export async function signOut() {
   try {
     const { error } = await supabase.auth.signOut();
     if (error) throw createAuthError(error.message, error);
+    // Clear the profile cache when signing out
+    profileCache.clear();
   } catch (error: any) {
     console.error('Logout error:', error);
     throw createAuthError(error.message, error);
@@ -120,7 +126,6 @@ export async function resendConfirmationEmail(email: string) {
   }
 }
 
-// Update the OTP functions to properly handle phone authentication
 export async function sendOtpToPhone(phone: string) {
   try {
     const { data, error } = await supabase.auth.signInWithOtp({
@@ -172,6 +177,13 @@ export async function refreshSession() {
 
 export async function fetchUserProfile(userId: string) {
   try {
+    // Check cache first
+    const cachedProfile = profileCache.get(userId);
+    if (cachedProfile && cachedProfile.timestamp > Date.now() - CACHE_EXPIRY_MS) {
+      return cachedProfile.data;
+    }
+
+    // If not in cache, fetch from database
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -179,6 +191,13 @@ export async function fetchUserProfile(userId: string) {
       .single();
 
     if (error) throw createAuthError(error.message, error);
+    
+    // Store in cache
+    profileCache.set(userId, {
+      data,
+      timestamp: Date.now()
+    });
+    
     return data;
   } catch (error: any) {
     console.error('Fetch profile error:', error);

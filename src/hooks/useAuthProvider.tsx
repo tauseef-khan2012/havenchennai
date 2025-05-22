@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -8,7 +9,6 @@ import {
   SignUpCredentials,
   AuthError,
 } from '@/types/auth';
-import * as authService from '@/services/authService';
 
 const initialState: AuthState = {
   session: null,
@@ -46,12 +46,24 @@ export function useAuthProvider() {
     if (!state.user) return;
     
     try {
-      const profile = await authService.fetchUserProfile(state.user.id);
+      const profile = await fetchUserProfile(state.user.id);
       updateState({ profile });
     } catch (error) {
       console.error('Error refreshing profile:', error);
     }
   }, [state.user, updateState]);
+
+  // Fetch user profile helper function
+  const fetchUserProfile = useCallback(async (userId: string) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (error) throw error;
+    return data;
+  }, []);
 
   // Handle user activity
   useEffect(() => {
@@ -59,19 +71,16 @@ export function useAuthProvider() {
       setLastActivity(Date.now());
     };
 
-    // Track user activity
-    window.addEventListener('mousemove', handleUserActivity);
-    window.addEventListener('keydown', handleUserActivity);
-    window.addEventListener('click', handleUserActivity);
-    window.addEventListener('scroll', handleUserActivity);
-    window.addEventListener('touchstart', handleUserActivity);
+    // Use event delegation to reduce event handlers
+    const events = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
+    events.forEach(event => {
+      window.addEventListener(event, handleUserActivity, { passive: true });
+    });
 
     return () => {
-      window.removeEventListener('mousemove', handleUserActivity);
-      window.removeEventListener('keydown', handleUserActivity);
-      window.removeEventListener('click', handleUserActivity);
-      window.removeEventListener('scroll', handleUserActivity);
-      window.removeEventListener('touchstart', handleUserActivity);
+      events.forEach(event => {
+        window.removeEventListener(event, handleUserActivity);
+      });
     };
   }, []);
 
@@ -86,105 +95,114 @@ export function useAuthProvider() {
       if (timeSinceLastActivity > INACTIVITY_TIMEOUT_MS) {
         // Auto logout due to inactivity
         clearInterval(checkInactivity);
-        authService.signOut()
-          .then(() => {
-            toast({
-              title: "Session expired",
-              description: "You've been logged out due to inactivity.",
-            });
-          })
-          .catch((error) => console.error('Auto logout error:', error));
+        signOut();
       }
     }, 60000); // Check every minute
 
     return () => clearInterval(checkInactivity);
-  }, [state.session, lastActivity, toast]);
+  }, [state.session, lastActivity]);
 
-  // Token refresh logic
+  // Sign out helper function
+  const signOut = useCallback(async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Session expired",
+        description: "You've been logged out due to inactivity.",
+      });
+    } catch (error) {
+      console.error('Auto logout error:', error);
+    }
+  }, [toast]);
+
+  // Token refresh logic - optimized to reduce unnecessary refresh checks
   useEffect(() => {
     if (!state.session) return;
 
-    const checkTokenExpiry = setInterval(async () => {
+    // Calculate initial time until token expiry to set appropriate timer
+    const expiresAt = state.session.expires_at ? state.session.expires_at * 1000 : 0;
+    const timeUntilExpiry = expiresAt - Date.now();
+    const timeUntilRefresh = Math.max(1000, timeUntilExpiry - AUTO_REFRESH_THRESHOLD_MS);
+    
+    // Set single timeout instead of repeated interval
+    const refreshTimeout = setTimeout(async () => {
       try {
-        // Get current session
-        const { data: { session } } = await supabase.auth.getSession();
+        console.log("Refreshing authentication token...");
+        const { data, error } = await supabase.auth.refreshSession();
         
-        if (!session) return;
-        
-        // Calculate time until token expiry
-        const expiresAt = session.expires_at ? session.expires_at * 1000 : 0;
-        const timeUntilExpiry = expiresAt - Date.now();
-        
-        // Refresh token if it will expire soon
-        if (timeUntilExpiry < AUTO_REFRESH_THRESHOLD_MS) {
-          console.log("Refreshing authentication token...");
-          const { data, error } = await supabase.auth.refreshSession();
-          
-          if (error) {
-            console.error('Token refresh error:', error);
-          } else if (data?.session) {
-            console.log("Token refreshed successfully");
-            updateState({ session: data.session, user: data.session.user });
-          }
+        if (error) {
+          console.error('Token refresh error:', error);
+        } else if (data?.session) {
+          console.log("Token refreshed successfully");
+          updateState({ session: data.session, user: data.session.user });
         }
       } catch (error) {
-        console.error('Token refresh check error:', error);
+        console.error('Token refresh error:', error);
       }
-    }, 5 * 60 * 1000); // Check every 5 minutes
+    }, timeUntilRefresh);
 
-    return () => clearInterval(checkTokenExpiry);
+    return () => clearTimeout(refreshTimeout);
   }, [state.session, updateState]);
 
   // Initialize auth state
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, currentSession) => {
-        console.log("Auth state changed:", event);
-        
-        updateState({
-          session: currentSession,
-          user: currentSession?.user ?? null,
-        });
-        
-        // Fetch profile data if user exists
-        if (currentSession?.user) {
-          setTimeout(() => {
-            authService.fetchUserProfile(currentSession.user.id)
-              .then(profile => updateState({ profile }))
-              .catch(error => console.error('Error fetching profile:', error));
-          }, 0);
-        } else {
-          updateState({ profile: null });
-        }
-      }
-    );
+    let subscription: { unsubscribe: () => void } | null = null;
 
-    // THEN check for existing session
-    authService.getCurrentSession()
-      .then(({ session }) => {
+    // Initialize auth state asynchronously
+    const initAuth = async () => {
+      try {
+        // Set up auth state listener FIRST
+        const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
+          (event, currentSession) => {
+            console.log("Auth state changed:", event);
+            
+            updateState({
+              session: currentSession,
+              user: currentSession?.user ?? null,
+            });
+            
+            // Fetch profile data if user exists - use setTimeout to prevent blocking
+            if (currentSession?.user) {
+              setTimeout(() => {
+                fetchUserProfile(currentSession.user.id)
+                  .then(profile => updateState({ profile }))
+                  .catch(error => console.error('Error fetching profile:', error));
+              }, 0);
+            } else {
+              updateState({ profile: null });
+            }
+          }
+        );
+        
+        subscription = authSubscription;
+
+        // THEN check for existing session
+        const { data } = await supabase.auth.getSession();
         updateState({
-          session,
-          user: session?.user ?? null,
+          session: data.session,
+          user: data.session?.user ?? null,
           isLoading: false,
           isInitialized: true
         });
         
-        if (session?.user) {
-          authService.fetchUserProfile(session.user.id)
-            .then(profile => updateState({ profile }))
-            .catch(error => console.error('Error fetching profile:', error));
+        if (data.session?.user) {
+          const profile = await fetchUserProfile(data.session.user.id);
+          updateState({ profile });
         }
-      })
-      .catch(error => {
-        console.error('Error getting session:', error);
+      } catch (error) {
+        console.error('Error initializing auth:', error);
         updateState({ isLoading: false, isInitialized: true });
-      });
+      }
+    };
+
+    initAuth();
 
     return () => {
-      subscription.unsubscribe();
+      if (subscription) {
+        subscription.unsubscribe();
+      }
     };
-  }, [updateState]);
+  }, [updateState, fetchUserProfile]);
 
   return {
     state,

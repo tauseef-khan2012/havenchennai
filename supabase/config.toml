@@ -28,6 +28,7 @@ enabled = true
 enabled = true
 site_url = "http://localhost:3000"
 
+# Configure JWT verification for each function
 [functions]
 [functions.create-razorpay-order]
 verify_jwt = true
