@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -7,16 +7,37 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
-import StayHero from '@/components/stay/StayHero';
 import StayNavigation from '@/components/stay/StayNavigation';
+import { ArrowDown, X } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const Stay = () => {
+  // State for booking form
   const [checkInDate, setCheckInDate] = useState('');
   const [checkOutDate, setCheckOutDate] = useState('');
   const [guests, setGuests] = useState(1);
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  // Refs for scroll sections
+  const overviewRef = useRef<HTMLDivElement>(null);
+  const amenitiesRef = useRef<HTMLDivElement>(null);
+  const deckViewsRef = useRef<HTMLDivElement>(null);
+  const locationRef = useRef<HTMLDivElement>(null);
+  
+  // Animation variants for sections
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+  };
+  
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.8 } }
+  };
 
   const handleBooking = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,174 +58,408 @@ const Stay = () => {
     // Navigate to the booking page with property ID
     navigate(`/booking?propertyId=${samplePropertyId}`);
   };
+  
+  const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
+    ref.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main>
-        <StayHero 
-          title="Book Your Stay"
-          subtitle="Experience our unique container home surrounded by nature."
-          backgroundImage="/lovable-uploads/43aa0007-941b-4b51-b1a0-a2b67f4bc6d2.png"
+      
+      {/* Hero Section */}
+      <section 
+        className="h-screen flex items-center justify-center relative snap-start scroll-mt-16"
+        ref={overviewRef}
+      >
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat animate-kenBurns"
+          style={{ 
+            backgroundImage: 'url(/lovable-uploads/43aa0007-941b-4b51-b1a0-a2b67f4bc6d2.png)',
+            filter: 'brightness(0.7)'
+          }}
         />
         
-        <StayNavigation />
+        <div className="relative container-custom z-10 text-white">
+          <motion.div 
+            initial="hidden"
+            animate="visible"
+            variants={fadeInUp}
+            className="max-w-2xl"
+          >
+            <h1 className="font-serif text-5xl md:text-6xl font-bold mb-4">
+              Your Lakeside Haven
+            </h1>
+            <p className="text-xl md:text-2xl mb-8">
+              Experience luxury and serenity in our custom-designed container home by Muttukadu Lake
+            </p>
+            <Button 
+              className="bg-white text-haven-green hover:bg-opacity-90 text-lg px-8 py-6"
+              onClick={() => setBookingModalOpen(true)}
+            >
+              Book Your Escape
+            </Button>
+          </motion.div>
+        </div>
         
-        {/* Main Content */}
-        <section className="py-16">
-          <div className="container-custom">
-            <div className="grid md:grid-cols-3 gap-12">
-              {/* Property Info and Gallery */}
-              <div className="md:col-span-2">
-                <h2 className="font-serif text-3xl font-bold mb-6">The Haven Container Home</h2>
-                <p className="text-gray-700 mb-6">
-                  Our custom-designed container home offers the perfect blend of modern luxury and rustic charm, 
-                  situated on 5 acres of pristine woodland. Wake up to stunning views of nature through floor-to-ceiling 
-                  windows, enjoy your morning coffee on the private deck, and fall asleep to the gentle sounds of the forest.
-                </p>
-                
-                {/* Image Gallery */}
-                <div className="grid grid-cols-2 gap-4 mb-8">
-                  <div className="col-span-2">
-                    <img 
-                      src="/lovable-uploads/a768b355-2a53-4898-91c5-3372bc1fe662.png" 
-                      alt="Container Home Exterior" 
-                      className="w-full h-64 object-cover rounded-lg"
-                    />
+        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white animate-bounce">
+          <button 
+            onClick={() => scrollToSection(amenitiesRef)}
+            aria-label="Scroll to learn more"
+            className="flex flex-col items-center"
+          >
+            <span className="mb-2 text-sm font-light">Discover More</span>
+            <ArrowDown className="h-6 w-6" />
+          </button>
+        </div>
+      </section>
+      
+      {/* Navigation Section - Sticky */}
+      <div className="sticky top-16 z-30 w-full">
+        <StayNavigation />
+      </div>
+      
+      {/* Overview/Introduction Section */}
+      <section 
+        className="min-h-screen py-16 bg-white snap-start scroll-mt-32"
+        ref={amenitiesRef}
+      >
+        <div className="container-custom">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={fadeInUp}
+            >
+              <h2 className="font-serif text-3xl font-bold mb-6">The Haven Experience</h2>
+              <p className="text-gray-700 mb-6">
+                Our custom-designed container home offers the perfect blend of modern luxury and rustic charm, 
+                situated on 5 acres of pristine woodland. Wake up to stunning views of nature through floor-to-ceiling 
+                windows, enjoy your morning coffee on the private deck, and fall asleep to the gentle sounds of the forest.
+              </p>
+              
+              <div className="grid grid-cols-3 gap-4 mb-8">
+                <div className="text-center">
+                  <div className="bg-haven-beige bg-opacity-30 rounded-full h-16 w-16 flex items-center justify-center mx-auto mb-2">
+                    <svg className="h-8 w-8 text-haven-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                    </svg>
                   </div>
-                  <div>
-                    <img 
-                      src="/lovable-uploads/c23dc9bb-c7f4-47d3-8c31-2c792d241ee2.png" 
-                      alt="Container Home Interior" 
-                      className="w-full h-40 object-cover rounded-lg"
-                    />
-                  </div>
-                  <div>
-                    <img 
-                      src="/lovable-uploads/deda06e0-1382-4f56-875d-f5715e78fc08.png" 
-                      alt="Container Home Bedroom" 
-                      className="w-full h-40 object-cover rounded-lg"
-                    />
-                  </div>
+                  <h3 className="font-medium">Peace</h3>
                 </div>
-                
-                {/* Feature Highlights */}
-                <div className="grid md:grid-cols-3 gap-6 mb-8">
-                  <div className="p-4 border border-haven-green/20 rounded-lg hover:shadow-md transition-shadow">
-                    <h3 className="font-serif text-xl font-semibold mb-2">Amenities</h3>
-                    <p className="text-gray-600 mb-3">Modern comfort in a rustic setting with premium amenities.</p>
-                    <Link to="/stay/amenities" className="text-haven-green hover:underline inline-flex items-center">
-                      View Details 
-                      <svg className="ml-1 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
+                <div className="text-center">
+                  <div className="bg-haven-beige bg-opacity-30 rounded-full h-16 w-16 flex items-center justify-center mx-auto mb-2">
+                    <svg className="h-8 w-8 text-haven-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
                   </div>
-                  
-                  <div className="p-4 border border-haven-green/20 rounded-lg hover:shadow-md transition-shadow">
-                    <h3 className="font-serif text-xl font-semibold mb-2">Deck Views</h3>
-                    <p className="text-gray-600 mb-3">Breathtaking panoramas from our multi-level deck spaces.</p>
-                    <Link to="/stay/deck-views" className="text-haven-green hover:underline inline-flex items-center">
-                      View Details 
-                      <svg className="ml-1 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  </div>
-                  
-                  <div className="p-4 border border-haven-green/20 rounded-lg hover:shadow-md transition-shadow">
-                    <h3 className="font-serif text-xl font-semibold mb-2">Location</h3>
-                    <p className="text-gray-600 mb-3">Perfectly situated by Muttukadu Lake with stunning natural surroundings.</p>
-                    <Link to="/stay/location" className="text-haven-green hover:underline inline-flex items-center">
-                      View Details 
-                      <svg className="ml-1 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  </div>
+                  <h3 className="font-medium">Privacy</h3>
                 </div>
-                
-                {/* Policies (Condensed) */}
-                <div className="mb-8 bg-haven-beige bg-opacity-20 p-6 rounded-lg">
-                  <h3 className="font-serif text-xl font-semibold mb-4">Key Policies</h3>
-                  <div className="grid md:grid-cols-2 gap-x-6 gap-y-4">
-                    <div>
-                      <p className="font-medium mb-1">Check-in / Check-out</p>
-                      <p className="text-gray-600">Check-in: 3:00 PM - 8:00 PM<br />Check-out: 11:00 AM</p>
-                    </div>
-                    <div>
-                      <p className="font-medium mb-1">Cancellation Policy</p>
-                      <p className="text-gray-600">Free cancellation up to 7 days before check-in.</p>
-                    </div>
+                <div className="text-center">
+                  <div className="bg-haven-beige bg-opacity-30 rounded-full h-16 w-16 flex items-center justify-center mx-auto mb-2">
+                    <svg className="h-8 w-8 text-haven-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                   </div>
+                  <h3 className="font-medium">Views</h3>
                 </div>
               </div>
               
-              {/* Booking Form */}
-              <div>
-                <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
-                  <h3 className="font-serif text-xl font-semibold mb-4">Book Your Stay</h3>
-                  <p className="text-2xl font-bold mb-2">$249 <span className="text-sm font-normal text-gray-600">per night</span></p>
-                  
-                  <Separator className="my-4" />
-                  
-                  <form onSubmit={handleBooking} className="space-y-4">
-                    <div>
-                      <Label htmlFor="check-in">Check-in Date</Label>
-                      <Input 
-                        id="check-in" 
-                        type="date" 
-                        value={checkInDate}
-                        onChange={(e) => setCheckInDate(e.target.value)}
-                        className="mt-1"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="check-out">Check-out Date</Label>
-                      <Input 
-                        id="check-out" 
-                        type="date"
-                        value={checkOutDate}
-                        onChange={(e) => setCheckOutDate(e.target.value)}
-                        className="mt-1"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="guests">Guests</Label>
-                      <select 
-                        id="guests"
-                        value={guests}
-                        onChange={(e) => setGuests(Number(e.target.value))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md mt-1"
-                      >
-                        <option value={1}>1 Guest</option>
-                        <option value={2}>2 Guests</option>
-                        <option value={3}>3 Guests</option>
-                        <option value={4}>4 Guests</option>
-                      </select>
-                    </div>
-                    
-                    <Button type="submit" className="w-full btn-primary">
-                      Request to Book
-                    </Button>
-                  </form>
-                  
-                  <div className="mt-6 text-center">
-                    <p className="text-sm text-gray-600 mb-2">Looking for something special?</p>
-                    <Link to="/packages" className="text-haven-green hover:underline font-medium">
-                      View our custom packages →
-                    </Link>
-                  </div>
+              <Link to="/stay/amenities">
+                <Button className="btn-primary mb-4 w-full">Explore Amenities</Button>
+              </Link>
+              <Link to="/stay/deck-views">
+                <Button variant="outline" className="w-full">Discover Deck Views</Button>
+              </Link>
+            </motion.div>
+            
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={fadeIn}
+              className="relative"
+            >
+              <div className="grid grid-cols-12 grid-rows-6 gap-2 h-[500px]">
+                <div className="col-span-8 row-span-4 relative overflow-hidden rounded-lg shadow-lg">
+                  <img 
+                    src="/lovable-uploads/a768b355-2a53-4898-91c5-3372bc1fe662.png" 
+                    alt="Container Home Exterior" 
+                    className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <div className="col-span-4 row-span-3 relative overflow-hidden rounded-lg shadow-lg">
+                  <img 
+                    src="/lovable-uploads/c23dc9bb-c7f4-47d3-8c31-2c792d241ee2.png" 
+                    alt="Container Home Interior" 
+                    className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <div className="col-span-4 row-span-3 relative overflow-hidden rounded-lg shadow-lg">
+                  <img 
+                    src="/lovable-uploads/2d7b66e7-63b3-4b13-a6f3-9d253a5609aa.png" 
+                    alt="Rooftop Deck" 
+                    className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <div className="col-span-8 row-span-2 relative overflow-hidden rounded-lg shadow-lg">
+                  <img 
+                    src="/lovable-uploads/deda06e0-1382-4f56-875d-f5715e78fc08.png" 
+                    alt="Container Home Bedroom" 
+                    className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
               </div>
+            </motion.div>
+          </div>
+          
+          {/* Testimonials */}
+          <div className="mt-24">
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={fadeInUp}
+              className="text-center mb-12"
+            >
+              <h2 className="font-serif text-3xl font-bold mb-2">Why Guests Love This Place</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Don't just take our word for it. Here's what our guests have to say about their stay at Haven.
+              </p>
+            </motion.div>
+            
+            <div className="grid md:grid-cols-3 gap-8">
+              <motion.div 
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
+                variants={fadeInUp}
+                className="bg-white p-6 rounded-lg shadow-md border border-gray-100"
+              >
+                <div className="flex items-center mb-4">
+                  <div className="text-yellow-400 flex mr-2">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <span className="text-gray-600 text-sm">5.0</span>
+                </div>
+                <p className="text-gray-700 mb-4">
+                  "The views from the rooftop deck were absolutely breathtaking. Watching the sunset over the lake was a highlight of our trip. Such a peaceful retreat!"
+                </p>
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-haven-green rounded-full flex items-center justify-center text-white font-medium mr-3">
+                    RK
+                  </div>
+                  <div>
+                    <p className="font-medium">Ravi Kumar</p>
+                    <p className="text-gray-600 text-sm">April 2025</p>
+                  </div>
+                </div>
+              </motion.div>
+              
+              <motion.div 
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
+                variants={fadeInUp}
+                className="bg-white p-6 rounded-lg shadow-md border border-gray-100"
+                style={{ transitionDelay: "0.1s" }}
+              >
+                <div className="flex items-center mb-4">
+                  <div className="text-yellow-400 flex mr-2">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <span className="text-gray-600 text-sm">5.0</span>
+                </div>
+                <p className="text-gray-700 mb-4">
+                  "The amenities were top-notch. From the premium coffee to the luxurious bed linens, every detail was thoughtfully curated. A perfect blend of comfort and style."
+                </p>
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-haven-blue rounded-full flex items-center justify-center text-white font-medium mr-3">
+                    AP
+                  </div>
+                  <div>
+                    <p className="font-medium">Anika Patel</p>
+                    <p className="text-gray-600 text-sm">March 2025</p>
+                  </div>
+                </div>
+              </motion.div>
+              
+              <motion.div 
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
+                variants={fadeInUp}
+                className="bg-white p-6 rounded-lg shadow-md border border-gray-100"
+                style={{ transitionDelay: "0.2s" }}
+              >
+                <div className="flex items-center mb-4">
+                  <div className="text-yellow-400 flex mr-2">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <span className="text-gray-600 text-sm">5.0</span>
+                </div>
+                <p className="text-gray-700 mb-4">
+                  "The location is unbeatable. Close enough to attractions but secluded enough to feel like you're in your own world. The nearby trails were perfect for morning walks."
+                </p>
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-haven-brown rounded-full flex items-center justify-center text-white font-medium mr-3">
+                    MR
+                  </div>
+                  <div>
+                    <p className="font-medium">Michael Rodriguez</p>
+                    <p className="text-gray-600 text-sm">May 2025</p>
+                  </div>
+                </div>
+              </motion.div>
             </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
+      
+      {/* Book Now Modal */}
+      <Dialog open={bookingModalOpen} onOpenChange={setBookingModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-2xl">Book Your Stay</DialogTitle>
+            <DialogDescription>
+              Select your dates and complete your reservation to secure your lakeside escape.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleBooking} className="space-y-4 mt-4">
+            <div>
+              <Label htmlFor="check-in">Check-in Date</Label>
+              <Input 
+                id="check-in" 
+                type="date" 
+                value={checkInDate}
+                onChange={(e) => setCheckInDate(e.target.value)}
+                className="mt-1"
+                min={new Date().toISOString().split('T')[0]}
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="check-out">Check-out Date</Label>
+              <Input 
+                id="check-out" 
+                type="date"
+                value={checkOutDate}
+                onChange={(e) => setCheckOutDate(e.target.value)}
+                className="mt-1"
+                min={checkInDate || new Date().toISOString().split('T')[0]}
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="guests">Guests</Label>
+              <select 
+                id="guests"
+                value={guests}
+                onChange={(e) => setGuests(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md mt-1"
+              >
+                <option value={1}>1 Guest</option>
+                <option value={2}>2 Guests</option>
+                <option value={3}>3 Guests</option>
+                <option value={4}>4 Guests</option>
+              </select>
+            </div>
+            
+            <div className="bg-haven-beige bg-opacity-20 p-4 rounded-md">
+              <div className="flex justify-between mb-2">
+                <span>$249 × 2 nights</span>
+                <span>$498</span>
+              </div>
+              <div className="flex justify-between mb-2">
+                <span>Cleaning fee</span>
+                <span>$50</span>
+              </div>
+              <div className="flex justify-between mb-2">
+                <span>Service fee</span>
+                <span>$25</span>
+              </div>
+              <Separator className="my-2" />
+              <div className="flex justify-between font-semibold">
+                <span>Total</span>
+                <span>$573</span>
+              </div>
+            </div>
+            
+            <Button type="submit" className="w-full btn-primary">
+              Request to Book
+            </Button>
+          </form>
+          
+          <div className="mt-4">
+            <details className="group">
+              <summary className="flex cursor-pointer items-center justify-between font-medium">
+                <span>Cancellation Policy</span>
+                <span className="transition group-open:rotate-180">
+                  <svg fill="none" height="24" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="24">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </span>
+              </summary>
+              <p className="mt-2 text-gray-600 text-sm">
+                Free cancellation up to 7 days before check-in. After that, 50% of the total booking amount is refundable.
+              </p>
+            </details>
+            
+            <details className="group mt-2">
+              <summary className="flex cursor-pointer items-center justify-between font-medium">
+                <span>House Rules</span>
+                <span className="transition group-open:rotate-180">
+                  <svg fill="none" height="24" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="24">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </span>
+              </summary>
+              <ul className="mt-2 text-gray-600 text-sm space-y-1">
+                <li>Check-in: 3:00 PM - 8:00 PM</li>
+                <li>Checkout: 11:00 AM</li>
+                <li>No smoking</li>
+                <li>No pets</li>
+                <li>No parties or events</li>
+              </ul>
+            </details>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Floating Book Now Button */}
+      <div className="fixed bottom-8 right-8 z-40">
+        <Button 
+          onClick={() => setBookingModalOpen(true)}
+          className="bg-haven-green text-white hover:bg-opacity-90 shadow-lg px-6 py-6 rounded-full text-lg font-medium"
+        >
+          Book Now
+        </Button>
+      </div>
+      
       <Footer />
-    </>
+    </div>
   );
 };
 
