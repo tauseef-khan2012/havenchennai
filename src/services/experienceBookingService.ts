@@ -4,7 +4,9 @@ import {
   UUID, 
   ExperienceBookingDetails,
   PriceBreakdown,
-  ChannelType
+  ChannelType,
+  PaymentStatus,
+  BookingStatus
 } from '@/types/booking';
 import { generateBookingReference } from '@/utils/bookingUtils';
 
@@ -33,8 +35,8 @@ export const createExperienceBooking = async (
         booking_reference: bookingReference,
         special_requests: experienceDetails.specialRequests,
         currency: priceBreakdown.currency,
-        booking_status: 'Pending Payment',
-        payment_status: 'Unpaid',
+        booking_status: 'Pending Payment' as BookingStatus,
+        payment_status: 'Unpaid' as PaymentStatus,
         source_platform: sourcePlatform || null,
         source_booking_id: sourceBookingId || null
       })

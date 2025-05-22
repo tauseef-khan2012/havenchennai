@@ -5,7 +5,9 @@ import {
   PropertyBookingDetails, 
   GuestInfo, 
   PriceBreakdown,
-  ChannelType
+  ChannelType,
+  PaymentStatus,
+  BookingStatus
 } from '@/types/booking';
 import { generateBookingReference } from '@/utils/bookingUtils';
 
@@ -43,8 +45,8 @@ export const createPropertyBooking = async (
         special_requests: propertyDetails.specialRequests,
         customer_notes: propertyDetails.customerNotes,
         currency: priceBreakdown.currency,
-        booking_status: 'Pending Payment',
-        payment_status: 'Unpaid',
+        booking_status: 'Pending Payment' as BookingStatus,
+        payment_status: 'Unpaid' as PaymentStatus,
         source_platform: sourcePlatform || null,
         source_booking_id: sourceBookingId || null
       })
@@ -86,8 +88,8 @@ export const createPropertyBooking = async (
             number_of_attendees: addon.attendees,
             total_amount_due: 0, // This will be updated with the actual amount later
             booking_reference: `${bookingReference}-EXP${addon.instanceId.substring(0, 4)}`,
-            booking_status: 'Pending Payment',
-            payment_status: 'Unpaid',
+            booking_status: 'Pending Payment' as BookingStatus,
+            payment_status: 'Unpaid' as PaymentStatus,
             special_requests: `Add-on for property booking: ${booking.id}`,
             currency: priceBreakdown.currency
           });
