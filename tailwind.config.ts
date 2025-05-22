@@ -19,6 +19,11 @@ export default {
 			}
 		},
 		extend: {
+			spacing: { 
+				sm: '20px', 
+				md: '40px', 
+				lg: '80px' 
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -56,11 +61,12 @@ export default {
 				// Haven custom colors
 				haven: {
 					'green': '#3b5249',
-					'beige': '#e9e5dc',
+					'beige': '#F5F2EE',
+					'dark': '#2C2F33',
+					'teal': '#007F7F',
 					'brown': '#65524d',
 					'blue': '#75869b',
 					'light-blue': '#bfd7ea',
-                    'dark': '#1c2321',
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',

@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -11,15 +11,31 @@ const Navbar = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Stay', path: '/stay' },
-    { name: 'Experiences', path: '/experiences' },
-    { name: 'Location', path: '/location' },
-    { name: 'Packages', path: '/packages' },
     { name: 'About', path: '/about' },
+    { name: 'The Container Home', path: '/stay' },
+    { name: 'Experiences', path: '/experiences' },
+    { name: 'Gallery', path: '/gallery' },
+    { name: 'Contact', path: '/contact' },
   ];
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const isActive = (path: string) => {
     if (path === '/' && location.pathname !== '/') return false;
@@ -31,7 +47,13 @@ const Navbar = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
+    <header 
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        scrolled 
+          ? 'bg-white bg-opacity-80 backdrop-blur-md shadow-sm' 
+          : 'bg-transparent'
+      }`}
+    >
       <div className="container-custom flex justify-between items-center h-16 md:h-20">
         <Link to="/" className="font-serif text-2xl font-bold text-haven-dark">
           Haven
@@ -55,12 +77,22 @@ const Navbar = () => {
                       <Link
                         key={link.path}
                         to={link.path}
-                        className={`text-lg py-2 ${isActive(link.path) ? 'text-haven-green font-semibold' : 'text-gray-700'}`}
+                        className={`text-lg py-2 ${isActive(link.path) ? 'text-haven-teal font-semibold' : 'text-gray-700'}`}
                         onClick={() => setMenuOpen(false)}
                       >
                         {link.name}
                       </Link>
                     ))}
+                    
+                    <Link
+                      to="/booking"
+                      className="mt-4 inline-block"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <Button className="bg-haven-teal text-white hover:bg-opacity-90 w-full">
+                        Book Now
+                      </Button>
+                    </Link>
                     
                     {user ? (
                       <>
@@ -104,8 +136,8 @@ const Navbar = () => {
                   to={link.path}
                   className={`font-medium ${
                     isActive(link.path)
-                      ? 'text-haven-green'
-                      : 'text-gray-700 hover:text-haven-green transition-colors'
+                      ? 'text-haven-teal'
+                      : 'text-gray-700 hover:text-haven-teal transition-colors'
                   }`}
                 >
                   {link.name}
@@ -113,24 +145,32 @@ const Navbar = () => {
               ))}
             </nav>
             
-            {user ? (
-              <div className="flex items-center space-x-4">
-                <Link to="/dashboard">
-                  <Button variant="outline" size="sm">Dashboard</Button>
-                </Link>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={signOut}
-                >
-                  Sign Out
+            <div className="flex items-center space-x-4">
+              <Link to="/booking">
+                <Button className="bg-haven-teal text-white hover:bg-opacity-90">
+                  Book Now
                 </Button>
-              </div>
-            ) : (
-              <Link to="/login">
-                <Button variant="outline" size="sm">Sign In</Button>
               </Link>
-            )}
+              
+              {user ? (
+                <div className="flex items-center space-x-4">
+                  <Link to="/dashboard">
+                    <Button variant="outline" size="sm">Dashboard</Button>
+                  </Link>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={signOut}
+                  >
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <Link to="/login">
+                  <Button variant="outline" size="sm">Sign In</Button>
+                </Link>
+              )}
+            </div>
           </div>
         )}
       </div>
