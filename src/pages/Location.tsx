@@ -4,6 +4,7 @@ import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { MapPin, Navigation, Compass } from 'lucide-react';
 import LocationHero from '@/components/location/LocationHero';
+import RecreationalFacilities from '@/components/location/RecreationalFacilities';
 
 const Location = () => {
   return (
@@ -78,6 +79,9 @@ const Location = () => {
             </div>
           </div>
         </section>
+        
+        {/* Add the RecreationalFacilities component here */}
+        <RecreationalFacilities />
         
         {/* Natural Surroundings Section */}
         <section className="py-16 bg-haven-beige bg-opacity-20">

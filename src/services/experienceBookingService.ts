@@ -1,78 +1,189 @@
+import { db } from '@/lib/db';
+import { v4 as uuidv4 } from 'uuid';
+import { ExperienceBooking, BookingStatus, PaymentStatus } from '@/types/booking';
 
-import { supabase } from '@/integrations/supabase/client';
-import { 
-  UUID, 
-  ExperienceBookingDetails,
-  PriceBreakdown,
-  ChannelType,
-  PaymentStatus,
-  BookingStatus
-} from '@/types/booking';
-import { generateBookingReference } from '@/utils/bookingUtils';
-
-/**
- * Creates an experience booking in the database
- */
 export const createExperienceBooking = async (
-  userId: UUID,
-  experienceDetails: ExperienceBookingDetails,
-  priceBreakdown: PriceBreakdown,
-  sourcePlatform?: ChannelType,
-  sourceBookingId?: string
-): Promise<{ bookingId: UUID, bookingReference: string }> => {
-  // Generate booking reference
-  const bookingReference = generateBookingReference();
-  
+  userId: string,
+  experienceId: string,
+  date: Date,
+  numberOfGuests: number,
+  specialRequests?: string
+): Promise<ExperienceBooking> => {
   try {
-    // Create the booking
-    const { data: booking, error: bookingError } = await supabase
-      .from('experience_bookings')
-      .insert({
-        user_id: userId,
-        experience_instance_id: experienceDetails.instanceId,
-        number_of_attendees: experienceDetails.numberOfAttendees,
-        total_amount_due: priceBreakdown.totalAmountDue,
-        booking_reference: bookingReference,
-        special_requests: experienceDetails.specialRequests,
-        currency: priceBreakdown.currency,
-        booking_status: 'Pending Payment' as BookingStatus,
-        payment_status: 'Unpaid' as PaymentStatus,
-        source_platform: sourcePlatform || null,
-        source_booking_id: sourceBookingId || null
-      })
-      .select('id')
-      .single();
+    // Calculate total price based on experience price and number of guests
+    const experience = await db.experience.findUnique({
+      where: { id: experienceId },
+    });
 
-    if (bookingError) {
-      console.error('Error creating experience booking:', bookingError);
-      throw new Error(`Failed to create experience booking: ${bookingError.message}`);
+    if (!experience) {
+      throw new Error('Experience not found');
     }
 
-    if (!booking) {
-      throw new Error('Failed to create experience booking - no data returned');
-    }
+    const totalPrice = experience.pricePerPerson * numberOfGuests;
 
-    // Update the current_attendees in the experience_instance
-    const { error: updateError } = await supabase.rpc(
-      'increment_experience_attendees', 
-      {
-        instance_id: experienceDetails.instanceId,
-        attendees_count: experienceDetails.numberOfAttendees
-      }
-    );
+    // Create booking
+    const booking = await db.experienceBooking.create({
+      data: {
+        id: uuidv4(),
+        userId,
+        experienceId,
+        date,
+        numberOfGuests,
+        totalPrice,
+        specialRequests,
+        status: 'Pending' as BookingStatus,
+        payment: {
+          create: {
+            id: uuidv4(),
+            amount: totalPrice,
+            status: 'Unpaid' as PaymentStatus,
+          },
+        },
+      },
+      include: {
+        experience: true,
+        payment: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
 
-    if (updateError) {
-      console.error('Error updating experience instance attendees:', updateError);
-      // Consider rolling back the booking here if capacity update fails
-      throw new Error(`Failed to update experience capacity: ${updateError.message}`);
-    }
-
-    return {
-      bookingId: booking.id,
-      bookingReference
-    };
+    return booking;
   } catch (error) {
-    console.error('Error in createExperienceBooking:', error);
+    console.error('Error creating experience booking:', error);
+    throw error;
+  }
+};
+
+export const getExperienceBookingById = async (bookingId: string): Promise<ExperienceBooking | null> => {
+  try {
+    const booking = await db.experienceBooking.findUnique({
+      where: { id: bookingId },
+      include: {
+        experience: true,
+        payment: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    return booking;
+  } catch (error) {
+    console.error('Error fetching experience booking:', error);
+    throw error;
+  }
+};
+
+export const updateExperienceBookingStatus = async (
+  bookingId: string,
+  status: BookingStatus
+): Promise<ExperienceBooking> => {
+  try {
+    const booking = await db.experienceBooking.update({
+      where: { id: bookingId },
+      data: { status },
+      include: {
+        experience: true,
+        payment: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    return booking;
+  } catch (error) {
+    console.error('Error updating experience booking status:', error);
+    throw error;
+  }
+};
+
+export const initiateExperienceBookingPayment = async (bookingId: string): Promise<ExperienceBooking> => {
+  try {
+    // In a real application, this would integrate with a payment gateway
+    // For now, we'll just update the booking status
+    const booking = await db.experienceBooking.update({
+      where: { id: bookingId },
+      data: { 
+        status: "Pending Payment" as BookingStatus,
+      },
+      include: {
+        experience: true,
+        payment: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    return booking;
+  } catch (error) {
+    console.error('Error initiating experience booking payment:', error);
+    throw error;
+  }
+};
+
+export const getUserExperienceBookings = async (userId: string): Promise<ExperienceBooking[]> => {
+  try {
+    const bookings = await db.experienceBooking.findMany({
+      where: { userId },
+      include: {
+        experience: true,
+        payment: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return bookings;
+  } catch (error) {
+    console.error('Error fetching user experience bookings:', error);
+    throw error;
+  }
+};
+
+export const cancelExperienceBooking = async (bookingId: string): Promise<ExperienceBooking> => {
+  try {
+    const booking = await db.experienceBooking.update({
+      where: { id: bookingId },
+      data: { 
+        status: 'Cancelled' as BookingStatus,
+      },
+      include: {
+        experience: true,
+        payment: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    return booking;
+  } catch (error) {
+    console.error('Error cancelling experience booking:', error);
     throw error;
   }
 };
