@@ -1,89 +1,140 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Menu, UserRound } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Menu, X } from 'lucide-react';
+import useMobile from '@/hooks/use-mobile';
 
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, profile, signOut } = useAuth();
+  const { user, signOut } = useAuth();
+  const location = useLocation();
+  const isMobile = useMobile();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const navLinks = [
+    { name: 'Home', path: '/' },
+    { name: 'Stay', path: '/stay' },
+    { name: 'Experiences', path: '/experiences' },
+    { name: 'Location', path: '/location' },
+    { name: 'Packages', path: '/packages' },
+    { name: 'About', path: '/about' },
+  ];
+
+  const isActive = (path: string) => {
+    if (path === '/' && location.pathname !== '/') return false;
+    return location.pathname.startsWith(path);
+  };
+
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
 
   return (
-    <nav className="bg-white bg-opacity-95 sticky top-0 z-50 shadow-sm">
-      <div className="container-custom flex justify-between items-center py-4">
-        <Link to="/" className="flex items-center">
-          <span className="font-serif text-haven-green text-2xl font-bold">Haven</span>
+    <header className="bg-white shadow-sm sticky top-0 z-50">
+      <div className="container-custom flex justify-between items-center h-16 md:h-20">
+        <Link to="/" className="font-serif text-2xl font-bold text-haven-dark">
+          Haven
         </Link>
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-6">
-          <Link to="/" className="text-haven-dark hover:text-haven-green transition-colors">Home</Link>
-          <Link to="/about" className="text-haven-dark hover:text-haven-green transition-colors">About Us</Link>
-          <Link to="/stay" className="text-haven-dark hover:text-haven-green transition-colors">Stay</Link>
-          <Link to="/experiences" className="text-haven-dark hover:text-haven-green transition-colors">Experiences</Link>
-          <Link to="/packages" className="text-haven-dark hover:text-haven-green transition-colors">Packages</Link>
-          
-          {user ? (
-            <div className="flex items-center space-x-4">
-              <Link to="/dashboard" className="flex items-center space-x-2">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-haven-green text-white">
-                    {profile?.full_name?.split(' ').map((n: string) => n[0]).join('') || user.email?.[0].toUpperCase() || 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="text-haven-dark hover:text-haven-green transition-colors">My Account</span>
-              </Link>
-            </div>
-          ) : (
-            <Link to="/login">
-              <Button variant="outline" className="ml-4">Login</Button>
-            </Link>
-          )}
-        </div>
-
-        {/* Mobile Menu Button */}
-        <div className="md:hidden">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label={isMenuOpen ? "Close Menu" : "Open Menu"}
-          >
-            <Menu className="h-6 w-6" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Mobile Navigation */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white shadow-md animate-fade-in">
-          <div className="container-custom py-4 flex flex-col space-y-4">
-            <Link to="/" className="text-haven-dark hover:text-haven-green transition-colors py-2 border-b border-gray-100" onClick={() => setIsMenuOpen(false)}>Home</Link>
-            <Link to="/about" className="text-haven-dark hover:text-haven-green transition-colors py-2 border-b border-gray-100" onClick={() => setIsMenuOpen(false)}>About Us</Link>
-            <Link to="/stay" className="text-haven-dark hover:text-haven-green transition-colors py-2 border-b border-gray-100" onClick={() => setIsMenuOpen(false)}>Stay</Link>
-            <Link to="/experiences" className="text-haven-dark hover:text-haven-green transition-colors py-2 border-b border-gray-100" onClick={() => setIsMenuOpen(false)}>Experiences</Link>
-            <Link to="/packages" className="text-haven-dark hover:text-haven-green transition-colors py-2 border-b border-gray-100" onClick={() => setIsMenuOpen(false)}>Packages</Link>
+        {isMobile ? (
+          <>
+            <button 
+              onClick={toggleMenu} 
+              className="p-2"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+            >
+              {menuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+            
+            {menuOpen && (
+              <div className="fixed inset-0 bg-white z-40 pt-16">
+                <div className="container-custom py-4">
+                  <nav className="flex flex-col space-y-4">
+                    {navLinks.map(link => (
+                      <Link
+                        key={link.path}
+                        to={link.path}
+                        className={`text-lg py-2 ${isActive(link.path) ? 'text-haven-green font-semibold' : 'text-gray-700'}`}
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        {link.name}
+                      </Link>
+                    ))}
+                    
+                    {user ? (
+                      <>
+                        <Link 
+                          to="/dashboard" 
+                          className="text-lg py-2 text-gray-700"
+                          onClick={() => setMenuOpen(false)}
+                        >
+                          Dashboard
+                        </Link>
+                        <button 
+                          onClick={() => {
+                            signOut();
+                            setMenuOpen(false);
+                          }} 
+                          className="text-lg py-2 text-gray-700 text-left"
+                        >
+                          Sign Out
+                        </button>
+                      </>
+                    ) : (
+                      <Link 
+                        to="/login" 
+                        className="text-lg py-2 text-gray-700"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        Sign In
+                      </Link>
+                    )}
+                  </nav>
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="flex items-center">
+            <nav className="flex space-x-6 mr-6">
+              {navLinks.map(link => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`font-medium ${
+                    isActive(link.path)
+                      ? 'text-haven-green'
+                      : 'text-gray-700 hover:text-haven-green transition-colors'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </nav>
             
             {user ? (
-              <>
-                <Link to="/dashboard" className="text-haven-dark hover:text-haven-green transition-colors py-2 border-b border-gray-100" onClick={() => setIsMenuOpen(false)}>
-                  My Account
+              <div className="flex items-center space-x-4">
+                <Link to="/dashboard">
+                  <Button variant="outline" size="sm">Dashboard</Button>
                 </Link>
-                <Button variant="outline" className="w-full" onClick={() => { signOut(); setIsMenuOpen(false); }}>
-                  Logout
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={signOut}
+                >
+                  Sign Out
                 </Button>
-              </>
+              </div>
             ) : (
-              <Link to="/login" className="w-full" onClick={() => setIsMenuOpen(false)}>
-                <Button variant="outline" className="w-full">Login</Button>
+              <Link to="/login">
+                <Button variant="outline" size="sm">Sign In</Button>
               </Link>
             )}
           </div>
-        </div>
-      )}
-    </nav>
+        )}
+      </div>
+    </header>
   );
 };
 

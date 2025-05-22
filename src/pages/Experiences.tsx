@@ -33,9 +33,9 @@ const Experiences = () => {
       <Navbar />
       <main>
         <ExperienceHero 
-          title="Outdoor Experiences" 
-          subtitle="Discover unique activities led by our passionate local experts."
-          backgroundImage="https://images.unsplash.com/photo-1472396961693-142e6e269027?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80"
+          title="Lakeside Experiences" 
+          subtitle="Discover unique activities in and around Haven, our intimate container retreat by Muttukadu Lake."
+          backgroundImage="https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80"
         />
         
         <ExperienceFilter 

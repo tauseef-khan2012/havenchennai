@@ -1,49 +1,24 @@
 
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
+
 const ExperiencePhilosophy = () => {
   return (
-    <section className="py-12 bg-haven-green text-white">
+    <section className="py-16 bg-haven-beige bg-opacity-20">
       <div className="container-custom">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <h2 className="font-serif text-3xl font-bold mb-4">Our Experience Philosophy</h2>
-            <p className="mb-4">
-              At Haven, we believe that meaningful connections with nature and local culture are essential 
-              for a truly transformative stay. Our experiences are carefully crafted to be:
-            </p>
-            <ul className="space-y-3">
-              <li className="flex items-start">
-                <svg className="h-6 w-6 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span><strong>Authentic</strong> - Created and led by passionate local experts</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="h-6 w-6 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span><strong>Immersive</strong> - Designed for deep connection with nature</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="h-6 w-6 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span><strong>Sustainable</strong> - Respectful of the environment and local communities</span>
-              </li>
-              <li className="flex items-start">
-                <svg className="h-6 w-6 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span><strong>Small-Group</strong> - Limited to ensure personal attention and minimal impact</span>
-              </li>
-            </ul>
-          </div>
-          <div className="rounded-lg overflow-hidden shadow-md">
-            <img 
-              src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-              alt="Nature experiences" 
-              className="w-full h-[400px] object-cover"
-            />
-          </div>
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="font-serif text-3xl font-bold mb-6">Our Experience Philosophy</h2>
+          <p className="text-gray-700 mb-8">
+            At Haven, we believe that meaningful experiences create lasting connections. Our curated activities are designed to help you connect—with nature, with yourself, and with each other. From the serene waters of Muttukadu Lake to the starlit skies above our rooftop deck, each experience offers a unique way to embrace the beauty of simplicity and the richness of the present moment.
+          </p>
+          <p className="text-gray-700 mb-8">
+            We've thoughtfully crafted each experience to complement the intimate nature of our container home, embracing sustainable practices and highlighting the natural wonders that surround us. Whether you're watching birds take flight across the lake or enjoying a meal under the stars, we invite you to slow down and savor the simple luxury of time well spent.
+          </p>
+          <Link to="/stay">
+            <Button className="bg-haven-green hover:bg-haven-green/90">
+              Explore Our Container Stay
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
