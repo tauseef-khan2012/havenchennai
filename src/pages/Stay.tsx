@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/components/ui/use-toast';
+import StayHero from '@/components/stay/StayHero';
 
 const Stay = () => {
   const [checkInDate, setCheckInDate] = useState('');
@@ -62,23 +63,11 @@ const Stay = () => {
     <>
       <Navbar />
       <main>
-        {/* Hero Section */}
-        <section className="relative h-[60vh] bg-black overflow-hidden">
-          <div 
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ 
-              backgroundImage: 'url(https://images.unsplash.com/photo-1500673922987-e212871fec22?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80)',
-              filter: 'brightness(0.6)'
-            }}
-          />
-          <div className="absolute inset-0 bg-black bg-opacity-30" />
-          <div className="relative h-full container-custom flex flex-col justify-center">
-            <div className="max-w-2xl animate-fade-up">
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Book Your Stay</h1>
-              <p className="text-xl text-white">Experience our unique container home surrounded by nature.</p>
-            </div>
-          </div>
-        </section>
+        <StayHero 
+          title="Book Your Stay"
+          subtitle="Experience our unique container home surrounded by nature."
+          backgroundImage="/lovable-uploads/43aa0007-941b-4b51-b1a0-a2b67f4bc6d2.png"
+        />
         
         {/* Main Content */}
         <section className="py-16">
@@ -97,22 +86,22 @@ const Stay = () => {
                 <div className="grid grid-cols-2 gap-4 mb-8">
                   <div className="col-span-2">
                     <img 
-                      src="https://images.unsplash.com/photo-1500673922987-e212871fec22?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80" 
+                      src="/lovable-uploads/a768b355-2a53-4898-91c5-3372bc1fe662.png" 
                       alt="Container Home Exterior" 
                       className="w-full h-64 object-cover rounded-lg"
                     />
                   </div>
                   <div>
                     <img 
-                      src="https://images.unsplash.com/photo-1472396961693-142e6e269027?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                      src="/lovable-uploads/c23dc9bb-c7f4-47d3-8c31-2c792d241ee2.png" 
                       alt="Container Home Interior" 
                       className="w-full h-40 object-cover rounded-lg"
                     />
                   </div>
                   <div>
                     <img 
-                      src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                      alt="Container Home Interior" 
+                      src="/lovable-uploads/deda06e0-1382-4f56-875d-f5715e78fc08.png" 
+                      alt="Container Home Bedroom" 
                       className="w-full h-40 object-cover rounded-lg"
                     />
                   </div>

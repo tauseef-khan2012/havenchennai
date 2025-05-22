@@ -3,29 +3,18 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { MapPin, Navigation, Compass } from 'lucide-react';
+import LocationHero from '@/components/location/LocationHero';
 
 const Location = () => {
   return (
     <>
       <Navbar />
       <main>
-        {/* Hero Section */}
-        <section className="relative h-[50vh] bg-black overflow-hidden">
-          <div 
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ 
-              backgroundImage: 'url(https://images.unsplash.com/photo-1518013431117-eb1465fa5752?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80)',
-              filter: 'brightness(0.6)'
-            }}
-          />
-          <div className="absolute inset-0 bg-black bg-opacity-30" />
-          <div className="relative h-full container-custom flex flex-col justify-center">
-            <div className="max-w-2xl animate-fade-up">
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Find Your Way to Haven</h1>
-              <p className="text-xl text-white">Nestled beside the serene Muttukadu Lake, our container retreat awaits your discovery.</p>
-            </div>
-          </div>
-        </section>
+        <LocationHero 
+          title="Find Your Way to Haven"
+          subtitle="Nestled beside the serene Muttukadu Lake, our container retreat awaits your discovery."
+          backgroundImage="/lovable-uploads/92fdb568-68f2-4ac8-9908-e0db6e29b56d.png"
+        />
         
         {/* Map Section */}
         <section className="py-16">
@@ -107,8 +96,8 @@ const Location = () => {
               </div>
               <div className="rounded-lg overflow-hidden shadow-lg">
                 <img 
-                  src="https://images.unsplash.com/photo-1518013431117-eb1465fa5752?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80" 
-                  alt="Muttukadu Lake" 
+                  src="/lovable-uploads/92fdb568-68f2-4ac8-9908-e0db6e29b56d.png" 
+                  alt="View of Muttukadu Lake from Haven's rooftop" 
                   className="w-full h-[350px] object-cover"
                 />
               </div>
@@ -126,8 +115,8 @@ const Location = () => {
               </div>
               <div className="rounded-lg overflow-hidden shadow-lg md:order-1">
                 <img 
-                  src="https://images.unsplash.com/photo-1612024782955-49fae79e42bb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80" 
-                  alt="Birds at Muttukadu" 
+                  src="/lovable-uploads/6f37f539-1310-49d2-965a-0c02228f5ced.png" 
+                  alt="Sunset view from Haven's rooftop" 
                   className="w-full h-[350px] object-cover"
                 />
               </div>
@@ -144,8 +133,8 @@ const Location = () => {
               <div className="bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:shadow-lg h-full flex flex-col">
                 <div className="h-48 overflow-hidden">
                   <img 
-                    src="https://images.unsplash.com/photo-1566908829550-e6551b00979b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80" 
-                    alt="Container Home" 
+                    src="/lovable-uploads/a768b355-2a53-4898-91c5-3372bc1fe662.png" 
+                    alt="Container Home Exterior" 
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   />
                 </div>
@@ -160,8 +149,8 @@ const Location = () => {
               <div className="bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:shadow-lg h-full flex flex-col">
                 <div className="h-48 overflow-hidden">
                   <img 
-                    src="https://images.unsplash.com/photo-1543459176-4426b37the9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80" 
-                    alt="Deck Spaces" 
+                    src="/lovable-uploads/15811ea8-1b7c-41c0-9b75-05f249f60154.png" 
+                    alt="Yellow Deck Spaces" 
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   />
                 </div>
@@ -176,15 +165,15 @@ const Location = () => {
               <div className="bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:shadow-lg h-full flex flex-col">
                 <div className="h-48 overflow-hidden">
                   <img 
-                    src="https://images.unsplash.com/photo-1601918774946-25832a4be0d6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1400&q=80" 
-                    alt="Open Spaces" 
+                    src="/lovable-uploads/15b485a2-1d79-4783-ba80-f0cf6d9d7a20.png" 
+                    alt="Container Home with Yellow Stairs" 
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   />
                 </div>
                 <div className="p-5 flex flex-col flex-grow">
-                  <h3 className="font-serif text-xl font-semibold mb-2">Backyard & Open Spaces</h3>
+                  <h3 className="font-serif text-xl font-semibold mb-2">Distinctive Architecture</h3>
                   <p className="text-gray-600 text-sm flex-grow">
-                    Our developing backyard and 5,000 sq. ft. sandy open space provide ample room for outdoor activities, small gatherings, and connecting with nature during your stay at Haven.
+                    Our developing backyard and architectural details like the signature yellow stairs provide both functionality and aesthetic appeal, making your stay at Haven a truly unique experience.
                   </p>
                 </div>
               </div>

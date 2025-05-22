@@ -91,12 +91,12 @@ const Index = () => {
               <PropertyHighlight 
                 title="Luxury Container Home"
                 description="Experience the perfect blend of modern comfort and rustic charm in our thoughtfully designed container home. With panoramic windows that frame breathtaking views, a fully equipped kitchen, luxurious bathroom, and a private deck for stargazing, our container home redefines eco-luxury."
-                imageUrl="https://images.unsplash.com/photo-1500673922987-e212871fec22?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80"
+                imageUrl="/lovable-uploads/a768b355-2a53-4898-91c5-3372bc1fe662.png"
               />
               <PropertyHighlight 
                 title="Immersed in Nature"
-                description="Situated on 5 acres of pristine woodland, our property offers the perfect balance of seclusion and accessibility. Wake up to birdsong, enjoy your morning coffee while watching deer graze nearby, and fall asleep to the gentle sounds of the forest."
-                imageUrl="https://images.unsplash.com/photo-1472396961693-142e6e269027?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80"
+                description="Situated on the shore of Muttukadu Lake, our property offers the perfect balance of seclusion and accessibility. Wake up to birdsong, enjoy your morning coffee while watching the sunrise over the lake, and fall asleep to the gentle sounds of nature."
+                imageUrl="/lovable-uploads/92fdb568-68f2-4ac8-9908-e0db6e29b56d.png"
                 reverse={true}
               />
             </div>
