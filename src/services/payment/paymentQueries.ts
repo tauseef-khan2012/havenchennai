@@ -1,26 +1,38 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { UUID, BookingType } from '@/types/booking';
+import { PaymentRecord, UUID, BookingType } from '@/types/booking';
 
 /**
- * Gets payment details by ID
- * @param paymentId Payment ID
- * @returns Payment details
+ * Gets details for a specific payment
+ * @param transactionId Transaction ID
+ * @returns Payment record
  */
-export const getPaymentDetails = async (paymentId: UUID): Promise<any> => {
+export const getPaymentDetails = async (transactionId: string): Promise<PaymentRecord | null> => {
   try {
     const { data, error } = await supabase
       .from('payments')
       .select('*')
-      .eq('id', paymentId)
-      .single();
+      .eq('transaction_id', transactionId)
+      .maybeSingle();
 
     if (error) {
-      console.error('Error fetching payment details:', error);
-      throw new Error(`Failed to fetch payment: ${error.message}`);
+      console.error('Error getting payment details:', error);
+      throw new Error(`Failed to get payment details: ${error.message}`);
     }
 
-    return data;
+    if (!data) {
+      return null;
+    }
+
+    return {
+      bookingId: data.booking_id,
+      bookingType: data.booking_type as BookingType,
+      amount: data.amount,
+      currency: data.currency,
+      transactionId: data.transaction_id,
+      paymentMethod: data.payment_method,
+      paymentStatus: data.status
+    };
   } catch (error) {
     console.error('Error in getPaymentDetails:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
@@ -29,30 +41,40 @@ export const getPaymentDetails = async (paymentId: UUID): Promise<any> => {
 };
 
 /**
- * Gets payments for a booking
+ * Gets all payments for a booking
  * @param bookingId Booking ID
- * @param bookingType Type of booking
- * @returns List of payments
+ * @param bookingType Booking type
+ * @returns Array of payment records
  */
 export const getBookingPayments = async (
   bookingId: UUID,
   bookingType: BookingType
-): Promise<any[]> => {
+): Promise<PaymentRecord[]> => {
   try {
-    const column = bookingType === 'property' ? 'booking_id' : 'experience_booking_id';
-    
     const { data, error } = await supabase
       .from('payments')
       .select('*')
-      .eq(column, bookingId)
-      .order('processed_at', { ascending: false });
+      .eq('booking_id', bookingId)
+      .eq('booking_type', bookingType);
 
     if (error) {
-      console.error('Error fetching booking payments:', error);
-      throw new Error(`Failed to fetch payments: ${error.message}`);
+      console.error('Error getting booking payments:', error);
+      throw new Error(`Failed to get booking payments: ${error.message}`);
     }
 
-    return data || [];
+    if (!data || data.length === 0) {
+      return [];
+    }
+
+    return data.map(item => ({
+      bookingId: item.booking_id,
+      bookingType: item.booking_type as BookingType,
+      amount: item.amount,
+      currency: item.currency,
+      transactionId: item.transaction_id,
+      paymentMethod: item.payment_method,
+      paymentStatus: item.status
+    }));
   } catch (error) {
     console.error('Error in getBookingPayments:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';

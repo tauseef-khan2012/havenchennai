@@ -3,29 +3,24 @@ import { supabase } from '@/integrations/supabase/client';
 import { PaymentInitiationData } from '@/types/booking';
 
 /**
- * Initiates a payment with the payment gateway
+ * Initiates a payment with Razorpay
  * @param paymentData Payment initiation data
- * @returns Order ID and gateway API key
+ * @returns Order ID and Razorpay key
  */
 export const initiatePayment = async (
   paymentData: PaymentInitiationData
-): Promise<{
-  orderId: string;
-  razorpayKey: string;
-}> => {
+): Promise<{ orderId: string; razorpayKey: string }> => {
   try {
     // Call Supabase Edge Function to create Razorpay order
     const { data, error } = await supabase.functions.invoke('create-razorpay-order', {
       body: {
-        bookingId: paymentData.bookingId,
-        bookingType: paymentData.bookingType,
         amount: paymentData.amount,
         currency: paymentData.currency,
         receipt: paymentData.bookingReference,
         notes: {
-          bookingReference: paymentData.bookingReference,
-          userEmail: paymentData.userEmail,
-          userName: paymentData.userName
+          bookingId: paymentData.bookingId,
+          bookingType: paymentData.bookingType,
+          userEmail: paymentData.userEmail
         }
       }
     });
@@ -35,8 +30,8 @@ export const initiatePayment = async (
       throw new Error(`Failed to initiate payment: ${error.message}`);
     }
 
-    if (!data || !data.orderId) {
-      throw new Error('Failed to create payment order: No order ID returned');
+    if (!data || !data.orderId || !data.razorpayKey) {
+      throw new Error('Invalid response from payment initiation');
     }
 
     return {

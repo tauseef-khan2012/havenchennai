@@ -16,7 +16,7 @@ const Index = () => {
       id: '1',
       title: 'Forest Hike & Meditation',
       description: 'Guided forest therapy with meditation and mindfulness practices in pristine wilderness.',
-      imageUrl: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+      imageUrl: '/lovable-uploads/8446db9f-ec1d-4876-adb8-84f568a58892.png',
       category: 'Wellness',
       duration: '3 hours',
       price: 89,
@@ -25,7 +25,7 @@ const Index = () => {
       id: '2',
       title: 'Wildlife Photography',
       description: 'Capture the beauty of local wildlife with expert photography guidance at dawn or dusk.',
-      imageUrl: 'https://images.unsplash.com/photo-1472396961693-142e6e269027?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+      imageUrl: '/lovable-uploads/3d09a878-2b77-4c76-b9dc-916c5572305e.png',
       category: 'Adventure',
       duration: '4 hours',
       price: 119,
@@ -34,11 +34,29 @@ const Index = () => {
       id: '3',
       title: 'Farm-to-Table Cooking',
       description: 'Learn to prepare delicious meals with fresh ingredients harvested from our on-site garden.',
-      imageUrl: 'https://images.unsplash.com/photo-1582562124811-c09040d0a901?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80',
+      imageUrl: '/lovable-uploads/d7acb4b7-3f86-425c-acc9-a34b740cb105.png',
       category: 'Culinary',
       duration: '2.5 hours',
       price: 99,
     },
+  ];
+
+  const amenities = [
+    {
+      title: 'Luxury Accommodations',
+      description: 'Thoughtfully designed container homes with premium finishes and comforts.',
+      imageUrl: '/lovable-uploads/15b485a2-1d79-4783-ba80-f0cf6d9d7a20.png'
+    },
+    {
+      title: 'Private Lake Views',
+      description: 'Every property features stunning panoramic views of Muttukadu Lake.',
+      imageUrl: '/lovable-uploads/2d7b66e7-63b3-4b13-a6f3-9d253a5609aa.png'
+    },
+    {
+      title: 'Immersive Experiences',
+      description: 'Connect with nature through our carefully curated outdoor activities.',
+      imageUrl: '/lovable-uploads/98e46d57-3441-4761-9cdf-18542ba4837c.png'
+    }
   ];
 
   return (
@@ -99,6 +117,35 @@ const Index = () => {
                 imageUrl="/lovable-uploads/92fdb568-68f2-4ac8-9908-e0db6e29b56d.png"
                 reverse={true}
               />
+              <PropertyHighlight 
+                title="Sustainable Living"
+                description="Our eco-friendly container homes are designed with sustainability in mind. Using repurposed shipping containers and equipped with solar power, rainwater harvesting, and locally-sourced materials, your stay has minimal environmental impact."
+                imageUrl="/lovable-uploads/6f37f539-1310-49d2-965a-0c02228f5ced.png"
+              />
+            </div>
+          </div>
+        </section>
+        
+        {/* Amenities Section */}
+        <section className="py-16 bg-gray-50">
+          <div className="container-custom">
+            <h2 className="font-serif text-3xl font-bold text-center mb-12">Premium Amenities</h2>
+            <div className="grid md:grid-cols-3 gap-8">
+              {amenities.map((amenity, index) => (
+                <div key={index} className="bg-white rounded-lg overflow-hidden shadow-md transition-transform hover:scale-[1.01]">
+                  <div className="h-56 overflow-hidden">
+                    <img 
+                      src={amenity.imageUrl} 
+                      alt={amenity.title} 
+                      className="w-full h-full object-cover transition-transform hover:scale-105"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="font-serif text-xl font-semibold mb-2">{amenity.title}</h3>
+                    <p className="text-gray-600">{amenity.description}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -149,6 +196,50 @@ const Index = () => {
                 author="Emily K."
                 location="Seattle, WA"
               />
+            </div>
+          </div>
+        </section>
+        
+        {/* Photo Gallery */}
+        <section className="py-16 bg-gray-50">
+          <div className="container-custom">
+            <h2 className="font-serif text-3xl font-bold text-center mb-12">Explore Our Haven</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="overflow-hidden rounded-lg col-span-2 row-span-2">
+                <img 
+                  src="/lovable-uploads/e017493d-c2c0-467e-a191-28fe62a406ab.png" 
+                  alt="Container home exterior" 
+                  className="w-full h-full object-cover transition-transform hover:scale-105"
+                />
+              </div>
+              <div className="overflow-hidden rounded-lg">
+                <img 
+                  src="/lovable-uploads/d1148760-0de0-44d6-ae11-98a16c4b61fc.png" 
+                  alt="Living area" 
+                  className="w-full h-full object-cover transition-transform hover:scale-105"
+                />
+              </div>
+              <div className="overflow-hidden rounded-lg">
+                <img 
+                  src="/lovable-uploads/e4f31ab2-de64-417b-af9f-97d3d17e2f47.png" 
+                  alt="Bedroom view" 
+                  className="w-full h-full object-cover transition-transform hover:scale-105"
+                />
+              </div>
+              <div className="overflow-hidden rounded-lg">
+                <img 
+                  src="/lovable-uploads/ea3b40a2-e087-4627-aecc-211b123dc269.png" 
+                  alt="Outdoor deck" 
+                  className="w-full h-full object-cover transition-transform hover:scale-105"
+                />
+              </div>
+              <div className="overflow-hidden rounded-lg">
+                <img 
+                  src="/lovable-uploads/deda06e0-1382-4f56-875d-f5715e78fc08.png" 
+                  alt="Lakeside view" 
+                  className="w-full h-full object-cover transition-transform hover:scale-105"
+                />
+              </div>
             </div>
           </div>
         </section>

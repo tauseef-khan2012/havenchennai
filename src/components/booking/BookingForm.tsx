@@ -1,18 +1,9 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBooking } from '@/hooks/useBooking';
-import { Card } from '@/components/ui/card';
-import { PriceSummary } from '@/components/booking/PriceSummary';
-import PropertyBookingStep1_DatesGuests from '@/components/booking/PropertyBookingStep1_DatesGuests';
-import PropertyBookingStep2_Addons from '@/components/booking/PropertyBookingStep2_Addons';
-import ExperienceBookingStep1_Attendees from '@/components/booking/ExperienceBookingStep1_Attendees';
-import ExperienceBookingStep2_Requests from '@/components/booking/ExperienceBookingStep2_Requests';
-import BookingStep_GuestInfo from '@/components/booking/BookingStep_GuestInfo';
-import BookingStep_Summary from '@/components/booking/BookingStep_Summary';
-import BookingStep_Payment from '@/components/booking/BookingStep_Payment';
-import BookingStep_Confirmation from '@/components/booking/BookingStep_Confirmation';
-import { calculateNights } from '@/utils/bookingUtils';
+import BookingStepRenderer from './BookingStepRenderer';
 import { UUID, PriceBreakdown, GuestInfo } from '@/types/booking';
 
 interface BookingFormProps {
@@ -125,6 +116,23 @@ export const BookingForm = ({
     }
   };
 
+  // Handle property step 1 completion
+  const handlePropertyStep1Complete = (checkIn: string, checkOut: string, guests: number) => {
+    setCheckInDate(checkIn);
+    setCheckOutDate(checkOut);
+    setGuestCount(guests);
+    handleCalculatePrice();
+  };
+
+  // Handle guest info update
+  const handleGuestInfoUpdate = (updatedGuests: GuestInfo[], updatedSpecialRequests?: string) => {
+    setGuests(updatedGuests);
+    if (updatedSpecialRequests !== undefined) {
+      setSpecialRequests(updatedSpecialRequests);
+    }
+    setFormStep(2);
+  };
+
   // Submit the booking
   const handleSubmit = async () => {
     if (!user) {
@@ -188,138 +196,34 @@ export const BookingForm = ({
     }
   };
 
-  // Handle property step 1 completion
-  const handlePropertyStep1Complete = (checkIn: string, checkOut: string, guests: number) => {
-    setCheckInDate(checkIn);
-    setCheckOutDate(checkOut);
-    setGuestCount(guests);
-    handleCalculatePrice();
-  };
-
-  // Handle guest info update
-  const handleGuestInfoUpdate = (updatedGuests: GuestInfo[], updatedSpecialRequests?: string) => {
-    setGuests(updatedGuests);
-    if (updatedSpecialRequests !== undefined) {
-      setSpecialRequests(updatedSpecialRequests);
-    }
-    setFormStep(2);
-  };
-
-  // Display the appropriate step based on formStep
-  const renderStep = () => {
-    const nights = checkInDate && checkOutDate 
-      ? calculateNights(new Date(checkInDate), new Date(checkOutDate))
-      : 0;
-    
-    switch (formStep) {
-      case 0:
-        return type === 'property' ? (
-          <PropertyBookingStep1_DatesGuests
-            propertyId={propertyId as UUID}
-            maxGuests={maxGuests}
-            onNext={(data) => {
-              // Handle the data from PropertyBookingStep1_DatesGuests
-              setCheckInDate(data.checkInDate.toISOString());
-              setCheckOutDate(data.checkOutDate.toISOString());
-              setGuestCount(data.numberOfGuests);
-              if (data.specialRequests) {
-                setSpecialRequests(data.specialRequests);
-              }
-              handleContinue();
-            }}
-          />
-        ) : (
-          <ExperienceBookingStep1_Attendees
-            attendeeCount={attendeeCount}
-            availableCapacity={availableCapacity}
-            isLoading={isLoading}
-            priceBreakdown={priceBreakdown}
-            onAttendeeChange={setAttendeeCount}
-            onCalculatePrice={handleCalculatePrice}
-            onContinue={handleContinue}
-          />
-        );
-        
-      case 1:
-        return type === 'property' ? (
-          <BookingStep_GuestInfo
-            numberOfGuests={guestCount}
-            onNext={handleGuestInfoUpdate}
-            onBack={() => setFormStep(0)}
-            initialGuestInfo={guests}
-            initialCustomerNotes={specialRequests}
-          />
-        ) : (
-          <ExperienceBookingStep2_Requests
-            specialRequests={specialRequests}
-            onSpecialRequestsChange={setSpecialRequests}
-            onBack={() => setFormStep(0)}
-            onContinue={handleContinue}
-          />
-        );
-        
-      case 2:
-        return (
-          <BookingStep_Summary
-            type={type}
-            checkInDate={checkInDate}
-            checkOutDate={checkOutDate}
-            guestCount={guestCount}
-            attendeeCount={attendeeCount}
-            guests={guests}
-            specialRequests={specialRequests}
-            priceBreakdown={priceBreakdown}
-            onBack={() => setFormStep(1)}
-            onSubmit={handleSubmit}
-            isLoading={isLoading}
-          />
-        );
-        
-      case 3:
-        return bookingInfo ? (
-          <BookingStep_Payment
-            bookingType={type}
-            priceBreakdown={bookingInfo.priceBreakdown}
-            propertyDetails={type === 'property' ? {
-              propertyId: propertyId as UUID,
-              checkInDate: new Date(checkInDate),
-              checkOutDate: new Date(checkOutDate),
-              numberOfGuests: guestCount,
-              specialRequests,
-              customerNotes: specialRequests
-            } : undefined}
-            experienceDetails={type === 'experience' ? {
-              instanceId: instanceId as UUID,
-              numberOfAttendees: attendeeCount,
-              specialRequests
-            } : undefined}
-            guests={guests}
-            selectedAddonExperiences={[]}
-            onBack={() => setFormStep(2)}
-            onSuccess={(bookingId, bookingReference) => {
-              // Handle the success callback
-              handlePayment();
-            }}
-            isLoading={isLoading}
-          />
-        ) : null;
-        
-      case 4:
-        return bookingInfo ? (
-          <BookingStep_Confirmation
-            bookingReference={bookingInfo.bookingReference}
-            onViewBookings={() => navigate('/dashboard')}
-          />
-        ) : null;
-        
-      default:
-        return null;
-    }
-  };
-
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      {renderStep()}
+      <BookingStepRenderer 
+        type={type}
+        formStep={formStep}
+        propertyId={propertyId}
+        instanceId={instanceId}
+        checkInDate={checkInDate}
+        checkOutDate={checkOutDate}
+        guestCount={guestCount}
+        attendeeCount={attendeeCount}
+        specialRequests={specialRequests}
+        guests={guests}
+        maxGuests={maxGuests}
+        availableCapacity={availableCapacity}
+        isLoading={isLoading}
+        priceBreakdown={priceBreakdown}
+        bookingInfo={bookingInfo}
+        onPropertyStep1Complete={handlePropertyStep1Complete}
+        onAttendeeChange={setAttendeeCount}
+        onSpecialRequestsChange={setSpecialRequests}
+        onGuestInfoUpdate={handleGuestInfoUpdate}
+        onCalculatePrice={handleCalculatePrice}
+        onContinue={handleContinue}
+        onBack={setFormStep}
+        onSubmit={handleSubmit}
+        onPayment={handlePayment}
+      />
     </div>
   );
 };

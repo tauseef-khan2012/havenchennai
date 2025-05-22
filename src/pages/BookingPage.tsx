@@ -7,6 +7,8 @@ import PropertyBookingStep1_DatesGuests from '@/components/booking/PropertyBooki
 import PropertyBookingStep2_Addons from '@/components/booking/PropertyBookingStep2_Addons';
 import BookingStep_GuestInfo from '@/components/booking/BookingStep_GuestInfo';
 import BookingStep_Payment from '@/components/booking/BookingStep_Payment';
+import BookingProgressBar from '@/components/booking/BookingProgressBar';
+import AuthenticationNotice from '@/components/booking/AuthenticationNotice';
 import { UUID, PriceBreakdown, GuestInfo } from '@/types/booking';
 import { calculateBookingPrice } from '@/services/bookingService';
 import { supabase } from '@/integrations/supabase/client';
@@ -35,6 +37,8 @@ const BookingPage: React.FC = () => {
   const [priceBreakdown, setPriceBreakdown] = useState<PriceBreakdown | null>(null);
   const [property, setProperty] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const BOOKING_STEPS = ['Dates & Guests', 'Experiences', 'Guest Info', 'Payment'];
 
   useEffect(() => {
     const fetchPropertyDetails = async () => {
@@ -231,36 +235,8 @@ const BookingPage: React.FC = () => {
             </p>
           </div>
           
-          {/* Progress indicator */}
-          <div className="mb-8">
-            <div className="flex justify-between">
-              {['Dates & Guests', 'Experiences', 'Guest Info', 'Payment'].map((label, index) => (
-                <div 
-                  key={index} 
-                  className={`flex flex-col items-center w-1/4 ${index + 1 < step ? 'text-haven-green' : index + 1 === step ? 'text-haven-green font-medium' : 'text-gray-400'}`}
-                >
-                  <div className={`rounded-full h-8 w-8 flex items-center justify-center mb-2 ${index + 1 <= step ? 'bg-haven-green text-white' : 'bg-gray-200 text-gray-600'}`}>
-                    {index + 1}
-                  </div>
-                  <span className="text-sm text-center">{label}</span>
-                </div>
-              ))}
-            </div>
-            <div className="relative mt-2 h-1 bg-gray-200">
-              <div 
-                className="absolute top-0 left-0 h-1 bg-haven-green transition-all duration-300" 
-                style={{ width: `${(step - 1) * 33.33}%` }}
-              />
-            </div>
-          </div>
-          
-          {!user && (
-            <div className="bg-amber-50 border border-amber-200 rounded-md p-4 mb-6">
-              <p className="text-amber-800">
-                <strong>Note:</strong> You need to be logged in to complete your booking. You'll be prompted to sign in before payment.
-              </p>
-            </div>
-          )}
+          <BookingProgressBar currentStep={step} steps={BOOKING_STEPS} />
+          <AuthenticationNotice user={user} />
           
           {renderStep()}
         </div>
