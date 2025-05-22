@@ -9,7 +9,7 @@ interface MobileMenuButtonProps {
 const MobileMenuButton = ({ isOpen, onClick }: MobileMenuButtonProps) => {
   return (
     <button
-      className="md:hidden"
+      className="md:hidden flex items-center justify-center"
       onClick={onClick}
       aria-label="Toggle menu"
     >

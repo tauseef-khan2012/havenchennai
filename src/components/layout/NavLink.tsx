@@ -14,7 +14,7 @@ const NavLink = ({ to, isActive, className, children }: NavLinkProps) => {
     <Link
       to={to}
       className={cn(
-        "text-sm font-medium transition-colors hover:text-haven-teal",
+        "text-base font-semibold transition-colors hover:text-haven-teal flex items-center",
         isActive ? "text-haven-teal" : "text-gray-700",
         className
       )}
