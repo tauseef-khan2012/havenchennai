@@ -22,6 +22,7 @@ import BookingConfirmationPage from "./components/booking/BookingConfirmationPag
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Location from "./pages/Location";
+import Gallery from "./pages/Gallery";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/stay/deck-views" element={<StayDeckViews />} />
             <Route path="/stay/location" element={<StayLocation />} />
             <Route path="/location" element={<Location />} />
+            <Route path="/gallery" element={<Gallery />} />
             <Route path="/booking" element={<BookingPage />} />
             <Route path="/booking/confirmation" element={<BookingConfirmationPage />} />
             <Route path="/experiences" element={<Experiences />} />

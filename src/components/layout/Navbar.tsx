@@ -1,179 +1,204 @@
 
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAuthSession } from "@/hooks/auth/useAuthSession";
+import { cn } from "@/lib/utils";
 
 const Navbar = () => {
-  const { user, signOut } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-  const isMobile = useIsMobile();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'About', path: '/about' },
-    { name: 'The Container Home', path: '/stay' },
-    { name: 'Experiences', path: '/experiences' },
-    { name: 'Gallery', path: '/gallery' },
-    { name: 'Contact', path: '/contact' },
-  ];
-
+  const { session } = useAuthSession();
+  
+  const isActive = (path: string) => {
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
+  
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 10);
     };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
+    
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const isActive = (path: string) => {
-    if (path === '/' && location.pathname !== '/') return false;
-    return location.pathname.startsWith(path);
-  };
-
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
-
+  
+  useEffect(() => {
+    // Close mobile menu when route changes
+    setIsMenuOpen(false);
+  }, [location.pathname]);
+  
   return (
-    <header 
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled 
-          ? 'bg-white bg-opacity-80 backdrop-blur-md shadow-sm' 
-          : 'bg-transparent'
-      }`}
+    <header
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+        isScrolled ? "bg-white shadow-md py-2" : "bg-transparent py-4"
+      )}
     >
-      <div className="container-custom flex justify-between items-center h-16 md:h-20">
+      <div className="container-custom mx-auto px-4 flex justify-between items-center">
         <Link to="/" className="font-serif text-2xl font-bold text-haven-dark">
-          Haven
+          LakeHaven
         </Link>
-
-        {isMobile ? (
-          <>
-            <button 
-              onClick={toggleMenu} 
-              className="p-2"
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
-            >
-              {menuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-            
-            {menuOpen && (
-              <div className="fixed inset-0 bg-white z-40 pt-16">
-                <div className="container-custom py-4">
-                  <nav className="flex flex-col space-y-4">
-                    {navLinks.map(link => (
-                      <Link
-                        key={link.path}
-                        to={link.path}
-                        className={`text-lg py-2 ${isActive(link.path) ? 'text-haven-teal font-semibold' : 'text-gray-700'}`}
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        {link.name}
-                      </Link>
-                    ))}
-                    
-                    <Link
-                      to="/booking"
-                      className="mt-4 inline-block"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      <Button className="bg-haven-teal text-white hover:bg-opacity-90 w-full">
-                        Book Now
-                      </Button>
-                    </Link>
-                    
-                    {user ? (
-                      <>
-                        <Link 
-                          to="/dashboard" 
-                          className="text-lg py-2 text-gray-700"
-                          onClick={() => setMenuOpen(false)}
-                        >
-                          Dashboard
-                        </Link>
-                        <button 
-                          onClick={() => {
-                            signOut();
-                            setMenuOpen(false);
-                          }} 
-                          className="text-lg py-2 text-gray-700 text-left"
-                        >
-                          Sign Out
-                        </button>
-                      </>
-                    ) : (
-                      <Link 
-                        to="/login" 
-                        className="text-lg py-2 text-gray-700"
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        Sign In
-                      </Link>
-                    )}
-                  </nav>
-                </div>
-              </div>
+        
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center space-x-6">
+          <Link
+            to="/stay"
+            className={cn(
+              "text-sm font-medium transition-colors hover:text-haven-teal",
+              isActive("/stay") ? "text-haven-teal" : "text-gray-700"
             )}
-          </>
-        ) : (
-          <div className="flex items-center">
-            <nav className="flex space-x-6 mr-6">
-              {navLinks.map(link => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`font-medium ${
-                    isActive(link.path)
-                      ? 'text-haven-teal'
-                      : 'text-gray-700 hover:text-haven-teal transition-colors'
-                  }`}
-                >
-                  {link.name}
-                </Link>
-              ))}
-            </nav>
+          >
+            The Stay
+          </Link>
+          <Link
+            to="/experiences"
+            className={cn(
+              "text-sm font-medium transition-colors hover:text-haven-teal",
+              isActive("/experiences") ? "text-haven-teal" : "text-gray-700"
+            )}
+          >
+            Experiences
+          </Link>
+          <Link
+            to="/location"
+            className={cn(
+              "text-sm font-medium transition-colors hover:text-haven-teal",
+              isActive("/location") ? "text-haven-teal" : "text-gray-700"
+            )}
+          >
+            Location
+          </Link>
+          <Link
+            to="/gallery"
+            className={cn(
+              "text-sm font-medium transition-colors hover:text-haven-teal",
+              isActive("/gallery") ? "text-haven-teal" : "text-gray-700"
+            )}
+          >
+            Gallery
+          </Link>
+          <Link
+            to="/about"
+            className={cn(
+              "text-sm font-medium transition-colors hover:text-haven-teal",
+              isActive("/about") ? "text-haven-teal" : "text-gray-700"
+            )}
+          >
+            About Us
+          </Link>
+          
+          {session ? (
+            <Link to="/dashboard">
+              <Button variant="outline" className="border-haven-teal text-haven-teal">
+                Dashboard
+              </Button>
+            </Link>
+          ) : (
+            <Link to="/login">
+              <Button variant="outline" className="border-haven-teal text-haven-teal">
+                Login
+              </Button>
+            </Link>
+          )}
+          
+          <Link to="/booking">
+            <Button className="bg-haven-teal hover:bg-haven-teal/90">
+              Book Now
+            </Button>
+          </Link>
+        </nav>
+        
+        {/* Mobile Menu Button */}
+        <button
+          className="md:hidden"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          {isMenuOpen ? (
+            <X className="h-6 w-6 text-gray-700" />
+          ) : (
+            <Menu className="h-6 w-6 text-gray-700" />
+          )}
+        </button>
+      </div>
+      
+      {/* Mobile Navigation Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-md py-4 px-4">
+          <nav className="flex flex-col space-y-4">
+            <Link
+              to="/stay"
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-haven-teal p-2",
+                isActive("/stay") ? "text-haven-teal" : "text-gray-700"
+              )}
+            >
+              The Stay
+            </Link>
+            <Link
+              to="/experiences"
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-haven-teal p-2",
+                isActive("/experiences") ? "text-haven-teal" : "text-gray-700"
+              )}
+            >
+              Experiences
+            </Link>
+            <Link
+              to="/location"
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-haven-teal p-2",
+                isActive("/location") ? "text-haven-teal" : "text-gray-700"
+              )}
+            >
+              Location
+            </Link>
+            <Link
+              to="/gallery"
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-haven-teal p-2",
+                isActive("/gallery") ? "text-haven-teal" : "text-gray-700"
+              )}
+            >
+              Gallery
+            </Link>
+            <Link
+              to="/about"
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-haven-teal p-2",
+                isActive("/about") ? "text-haven-teal" : "text-gray-700"
+              )}
+            >
+              About Us
+            </Link>
             
-            <div className="flex items-center space-x-4">
-              <Link to="/booking">
-                <Button className="bg-haven-teal text-white hover:bg-opacity-90">
+            <div className="flex flex-col space-y-2 pt-2 border-t border-gray-100">
+              {session ? (
+                <Link to="/dashboard" className="w-full">
+                  <Button variant="outline" className="w-full border-haven-teal text-haven-teal">
+                    Dashboard
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/login" className="w-full">
+                  <Button variant="outline" className="w-full border-haven-teal text-haven-teal">
+                    Login
+                  </Button>
+                </Link>
+              )}
+              
+              <Link to="/booking" className="w-full">
+                <Button className="w-full bg-haven-teal hover:bg-haven-teal/90">
                   Book Now
                 </Button>
               </Link>
-              
-              {user ? (
-                <div className="flex items-center space-x-4">
-                  <Link to="/dashboard">
-                    <Button variant="outline" size="sm">Dashboard</Button>
-                  </Link>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={signOut}
-                  >
-                    Sign Out
-                  </Button>
-                </div>
-              ) : (
-                <Link to="/login">
-                  <Button variant="outline" size="sm">Sign In</Button>
-                </Link>
-              )}
             </div>
-          </div>
-        )}
-      </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 };

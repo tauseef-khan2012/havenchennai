@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { getNetworkAwareImageUrl } from '@/utils/formatters';
@@ -15,6 +14,7 @@ interface GalleryImage {
   height: number;
 }
 
+// We're keeping the home gallery smaller for performance
 const galleryImages: GalleryImage[] = [
   {
     id: '1',
