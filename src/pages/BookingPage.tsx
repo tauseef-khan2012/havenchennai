@@ -1,29 +1,15 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import PropertyBookingStep1_DatesGuests from '@/components/booking/PropertyBookingStep1_DatesGuests';
-import PropertyBookingStep2_Addons from '@/components/booking/PropertyBookingStep2_Addons';
-import BookingStep_GuestInfo from '@/components/booking/BookingStep_GuestInfo';
-import BookingStep_Payment from '@/components/booking/BookingStep_Payment';
 import BookingProgressBar from '@/components/booking/BookingProgressBar';
 import AuthenticationNotice from '@/components/booking/AuthenticationNotice';
-import { UUID, PriceBreakdown, GuestInfo } from '@/types/booking';
-import { calculateBookingPrice } from '@/services/bookingService';
+import BookingForm from '@/components/booking/BookingForm';
+import { UUID } from '@/types/booking';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-
-interface BookingData {
-  propertyId: UUID;
-  checkInDate: Date;
-  checkOutDate: Date;
-  numberOfGuests: number;
-  specialRequests?: string;
-  customerNotes?: string;
-  selectedAddons: { instanceId: UUID; attendees: number }[];
-  guests: GuestInfo[];
-}
 
 const BookingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -32,195 +18,86 @@ const BookingPage: React.FC = () => {
   const { user } = useAuth();
 
   const propertyId = searchParams.get('propertyId');
-  const [step, setStep] = useState(1);
-  const [bookingData, setBookingData] = useState<Partial<BookingData>>({});
-  const [priceBreakdown, setPriceBreakdown] = useState<PriceBreakdown | null>(null);
+  const experienceId = searchParams.get('experienceId');
   const [property, setProperty] = useState<any | null>(null);
+  const [experience, setExperience] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const BOOKING_STEPS = ['Dates & Guests', 'Experiences', 'Guest Info', 'Payment'];
-
   useEffect(() => {
-    const fetchPropertyDetails = async () => {
-      if (!propertyId) {
-        toast({
-          title: "Error",
-          description: "No property selected.",
-          variant: "destructive"
-        });
-        navigate('/stay');
-        return;
-      }
-
+    const fetchBookingDetails = async () => {
+      setIsLoading(true);
+      
       try {
-        const { data, error } = await supabase
-          .from('properties')
-          .select('*')
-          .eq('id', propertyId)
-          .single();
+        if (propertyId) {
+          const { data, error } = await supabase
+            .from('properties')
+            .select('*')
+            .eq('id', propertyId)
+            .single();
 
-        if (error) {
-          throw error;
+          if (error) {
+            throw error;
+          }
+
+          if (!data) {
+            throw new Error('Property not found');
+          }
+
+          setProperty(data);
+        } else if (experienceId) {
+          const { data, error } = await supabase
+            .from('experiences')
+            .select('*')
+            .eq('id', experienceId)
+            .single();
+
+          if (error) {
+            throw error;
+          }
+
+          if (!data) {
+            throw new Error('Experience not found');
+          }
+
+          setExperience(data);
+        } else {
+          throw new Error('No booking item selected');
         }
-
-        if (!data) {
-          throw new Error('Property not found');
-        }
-
-        setProperty(data);
       } catch (error) {
-        console.error('Error fetching property:', error);
+        console.error('Error fetching booking details:', error);
         toast({
           title: "Error",
-          description: "Failed to load property details.",
+          description: "Failed to load booking details.",
           variant: "destructive"
         });
-        navigate('/stay');
+        navigate(propertyId ? '/stay' : '/experiences');
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchPropertyDetails();
-  }, [propertyId, navigate, toast]);
+    fetchBookingDetails();
+  }, [propertyId, experienceId, navigate, toast]);
 
-  const calculatePrice = async () => {
-    if (!bookingData.propertyId || !bookingData.checkInDate || !bookingData.checkOutDate) {
-      return null;
-    }
-
-    try {
-      const breakdown = await calculateBookingPrice({
-        type: 'property',
-        propertyId: bookingData.propertyId,
-        checkInDate: bookingData.checkInDate,
-        checkOutDate: bookingData.checkOutDate,
-        selectedAddonExperiences: bookingData.selectedAddons
-      });
-
-      setPriceBreakdown(breakdown);
-      return breakdown;
-    } catch (error) {
-      console.error('Error calculating price:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to calculate booking price.',
-        variant: 'destructive'
-      });
-      return null;
-    }
-  };
-
-  const handleStep1Completion = async (data: {
-    checkInDate: Date;
-    checkOutDate: Date;
-    numberOfGuests: number;
-    specialRequests?: string;
-  }) => {
-    setBookingData(prev => ({
-      ...prev,
-      propertyId: propertyId as UUID,
-      ...data
-    }));
-    
-    setStep(2);
-  };
-
-  const handleStep2Completion = (addons: { instanceId: UUID; attendees: number }[]) => {
-    setBookingData(prev => ({
-      ...prev,
-      selectedAddons: addons
-    }));
-    
-    setStep(3);
-  };
-
-  const handleStep3Completion = async (guests: GuestInfo[], customerNotes?: string) => {
-    setBookingData(prev => ({
-      ...prev,
-      guests,
-      customerNotes
-    }));
-    
-    const pricing = await calculatePrice();
-    if (pricing) {
-      setStep(4);
-    }
-  };
-
-  const handlePaymentSuccess = (bookingId: UUID, bookingReference: string) => {
-    navigate(`/booking/confirmation?reference=${bookingReference}&status=success`);
-  };
-
-  const renderStep = () => {
-    if (isLoading || !property) {
-      return <div className="text-center py-12">Loading property details...</div>;
-    }
-
-    switch (step) {
-      case 1:
-        return (
-          <PropertyBookingStep1_DatesGuests
-            propertyId={propertyId as UUID}
-            onNext={handleStep1Completion}
-            maxGuests={property.max_guests}
-            minNights={1}
-          />
-        );
-      case 2:
-        if (!bookingData.checkInDate || !bookingData.checkOutDate || !bookingData.numberOfGuests) {
-          setStep(1);
-          return null;
-        }
-        return (
-          <PropertyBookingStep2_Addons
-            checkInDate={bookingData.checkInDate}
-            checkOutDate={bookingData.checkOutDate}
-            numberOfGuests={bookingData.numberOfGuests}
-            onNext={handleStep2Completion}
-            onBack={() => setStep(1)}
-          />
-        );
-      case 3:
-        if (!bookingData.numberOfGuests) {
-          setStep(1);
-          return null;
-        }
-        return (
-          <BookingStep_GuestInfo
-            numberOfGuests={bookingData.numberOfGuests}
-            onNext={handleStep3Completion}
-            onBack={() => setStep(2)}
-          />
-        );
-      case 4:
-        if (!priceBreakdown || !bookingData.propertyId || !bookingData.checkInDate || 
-            !bookingData.checkOutDate || !bookingData.numberOfGuests || !bookingData.guests) {
-          setStep(1);
-          return null;
-        }
-        return (
-          <BookingStep_Payment
-            bookingType="property"
-            priceBreakdown={priceBreakdown}
-            propertyDetails={{
-              propertyId: bookingData.propertyId,
-              checkInDate: bookingData.checkInDate,
-              checkOutDate: bookingData.checkOutDate,
-              numberOfGuests: bookingData.numberOfGuests,
-              specialRequests: bookingData.specialRequests,
-              customerNotes: bookingData.customerNotes
-            }}
-            guests={bookingData.guests}
-            selectedAddonExperiences={bookingData.selectedAddons}
-            onBack={() => setStep(3)}
-            onSuccess={handlePaymentSuccess}
-          />
-        );
-      default:
-        return null;
-    }
-  };
+  if (isLoading) {
+    return (
+      <>
+        <Navbar />
+        <main className="py-16 bg-gray-50">
+          <div className="container-custom max-w-3xl">
+            <div className="mb-8 animate-pulse">
+              <div className="h-8 bg-gray-200 rounded w-1/2 mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            </div>
+            <div className="bg-white rounded-lg shadow-md p-6 animate-pulse">
+              <div className="h-64 bg-gray-100 rounded"></div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>
@@ -228,17 +105,25 @@ const BookingPage: React.FC = () => {
       <main className="py-16 bg-gray-50">
         <div className="container-custom max-w-3xl">
           <div className="mb-8">
-            <h1 className="text-3xl font-serif font-bold mb-2">Book Your Stay</h1>
+            <h1 className="text-3xl font-serif font-bold mb-2">
+              {propertyId ? 'Book Your Stay' : 'Book Your Experience'}
+            </h1>
             <p className="text-gray-600">
-              {property?.name ? `${property.name} - ` : ''}
+              {property?.name || experience?.name ? 
+                `${property?.name || experience?.name} - ` : ''}
               Complete your booking in a few simple steps
             </p>
           </div>
           
-          <BookingProgressBar currentStep={step} steps={BOOKING_STEPS} />
           <AuthenticationNotice user={user} />
           
-          {renderStep()}
+          <BookingForm 
+            type={propertyId ? 'property' : 'experience'}
+            propertyId={propertyId as UUID}
+            instanceId={experienceId as UUID}
+            maxGuests={property?.max_guests || 4}
+            availableCapacity={experience?.max_capacity_per_instance || 10}
+          />
         </div>
       </main>
       <Footer />

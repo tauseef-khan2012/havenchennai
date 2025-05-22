@@ -3,6 +3,7 @@ import { useState, useCallback } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { UUID, BookingType } from '@/types/booking';
+import { useRazorpayPayment } from './useRazorpayPayment';
 import { 
   initiatePayment, 
   verifyPayment, 
@@ -16,6 +17,69 @@ export const useBookingPayment = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+  
+  const handlePaymentSuccess = async (
+    paymentId: string, 
+    orderId: string, 
+    signature: string,
+    bookingId: UUID,
+    bookingType: BookingType
+  ) => {
+    try {
+      await verifyPayment({
+        razorpayPaymentId: paymentId,
+        razorpayOrderId: orderId,
+        razorpaySignature: signature,
+        bookingId,
+        bookingType
+      });
+      
+      toast({
+        title: 'Payment successful',
+        description: 'Your booking has been confirmed.',
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Error verifying payment:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
+      toast({
+        title: 'Payment verification failed',
+        description: errorMessage,
+        variant: 'destructive'
+      });
+      
+      return false;
+    }
+  };
+  
+  const handlePaymentError = async (
+    error: any,
+    orderId: string,
+    bookingId: UUID,
+    bookingType: BookingType
+  ) => {
+    try {
+      await handlePaymentFailure({
+        razorpayOrderId: orderId,
+        errorCode: error.code || 'PAYMENT_FAILED',
+        errorDescription: error.message || 'Payment was not completed',
+        bookingId,
+        bookingType
+      });
+      
+      toast({
+        title: 'Payment failed',
+        description: 'Your payment could not be processed. Please try again.',
+        variant: 'destructive'
+      });
+    } catch (err) {
+      console.error('Error handling payment failure:', err);
+    }
+    
+    return false;
+  };
 
   /**
    * Process payment for a booking
@@ -90,48 +154,37 @@ export const useBookingPayment = () => {
         }
       };
       
-      // This part would use the Razorpay JS SDK
-      // For now, we'll mock a successful payment
-      const paymentSuccess = true;
+      // For development, we'll use a mock successful payment
+      // In production, this would use the Razorpay JS SDK
       
-      if (paymentSuccess) {
-        // Generate mock payment ID for testing
-        const mockPaymentId = 'pay_' + Math.random().toString(36).substring(7);
-        const mockSignature = 'sig_' + Math.random().toString(36).substring(7);
-        
-        // Verify and record payment (in real implementation, this would come from Razorpay callback)
-        await verifyPayment({
-          razorpayPaymentId: mockPaymentId,
-          razorpayOrderId: orderId,
-          razorpaySignature: mockSignature,
-          bookingId,
-          bookingType
-        });
-        
-        toast({
-          title: 'Payment successful',
-          description: 'Your booking has been confirmed.',
-        });
-        
-        return true;
-      } else {
-        // Handle payment failure
-        await handlePaymentFailure({
-          razorpayOrderId: orderId,
-          errorCode: 'PAYMENT_FAILED',
-          errorDescription: 'Payment was not completed',
-          bookingId,
-          bookingType
-        });
-        
-        toast({
-          title: 'Payment failed',
-          description: 'Your payment could not be processed. Please try again.',
-          variant: 'destructive'
-        });
-        
-        return false;
-      }
+      // Mock a payment success for development
+      const mockPaymentId = 'pay_' + Math.random().toString(36).substring(7);
+      const mockSignature = 'sig_' + Math.random().toString(36).substring(7);
+      
+      const success = await handlePaymentSuccess(
+        mockPaymentId,
+        orderId,
+        mockSignature,
+        bookingId,
+        bookingType
+      );
+      
+      return success;
+      
+      // In production, this would open the Razorpay payment dialog
+      /*
+      const razorpay = useRazorpayPayment({
+        onSuccess: async (paymentId, orderId, signature) => {
+          return await handlePaymentSuccess(paymentId, orderId, signature, bookingId, bookingType);
+        },
+        onFailure: async (error) => {
+          return await handlePaymentError(error, orderId, bookingId, bookingType);
+        }
+      });
+      
+      razorpay.processPayment(options);
+      */
+      
     } catch (error) {
       console.error('Error processing payment:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
