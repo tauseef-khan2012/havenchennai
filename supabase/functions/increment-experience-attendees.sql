@@ -6,4 +6,6 @@ BEGIN
   SET current_attendees = current_attendees + attendees_count
   WHERE id = instance_id;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = 'public';
