@@ -8,9 +8,9 @@ interface ExperienceDetailHeroProps {
 
 const ExperienceDetailHero = ({ experience }: ExperienceDetailHeroProps) => {
   return (
-    <section className="relative h-[60vh] bg-black overflow-hidden">
+    <section className="relative h-[40vh] bg-black overflow-hidden">
       <div 
-        className="absolute inset-0 bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
           backgroundImage: `url(${experience.imageUrl})`,
           filter: 'brightness(0.6)'
