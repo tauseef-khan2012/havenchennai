@@ -14,9 +14,10 @@ const Index = () => {
   // Implement network-aware image loading
   useEffect(() => {
     const checkNetworkSpeed = () => {
-      if (navigator.connection && 'downlink' in navigator.connection) {
-        const connection = navigator.connection as any;
-        if (connection.downlink < 1) {
+      // Use a type-safe way to check for connection API
+      const nav = navigator as any;
+      if (nav.connection && typeof nav.connection.downlink === 'number') {
+        if (nav.connection.downlink < 1) {
           document.querySelectorAll('img[data-lowres]').forEach(img => {
             const element = img as HTMLImageElement;
             if (element.dataset.lowres) {

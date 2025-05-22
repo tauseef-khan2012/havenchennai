@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { getNetworkAwareImageUrl } from '@/utils/formatters';
+import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 
 interface GalleryImage {
   id: string;
