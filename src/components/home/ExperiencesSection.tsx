@@ -76,7 +76,7 @@ const experiences: Experience[] = [
     alt: 'Birds at Vedanthangal Bird Sanctuary',
     story: 'Join our expert naturalist for a guided bird watching tour around Muttukadu Lake and nearby wetlands. This area becomes a haven for numerous migratory and resident bird species. With binoculars provided, you'll observe painted storks, spot-billed pelicans, egrets, and many more in their natural habitat.',
     travelTime: '10-25 minutes from Haven'
-  },
+  }
 ];
 
 interface CardCarouselProps {
