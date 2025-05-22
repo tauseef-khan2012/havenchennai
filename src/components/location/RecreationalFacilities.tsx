@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Basketball, Cricket, Playground, Park } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUp, ArrowLeft } from "lucide-react";
 
 interface FacilityCardProps {
   title: string;
@@ -36,37 +36,37 @@ const RecreationalFacilities = () => {
       title: "Basketball Court",
       description: "Our full-size basketball court provides the perfect space for a friendly game or serious practice session.",
       image: "/lovable-uploads/7ef10cc7-1183-4067-8e12-ead8cd47788f.png",
-      icon: <Basketball className="h-5 w-5" />
+      icon: <ArrowDown className="h-5 w-5" />
     },
     {
       title: "Cricket Net",
       description: "Perfect your bowling and batting skills in our professional cricket practice nets.",
       image: "/lovable-uploads/98e46d57-3441-4761-9cdf-18542ba4837c.png",
-      icon: <Cricket className="h-5 w-5" />
+      icon: <ArrowRight className="h-5 w-5" />
     },
     {
       title: "Children's Playground",
       description: "A colorful playground with slides, swings, and climbing equipment to keep the little ones entertained.",
       image: "/lovable-uploads/d7acb4b7-3f86-425c-acc9-a34b740cb105.png",
-      icon: <Playground className="h-5 w-5" />
+      icon: <ArrowUp className="h-5 w-5" />
     },
     {
       title: "Swings Area",
       description: "Relax and unwind on our swings while enjoying the beautiful surroundings.",
       image: "/lovable-uploads/d1148760-0de0-44d6-ae11-98a16c4b61fc.png",
-      icon: <Playground className="h-5 w-5" />
+      icon: <ArrowUp className="h-5 w-5" />
     },
     {
       title: "Outdoor Fitness Area",
       description: "Stay fit with our range of outdoor fitness equipment designed for all ages and fitness levels.",
       image: "/lovable-uploads/ba10980e-eaed-41d2-950b-de5ba0f75e97.png",
-      icon: <Park className="h-5 w-5" />
+      icon: <ArrowLeft className="h-5 w-5" />
     },
     {
       title: "Walking Paths & Garden",
       description: "Scenic walking paths wind through our beautifully landscaped gardens, perfect for morning or evening strolls.",
       image: "/lovable-uploads/3d09a878-2b77-4c76-b9dc-916c5572305e.png",
-      icon: <Park className="h-5 w-5" />
+      icon: <ArrowLeft className="h-5 w-5" />
     },
   ];
 

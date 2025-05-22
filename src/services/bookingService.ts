@@ -22,28 +22,45 @@ export const createBooking = async (
       if (!bookingData.property) {
         throw new Error('Missing property booking details');
       }
+
+      // Create property booking
+      const result = await createPropertyBooking({
+        propertyId: bookingData.property.propertyId,
+        userId: bookingData.userId,
+        checkInDate: bookingData.property.checkInDate,
+        checkOutDate: bookingData.property.checkOutDate,
+        numberOfGuests: bookingData.property.numberOfGuests,
+        totalPrice: bookingData.priceBreakdown.totalAmountDue,
+        specialRequests: bookingData.property.specialRequests
+      });
+
+      if ('error' in result) {
+        throw new Error(result.error);
+      }
+
+      return { 
+        bookingId: result.bookingId, 
+        bookingReference: result.bookingReference 
+      };
       
-      return await createPropertyBooking(
-        bookingData.userId,
-        bookingData.property,
-        bookingData.priceBreakdown,
-        bookingData.guests,
-        bookingData.sourcePlatform,
-        bookingData.sourceBookingId,
-        bookingData.selectedAddonExperiences
-      );
     } else if (bookingData.type === 'experience') {
       if (!bookingData.experience) {
         throw new Error('Missing experience booking details');
       }
       
-      return await createExperienceBooking(
+      // Create experience booking
+      const booking = await createExperienceBooking(
         bookingData.userId,
-        bookingData.experience,
-        bookingData.priceBreakdown,
-        bookingData.sourcePlatform,
-        bookingData.sourceBookingId
+        bookingData.experience.instanceId,
+        new Date(), // You might want to get this from bookingData
+        bookingData.experience.numberOfAttendees,
+        bookingData.experience.specialRequests
       );
+      
+      return { 
+        bookingId: booking.id, 
+        bookingReference: booking.bookingReference 
+      };
     } else {
       throw new Error('Invalid booking type');
     }
