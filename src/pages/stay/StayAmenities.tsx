@@ -4,87 +4,21 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import StayHero from '@/components/stay/StayHero';
 import StayNavigation from '@/components/stay/StayNavigation';
-import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Bed, Wifi, Tv, Bath, Fan, Utensils, Snowflake, Book, X } from 'lucide-react';
+import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
+import { Wifi, Tv, Coffee, UtensilsCrossed, Wind, Sparkles, Bath, Shirt, Car, AirVent, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const StayAmenities = () => {
-  const [activeAmenity, setActiveAmenity] = useState<string | null>(null);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [currentImage, setCurrentImage] = useState('');
-  
-  // Group amenities by category for better organization
-  const amenities = {
-    bedroom: [
-      { name: 'Queen-sized bed with premium organic linens', icon: Bed },
-      { name: 'Extra pillows and blankets', icon: Bed },
-      { name: 'Blackout curtains', icon: Bed },
-      { name: 'Bedside tables with reading lamps', icon: Bed },
-    ],
-    entertainment: [
-      { name: 'Smart TV with Netflix access', icon: Tv },
-      { name: 'Mood lighting throughout', icon: Tv },
-      { name: 'Bluetooth sound system', icon: Tv },
-      { name: 'Curated selection of books', icon: Book },
-    ],
-    bathroom: [
-      { name: 'Modern bathroom with rainfall shower', icon: Bath },
-      { name: 'Organic toiletries', icon: Bath },
-      { name: 'Hair dryer', icon: Bath },
-      { name: 'Plush towels', icon: Bath },
-    ],
-    workspace: [
-      { name: 'Dedicated work desk with ergonomic chair', icon: Wifi },
-      { name: 'Fast Wi-Fi connection', icon: Wifi },
-      { name: 'Multiple power outlets', icon: Wifi },
-      { name: 'Natural lighting', icon: Wifi },
-    ],
-    kitchen: [
-      { name: 'Fully equipped kitchenette', icon: Utensils },
-      { name: 'Local coffee and tea', icon: Utensils },
-      { name: 'Mini refrigerator', icon: Utensils },
-      { name: 'Microwave', icon: Utensils },
-    ],
-    comfort: [
-      { name: 'Sustainable climate control', icon: Snowflake },
-      { name: 'Ceiling fan', icon: Fan },
-      { name: 'Multiple deck spaces', icon: Fan },
-      { name: 'Indoor plants for fresh air', icon: Fan },
-    ],
-  };
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  // Featured amenity images
-  const featuredAmenities = [
-    {
-      name: 'Entertainment Center with Netflix',
-      image: '/lovable-uploads/0f776507-f284-4d7c-9893-068e9aafd374.png',
-      description: 'Relax with your favorite shows and movies on our smart TV with Netflix access and ambient mood lighting.'
-    },
-    {
-      name: 'Curated Book Collection',
-      image: '/lovable-uploads/e017493d-c2c0-467e-a191-28fe62a406ab.png',
-      description: 'Enjoy our carefully selected books during your stay, perfect for quiet afternoons on the deck.'
-    },
-    {
-      name: 'Work Desk Setup',
-      image: '/lovable-uploads/d2fe6d2c-b060-49a3-99d0-62891571bc97.png',
-      description: 'Stay productive with our comfortable work space, fast WiFi, and all the amenities you need.'
-    }
-  ];
-  
-  const openLightbox = (imageSrc: string) => {
-    setCurrentImage(imageSrc);
-    setLightboxOpen(true);
-  };
-  
-  // Animation variants
+  // Define animation variants
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
   };
-  
+
   const staggerContainer = {
     hidden: { opacity: 0 },
     visible: {
@@ -95,173 +29,350 @@ const StayAmenities = () => {
     }
   };
 
+  // Categories of amenities
+  const amenityCategories = [
+    {
+      id: 'comfort',
+      name: 'Comfort & Entertainment',
+      amenities: [
+        { 
+          name: 'Air Conditioning',
+          description: 'Powerful split AC units in all rooms ensure comfort even on the hottest days.',
+          icon: <Wind className="h-5 w-5" />,
+          available: true
+        },
+        { 
+          name: 'Smart TV',
+          description: 'Enjoy streaming your favorite shows on our 55" 4K Smart TV with Netflix, Prime, and more.',
+          icon: <Tv className="h-5 w-5" />,
+          available: true
+        },
+        { 
+          name: 'High-Speed WiFi',
+          description: 'Stay connected with complimentary fiber-optic WiFi throughout the property.',
+          icon: <Wifi className="h-5 w-5" />,
+          available: true
+        },
+        { 
+          name: 'Premium Bedding',
+          description: 'Sleep soundly on our hotel-quality mattresses with 100% cotton linens.',
+          icon: <Sparkles className="h-5 w-5" />,
+          available: true
+        }
+      ]
+    },
+    {
+      id: 'convenience',
+      name: 'Kitchen & Convenience',
+      amenities: [
+        { 
+          name: 'Fully Equipped Kitchen',
+          description: 'Modern kitchen with refrigerator, induction cooktop, microwave, and all essentials.',
+          icon: <UtensilsCrossed className="h-5 w-5" />,
+          available: true
+        },
+        { 
+          name: 'Coffee Maker',
+          description: 'Start your day with freshly brewed coffee from our premium coffee maker.',
+          icon: <Coffee className="h-5 w-5" />,
+          available: true
+        },
+        { 
+          name: 'Laundry Facilities',
+          description: 'Washing machine available for longer stays with complimentary eco-friendly detergent.',
+          icon: <Shirt className="h-5 w-5" />,
+          available: true
+        },
+        { 
+          name: 'Parking',
+          description: 'Secure private parking directly at the property for your vehicle.',
+          icon: <Car className="h-5 w-5" />,
+          available: true
+        }
+      ]
+    },
+    {
+      id: 'bathroom',
+      name: 'Bathroom & Essentials',
+      amenities: [
+        { 
+          name: 'Rainfall Shower',
+          description: 'Luxurious rainfall shower with hot water and premium natural toiletries.',
+          icon: <Bath className="h-5 w-5" />,
+          available: true
+        },
+        { 
+          name: 'Fresh Towels',
+          description: 'Plush, hotel-quality towels provided for each guest.',
+          icon: <Sparkles className="h-5 w-5" />,
+          available: true
+        },
+        { 
+          name: 'Hairdryer',
+          description: 'Professional-grade hairdryer available in the bathroom.',
+          icon: <AirVent className="h-5 w-5" />,
+          available: true
+        }
+      ]
+    }
+  ];
+
+  // Gallery images
+  const galleryImages = [
+    {
+      src: '/lovable-uploads/15811ea8-1b7c-41c0-9b75-05f249f60154.png',
+      alt: 'Living area with comfortable seating',
+      category: 'Interior'
+    },
+    {
+      src: '/lovable-uploads/3d09a878-2b77-4c76-b9dc-916c5572305e.png',
+      alt: 'Modern kitchen with all amenities',
+      category: 'Kitchen'
+    },
+    {
+      src: '/lovable-uploads/15b485a2-1d79-4783-ba80-f0cf6d9d7a20.png',
+      alt: 'Bedroom with premium bedding',
+      category: 'Bedroom'
+    },
+    {
+      src: '/lovable-uploads/a768b355-2a53-4898-91c5-3372bc1fe662.png',
+      alt: 'Stylish bathroom with rainfall shower',
+      category: 'Bathroom'
+    },
+    {
+      src: '/lovable-uploads/92fdb568-68f2-4ac8-9908-e0db6e29b56d.png',
+      alt: 'Outdoor deck with seating',
+      category: 'Outdoor'
+    },
+    {
+      src: '/lovable-uploads/6f37f539-1310-49d2-965a-0c02228f5ced.png',
+      alt: 'Rooftop deck with lake view',
+      category: 'Outdoor'
+    }
+  ];
+
   return (
     <>
       <Navbar />
-      <main className="min-h-screen">
+      <main>
         <StayHero 
           title="Amenities & Features"
-          subtitle="Every detail of our container home is designed for comfort and convenience."
-          backgroundImage="/lovable-uploads/c23dc9bb-c7f4-47d3-8c31-2c792d241ee2.png"
+          subtitle="Every detail has been thoughtfully designed to enhance your comfort and convenience."
+          backgroundImage="/lovable-uploads/15811ea8-1b7c-41c0-9b75-05f249f60154.png"
         />
         <StayNavigation />
         
+        {/* Amenities Section */}
         <section className="py-16">
           <div className="container-custom">
             <motion.div 
+              initial="hidden" 
+              animate="visible" 
+              variants={fadeInUp}
+              className="text-center mb-12"
+            >
+              <h2 className="font-serif text-3xl font-bold mb-4">Exceptional Amenities</h2>
+              <p className="text-gray-700 max-w-3xl mx-auto">
+                Our container retreat is equipped with everything you need for a comfortable and memorable stay.
+                We've carefully selected each amenity to enhance your experience while maintaining our commitment to sustainability.
+              </p>
+            </motion.div>
+            
+            <motion.div 
+              variants={staggerContainer}
               initial="hidden"
               animate="visible"
-              variants={fadeInUp}
-              className="max-w-3xl mx-auto"
+              className="space-y-16"
             >
-              <h2 className="font-serif text-3xl font-bold mb-8 text-center">Everything You Need for a Perfect Stay</h2>
-              <p className="text-gray-700 mb-10 text-center">
-                Our container home is thoughtfully equipped with premium amenities to ensure your comfort and convenience.
-                From the plush bedding to the sustainable climate control, we've thought of everything so you don't have to.
-              </p>
-              
-              {/* Featured amenities with images */}
-              <div className="mb-20 space-y-24">
-                {featuredAmenities.map((amenity, index) => (
-                  <motion.div 
-                    key={index} 
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true, margin: "-100px" }}
+              {amenityCategories.map((category) => (
+                <div key={category.id} className="space-y-8">
+                  <motion.h3 
                     variants={fadeInUp}
-                    className={`flex flex-col ${index % 2 === 1 ? 'md:flex-row-reverse' : 'md:flex-row'} gap-8 items-center`}
+                    className="font-serif text-2xl font-semibold text-center"
                   >
-                    <div className="md:w-1/2">
-                      <div 
-                        className="relative overflow-hidden rounded-lg shadow-lg cursor-pointer group"
-                        onClick={() => openLightbox(amenity.image)}
+                    {category.name}
+                  </motion.h3>
+                  
+                  <motion.div 
+                    variants={staggerContainer}
+                    className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
+                  >
+                    {category.amenities.map((amenity, index) => (
+                      <motion.div 
+                        key={index}
+                        variants={fadeInUp}
+                        className="bg-white rounded-lg p-6 shadow-md border border-gray-50 hover:shadow-lg transition-shadow"
                       >
+                        <div className="flex items-center mb-4">
+                          <div className="bg-haven-green bg-opacity-10 p-3 rounded-full mr-4">
+                            <span className="text-haven-green">
+                              {amenity.icon}
+                            </span>
+                          </div>
+                          <h4 className="font-medium">{amenity.name}</h4>
+                        </div>
+                        <p className="text-gray-600 text-sm">{amenity.description}</p>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+        
+        {/* Gallery Section */}
+        <section className="py-16 bg-haven-beige bg-opacity-10">
+          <div className="container-custom">
+            <motion.div 
+              initial="hidden" 
+              whileInView="visible" 
+              viewport={{ once: true }}
+              variants={fadeInUp}
+              className="text-center mb-12"
+            >
+              <h2 className="font-serif text-3xl font-bold mb-4">Gallery</h2>
+              <p className="text-gray-700 max-w-3xl mx-auto">
+                Take a closer look at our thoughtfully designed spaces and amenities.
+                Click on any image to view in full size.
+              </p>
+            </motion.div>
+            
+            <Tabs defaultValue="all" className="w-full">
+              <TabsList className="mx-auto flex justify-center mb-8">
+                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="Interior">Interior</TabsTrigger>
+                <TabsTrigger value="Kitchen">Kitchen</TabsTrigger>
+                <TabsTrigger value="Bedroom">Bedroom</TabsTrigger>
+                <TabsTrigger value="Bathroom">Bathroom</TabsTrigger>
+                <TabsTrigger value="Outdoor">Outdoor</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="all" className="mt-0">
+                <motion.div 
+                  variants={staggerContainer}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+                >
+                  {galleryImages.map((image, index) => (
+                    <motion.div 
+                      key={index}
+                      variants={fadeInUp}
+                      className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer group"
+                      onClick={() => setSelectedImage(image.src)}
+                    >
+                      <div className="relative h-64 overflow-hidden">
                         <img 
-                          src={amenity.image} 
-                          alt={amenity.name} 
-                          className="w-full h-[300px] object-cover transition-transform duration-700 group-hover:scale-105"
+                          src={image.src} 
+                          alt={image.alt}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                           loading="lazy"
                           decoding="async"
                         />
-                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
-                          <div className="text-white text-sm font-medium bg-black/50 px-3 py-1 rounded-full">
-                            Click to enlarge
-                          </div>
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                          <span className="text-white text-sm">{image.alt}</span>
                         </div>
                       </div>
-                    </div>
-                    <div className="md:w-1/2">
-                      <h3 className="font-serif text-2xl font-semibold mb-3">{amenity.name}</h3>
-                      <p className="text-gray-700">{amenity.description}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </TabsContent>
               
-              <motion.div 
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-                variants={fadeInUp}
-                className="space-y-12"
-              >
-                {Object.entries(amenities).map(([category, items]) => (
-                  <div key={category}>
-                    <h3 className="font-serif text-xl font-semibold mb-4 capitalize">{category} Amenities</h3>
-                    <motion.div 
-                      variants={staggerContainer}
-                      initial="hidden"
-                      whileInView="visible"
-                      viewport={{ once: true }}
-                      className="grid md:grid-cols-2 gap-4"
-                    >
-                      {items.map((amenity, index) => (
-                        <motion.div key={index} variants={fadeInUp}>
-                          <Card 
-                            className={`border-haven-green/20 hover:border-haven-green transition-all duration-300 cursor-pointer ${activeAmenity === `${category}-${index}` ? 'border-haven-green bg-haven-beige bg-opacity-10' : ''}`}
-                            onClick={() => setActiveAmenity(activeAmenity === `${category}-${index}` ? null : `${category}-${index}`)}
-                          >
-                            <CardContent className="p-4 flex items-start space-x-3">
-                              <amenity.icon className="h-5 w-5 text-haven-green flex-shrink-0 mt-0.5" />
-                              <div>
-                                <span className="block">{amenity.name}</span>
-                                {activeAmenity === `${category}-${index}` && (
-                                  <motion.p 
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: 'auto' }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                    className="text-sm text-gray-600 mt-1"
-                                  >
-                                    {getAmenityDescription(category, amenity.name)}
-                                  </motion.p>
-                                )}
-                              </div>
-                            </CardContent>
-                          </Card>
+              {["Interior", "Kitchen", "Bedroom", "Bathroom", "Outdoor"].map((category) => (
+                <TabsContent key={category} value={category} className="mt-0">
+                  <motion.div 
+                    variants={staggerContainer}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+                  >
+                    {galleryImages
+                      .filter(image => image.category === category)
+                      .map((image, index) => (
+                        <motion.div 
+                          key={index}
+                          variants={fadeInUp}
+                          className="rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow cursor-pointer group"
+                          onClick={() => setSelectedImage(image.src)}
+                        >
+                          <div className="relative h-64 overflow-hidden">
+                            <img 
+                              src={image.src} 
+                              alt={image.alt}
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                              <span className="text-white text-sm">{image.alt}</span>
+                            </div>
+                          </div>
                         </motion.div>
                       ))}
-                    </motion.div>
-                  </div>
-                ))}
-              </motion.div>
+                  </motion.div>
+                </TabsContent>
+              ))}
+            </Tabs>
+          </div>
+        </section>
+        
+        {/* House Rules Section */}
+        <section className="py-16">
+          <div className="container-custom">
+            <motion.div 
+              initial="hidden" 
+              whileInView="visible" 
+              viewport={{ once: true }}
+              variants={fadeInUp}
+              className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md"
+            >
+              <h2 className="font-serif text-2xl font-bold mb-6 text-center">House Rules & Policies</h2>
               
-              <motion.div 
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-                variants={fadeInUp}
-                className="mt-16 bg-haven-beige bg-opacity-20 p-6 rounded-lg"
-              >
-                <h3 className="font-serif text-xl font-semibold mb-3">Special Touches</h3>
-                <ul className="space-y-2">
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-haven-green mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Complimentary local wine upon arrival</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-haven-green mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Fresh organic breakfast basket (weekends only)</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-haven-green mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Yoga mats and meditation cushions</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="h-5 w-5 text-haven-green mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Curated guidebook to local attractions</span>
-                  </li>
-                </ul>
-              </motion.div>
+              <div className="space-y-4">
+                <div className="border-b border-gray-100 pb-4">
+                  <h3 className="font-medium mb-2">Check-in / Check-out</h3>
+                  <p className="text-gray-600 text-sm">Check-in: 2:00 PM - 8:00 PM</p>
+                  <p className="text-gray-600 text-sm">Check-out: 11:00 AM</p>
+                  <p className="text-gray-600 text-sm mt-2">Early check-in and late check-out may be available upon request, subject to availability.</p>
+                </div>
+                
+                <div className="border-b border-gray-100 pb-4">
+                  <h3 className="font-medium mb-2">General Rules</h3>
+                  <ul className="text-gray-600 text-sm space-y-2">
+                    <li>• No smoking inside the container home. Smoking is permitted only in designated outdoor areas.</li>
+                    <li>• Quiet hours from 10:00 PM to 7:00 AM to respect our neighbors and wildlife.</li>
+                    <li>• Please conserve water and electricity during your stay.</li>
+                    <li>• Pets are not allowed due to the sensitive lakeside ecosystem.</li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h3 className="font-medium mb-2">Cancellation Policy</h3>
+                  <p className="text-gray-600 text-sm">Free cancellation up to 7 days before check-in. Cancellations made within 7 days of check-in are eligible for a 50% refund, excluding service fees.</p>
+                </div>
+              </div>
             </motion.div>
           </div>
         </section>
       </main>
       
-      {/* Lightbox */}
-      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-        <DialogContent className="max-w-4xl p-0 overflow-hidden bg-transparent border-none">
+      {/* Image Lightbox */}
+      <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
+        <DialogContent className="max-w-4xl p-0 bg-transparent border-none">
           <div className="relative">
+            <DialogClose className="absolute top-2 right-2 z-10">
+              <Button variant="ghost" size="icon" className="rounded-full bg-black/50 hover:bg-black/70 text-white">
+                <X className="h-5 w-5" />
+              </Button>
+            </DialogClose>
             <img 
-              src={currentImage} 
+              src={selectedImage || ''} 
               alt="Enlarged view" 
-              className="w-full max-h-[80vh] object-contain"
+              className="w-full rounded-lg object-contain max-h-[80vh]"
             />
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="absolute top-2 right-2 rounded-full bg-black/50 hover:bg-black/70 text-white"
-              onClick={() => setLightboxOpen(false)}
-            >
-              <X className="h-5 w-5" />
-            </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -269,32 +380,6 @@ const StayAmenities = () => {
       <Footer />
     </>
   );
-};
-
-// Helper function to get amenity descriptions
-const getAmenityDescription = (category: string, name: string) => {
-  const descriptions: Record<string, Record<string, string>> = {
-    bedroom: {
-      'Queen-sized bed with premium organic linens': 'Our custom queen bed features 100% organic cotton linens with a 600 thread count for the ultimate sleeping experience.',
-      'Extra pillows and blankets': 'Different firmness options available to ensure your perfect night's sleep.',
-      'Blackout curtains': 'Block out early morning light for uninterrupted rest.',
-      'Bedside tables with reading lamps': 'Perfect for late-night reading with adjustable brightness.'
-    },
-    entertainment: {
-      'Smart TV with Netflix access': 'A 50-inch smart TV with complimentary Netflix, Prime Video, and other streaming services.',
-      'Mood lighting throughout': 'Adjustable lighting to create the perfect ambiance for any occasion.',
-      'Bluetooth sound system': 'Connect your devices and enjoy your favorite music throughout your stay.',
-      'Curated selection of books': 'A handpicked collection of books about local culture, nature, and fiction for your enjoyment.'
-    },
-    workspace: {
-      'Dedicated work desk with ergonomic chair': 'A comfortable workspace designed for productivity with natural lighting.',
-      'Fast Wi-Fi connection': 'High-speed fiber internet (100+ Mbps) for seamless video calls and streaming.',
-      'Multiple power outlets': 'Conveniently placed outlets with USB ports throughout the space.',
-      'Natural lighting': 'The desk is positioned to take advantage of natural light throughout the day.'
-    }
-  };
-  
-  return descriptions[category]?.[name] || 'Thoughtfully selected for your comfort and convenience.';
 };
 
 export default StayAmenities;

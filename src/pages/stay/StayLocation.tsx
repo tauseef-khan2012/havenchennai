@@ -34,7 +34,7 @@ const StayLocation = () => {
     {
       name: 'Mahabalipuram UNESCO Sites',
       distance: '15 min drive',
-      description: 'Explore the famous Shore Temple, Arjuna's Penance, and other 7th-century rock-cut monuments that are UNESCO World Heritage sites.',
+      description: "Explore the famous Shore Temple, Arjuna's Penance, and other 7th-century rock-cut monuments that are UNESCO World Heritage sites.",
       image: '/lovable-uploads/92fdb568-68f2-4ac8-9908-e0db6e29b56d.png',
       coordinates: { lat: 12.6269, lng: 80.1928 },
       website: 'https://whc.unesco.org/en/list/249'

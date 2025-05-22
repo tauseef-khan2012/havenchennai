@@ -24,7 +24,7 @@ const StayNavigation = () => {
   }, []);
 
   return (
-    <div className={`bg-white border-b transition-all duration-300 ${
+    <div className={`sticky top-0 z-10 bg-white border-b transition-all duration-300 ${
       scrolled ? 'bg-opacity-95 backdrop-blur-sm shadow-sm' : 'bg-opacity-100'
     }`}>
       <div className="container-custom py-2">
