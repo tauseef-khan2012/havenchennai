@@ -17,34 +17,34 @@ const StayDeckViews = () => {
     {
       name: 'Rooftop Deck',
       description: 'Our spectacular rooftop deck offers 360-degree views of the lake and sky, perfect for stargazing and sunrise watching.',
-      image: '/lovable-uploads/15b485a2-1d79-4783-ba80-f0cf6d9d7a20.png',
+      image: '/lovable-uploads/2d7b66e7-63b3-4b13-a6f3-9d253a5609aa.png',
       features: [
         'Panoramic views of Muttukadu Lake',
-        'Comfortable seating for relaxation',
+        'Yoga and meditation space with mats',
         'Perfect spot for watching sunrises and sunsets',
         'Nighttime stargazing opportunities'
       ]
     },
     {
-      name: 'Ground Floor Deck',
-      description: 'The ground floor deck provides a comfortable outdoor living space with direct views of the surrounding nature.',
-      image: '/lovable-uploads/15811ea8-1b7c-41c0-9b75-05f249f60154.png',
+      name: 'First Floor Deck',
+      description: 'The first floor deck provides a comfortable outdoor living space with direct views of the surrounding nature.',
+      image: '/lovable-uploads/ea3b40a2-e087-4627-aecc-211b123dc269.png',
       features: [
-        'Shaded relaxation area',
-        'Perfect for morning coffee',
-        'Watch local birds and wildlife',
-        'Connect with nature'
+        'Comfortable seating for relaxation',
+        'Perfect for enjoying morning coffee',
+        'Lake and greenery views',
+        'Quiet space to read or work'
       ]
     },
     {
-      name: 'First Floor Smoking Deck',
-      description: 'A designated space for smokers with beautiful views and comfortable seating.',
-      image: '/lovable-uploads/a768b355-2a53-4898-91c5-3372bc1fe662.png',
+      name: 'Ground Floor Deck',
+      description: 'A spacious ground-level deck surrounded by greenery and plants, perfect for socializing.',
+      image: '/lovable-uploads/3f68b7dc-fc1b-4cab-ac65-013e5c1e074f.png',
       features: [
-        'Designated smoking area',
-        'Elevated views',
-        'Fresh air circulation',
-        'Private space'
+        'Shaded outdoor space',
+        'Comfortable seating area',
+        'Surrounded by plants and nature',
+        'Easy access to surrounding grounds'
       ]
     }
   ];
@@ -105,29 +105,29 @@ const StayDeckViews = () => {
                 <CarouselContent>
                   <CarouselItem>
                     <img 
-                      src="/lovable-uploads/15b485a2-1d79-4783-ba80-f0cf6d9d7a20.png" 
+                      src="/lovable-uploads/2d7b66e7-63b3-4b13-a6f3-9d253a5609aa.png" 
                       alt="Rooftop Deck View" 
                       className="w-full h-[400px] object-cover rounded-lg"
                     />
                   </CarouselItem>
                   <CarouselItem>
                     <img 
-                      src="/lovable-uploads/15811ea8-1b7c-41c0-9b75-05f249f60154.png" 
+                      src="/lovable-uploads/ea3b40a2-e087-4627-aecc-211b123dc269.png" 
+                      alt="First Floor Deck" 
+                      className="w-full h-[400px] object-cover rounded-lg"
+                    />
+                  </CarouselItem>
+                  <CarouselItem>
+                    <img 
+                      src="/lovable-uploads/8446db9f-ec1d-4876-adb8-84f568a58892.png" 
+                      alt="Sunset View from Deck" 
+                      className="w-full h-[400px] object-cover rounded-lg"
+                    />
+                  </CarouselItem>
+                  <CarouselItem>
+                    <img 
+                      src="/lovable-uploads/3f68b7dc-fc1b-4cab-ac65-013e5c1e074f.png" 
                       alt="Ground Floor Deck" 
-                      className="w-full h-[400px] object-cover rounded-lg"
-                    />
-                  </CarouselItem>
-                  <CarouselItem>
-                    <img 
-                      src="/lovable-uploads/6f37f539-1310-49d2-965a-0c02228f5ced.png" 
-                      alt="Lake View from Deck" 
-                      className="w-full h-[400px] object-cover rounded-lg"
-                    />
-                  </CarouselItem>
-                  <CarouselItem>
-                    <img 
-                      src="/lovable-uploads/92fdb568-68f2-4ac8-9908-e0db6e29b56d.png" 
-                      alt="Sunset View" 
                       className="w-full h-[400px] object-cover rounded-lg"
                     />
                   </CarouselItem>

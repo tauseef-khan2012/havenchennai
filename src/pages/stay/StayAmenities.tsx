@@ -5,7 +5,7 @@ import Footer from '@/components/layout/Footer';
 import StayHero from '@/components/stay/StayHero';
 import StayNavigation from '@/components/stay/StayNavigation';
 import { Card, CardContent } from '@/components/ui/card';
-import { Bed, Wifi, Coffee, Tv, Bath, Fan, Utensils, Snowflake } from 'lucide-react';
+import { Bed, Wifi, Tv, Bath, Fan, Utensils, Snowflake, Book } from 'lucide-react';
 
 const StayAmenities = () => {
   // Group amenities by category for better organization
@@ -16,25 +16,56 @@ const StayAmenities = () => {
       { name: 'Blackout curtains', icon: Bed },
       { name: 'Bedside tables with reading lamps', icon: Bed },
     ],
+    entertainment: [
+      { name: 'Smart TV with Netflix access', icon: Tv },
+      { name: 'Mood lighting throughout', icon: Tv },
+      { name: 'Bluetooth sound system', icon: Tv },
+      { name: 'Curated selection of books', icon: Book },
+    ],
     bathroom: [
       { name: 'Modern bathroom with rainfall shower', icon: Bath },
       { name: 'Organic toiletries', icon: Bath },
       { name: 'Hair dryer', icon: Bath },
       { name: 'Plush towels', icon: Bath },
     ],
+    workspace: [
+      { name: 'Dedicated work desk with ergonomic chair', icon: Wifi },
+      { name: 'Fast Wi-Fi connection', icon: Wifi },
+      { name: 'Multiple power outlets', icon: Wifi },
+      { name: 'Natural lighting', icon: Wifi },
+    ],
     kitchen: [
       { name: 'Fully equipped kitchenette', icon: Utensils },
-      { name: 'Local coffee and tea', icon: Coffee },
+      { name: 'Local coffee and tea', icon: Utensils },
       { name: 'Mini refrigerator', icon: Utensils },
       { name: 'Microwave', icon: Utensils },
     ],
     comfort: [
       { name: 'Sustainable climate control', icon: Snowflake },
       { name: 'Ceiling fan', icon: Fan },
-      { name: 'Fast Wi-Fi', icon: Wifi },
-      { name: 'Bluetooth sound system', icon: Tv },
+      { name: 'Multiple deck spaces', icon: Fan },
+      { name: 'Indoor plants for fresh air', icon: Fan },
     ],
   };
+
+  // Featured amenity images
+  const featuredAmenities = [
+    {
+      name: 'Entertainment Center with Netflix',
+      image: '/lovable-uploads/0f776507-f284-4d7c-9893-068e9aafd374.png',
+      description: 'Relax with your favorite shows and movies on our smart TV with Netflix access and ambient mood lighting.'
+    },
+    {
+      name: 'Curated Book Collection',
+      image: '/lovable-uploads/e017493d-c2c0-467e-a191-28fe62a406ab.png',
+      description: 'Enjoy our carefully selected books during your stay, perfect for quiet afternoons on the deck.'
+    },
+    {
+      name: 'Work Desk Setup',
+      image: '/lovable-uploads/d2fe6d2c-b060-49a3-99d0-62891571bc97.png',
+      description: 'Stay productive with our comfortable work space, fast WiFi, and all the amenities you need.'
+    }
+  ];
 
   return (
     <>
@@ -55,6 +86,25 @@ const StayAmenities = () => {
                 Our container home is thoughtfully equipped with premium amenities to ensure your comfort and convenience.
                 From the plush bedding to the sustainable climate control, we've thought of everything so you don't have to.
               </p>
+              
+              {/* Featured amenities with images */}
+              <div className="mb-16 space-y-12">
+                {featuredAmenities.map((amenity, index) => (
+                  <div key={index} className={`flex flex-col ${index % 2 === 1 ? 'md:flex-row-reverse' : 'md:flex-row'} gap-8 items-center`}>
+                    <div className="md:w-1/2">
+                      <img 
+                        src={amenity.image} 
+                        alt={amenity.name} 
+                        className="w-full h-[300px] object-cover rounded-lg shadow-md"
+                      />
+                    </div>
+                    <div className="md:w-1/2">
+                      <h3 className="font-serif text-2xl font-semibold mb-3">{amenity.name}</h3>
+                      <p className="text-gray-700">{amenity.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
               
               <div className="space-y-12">
                 {Object.entries(amenities).map(([category, items]) => (
