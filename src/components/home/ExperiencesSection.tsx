@@ -24,7 +24,7 @@ const experiences: Experience[] = [
     category: 'Cultural',
     image: '/lovable-uploads/8446db9f-ec1d-4876-adb8-84f568a58892.png',
     alt: 'Shore Temple at Mahabalipuram',
-    story: 'Step back in time as you explore the magnificent 7th-century Shore Temple and the ancient rock-cut monuments of Mahabalipuram. This UNESCO World Heritage site showcases the remarkable Pallava dynasty architecture with its intricate carvings and historical significance. Don't miss the famous "Descent of the Ganges" rock relief, one of the largest open-air rock reliefs in the world.',
+    story: 'Step back in time as you explore the magnificent 7th-century Shore Temple and the ancient rock-cut monuments of Mahabalipuram. This UNESCO World Heritage site showcases the remarkable Pallava dynasty architecture with its intricate carvings and historical significance. Don\'t miss the famous "Descent of the Ganges" rock relief, one of the largest open-air rock reliefs in the world.',
     travelTime: '30 minutes from Haven'
   },
   {
@@ -54,7 +54,7 @@ const experiences: Experience[] = [
     category: 'Adventure',
     image: '/lovable-uploads/3f68b7dc-fc1b-4cab-ac65-013e5c1e074f.png',
     alt: 'Crocodile at Madras Crocodile Bank',
-    story: 'Discover one of the largest reptile zoos in the world at the Madras Crocodile Bank. Home to over 2,000 crocodiles, alligators, and other reptiles, this conservation center offers fascinating guided tours where you can learn about these prehistoric creatures. Don't miss the feeding sessions for an unforgettable experience!',
+    story: 'Discover one of the largest reptile zoos in the world at the Madras Crocodile Bank. Home to over 2,000 crocodiles, alligators, and other reptiles, this conservation center offers fascinating guided tours where you can learn about these prehistoric creatures. Don\'t miss the feeding sessions for an unforgettable experience!',
     travelTime: '15 minutes from Haven'
   },
   {
@@ -64,7 +64,7 @@ const experiences: Experience[] = [
     category: 'Couples',
     image: '/lovable-uploads/43aa0007-941b-4b51-b1a0-a2b67f4bc6d2.png',
     alt: 'Beachside dinner setup near ECR',
-    story: 'Indulge in a magical dining experience with your special someone right on the beach. We'll arrange a private table set against the backdrop of crashing waves and twinkling stars. Feast on freshly caught seafood prepared by local chefs while enjoying the gentle sea breeze and the sound of the ocean.',
+    story: 'Indulge in a magical dining experience with your special someone right on the beach. We\'ll arrange a private table set against the backdrop of crashing waves and twinkling stars. Feast on freshly caught seafood prepared by local chefs while enjoying the gentle sea breeze and the sound of the ocean.',
     travelTime: '20 minutes from Haven'
   },
   {
@@ -74,7 +74,7 @@ const experiences: Experience[] = [
     category: 'Adventure',
     image: '/lovable-uploads/ba10980e-eaed-41d2-950b-de5ba0f75e97.png',
     alt: 'Birds at Vedanthangal Bird Sanctuary',
-    story: 'Join our expert naturalist for a guided bird watching tour around Muttukadu Lake and nearby wetlands. This area becomes a haven for numerous migratory and resident bird species. With binoculars provided, you'll observe painted storks, spot-billed pelicans, egrets, and many more in their natural habitat.',
+    story: 'Join our expert naturalist for a guided bird watching tour around Muttukadu Lake and nearby wetlands. This area becomes a haven for numerous migratory and resident bird species. With binoculars provided, you\'ll observe painted storks, spot-billed pelicans, egrets, and many more in their natural habitat.',
     travelTime: '10-25 minutes from Haven'
   }
 ];
