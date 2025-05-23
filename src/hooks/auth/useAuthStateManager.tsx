@@ -7,6 +7,7 @@ interface AuthStateUpdate {
   session?: any;
   user?: any;
   profile?: any;
+  isInitialized?: boolean;
 }
 
 export function useAuthStateManager(updateState: (state: any) => void) {
