@@ -2,19 +2,24 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface LoadingStateProps {
   size?: 'sm' | 'md' | 'lg';
   message?: string;
   className?: string;
   variant?: 'spinner' | 'pulse' | 'skeleton';
+  children?: React.ReactNode;
+  fullPage?: boolean;
 }
 
 export const LoadingState: React.FC<LoadingStateProps> = ({
   size = 'md',
   message,
   className,
-  variant = 'spinner'
+  variant = 'spinner',
+  children,
+  fullPage = false
 }) => {
   const sizeClasses = {
     sm: 'h-4 w-4',
@@ -22,13 +27,20 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
     lg: 'h-8 w-8'
   };
 
+  const containerClass = cn(
+    'flex flex-col items-center justify-center gap-2', 
+    fullPage && 'fixed inset-0 bg-background/80 backdrop-blur-sm z-50',
+    className
+  );
+
   if (variant === 'spinner') {
     return (
-      <div className={cn('flex flex-col items-center justify-center gap-2', className)}>
+      <div className={containerClass}>
         <Loader2 className={cn('animate-spin', sizeClasses[size])} />
         {message && (
           <p className="text-sm text-muted-foreground animate-pulse">{message}</p>
         )}
+        {children}
       </div>
     );
   }
@@ -40,17 +52,20 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
         {message && (
           <p className="text-sm text-muted-foreground">{message}</p>
         )}
+        {children}
       </div>
     );
   }
 
+  // Skeleton variant
   return (
     <div className={cn('space-y-2', className)}>
-      <div className="h-4 bg-muted rounded animate-pulse" />
-      <div className="h-4 bg-muted rounded animate-pulse w-3/4" />
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-3/4" />
       {message && (
         <p className="text-sm text-muted-foreground">{message}</p>
       )}
+      {children}
     </div>
   );
 };

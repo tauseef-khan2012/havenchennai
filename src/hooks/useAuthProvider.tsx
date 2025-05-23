@@ -5,10 +5,9 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import {
   AuthState,
-  SignInCredentials,
-  SignUpCredentials,
   AuthError,
 } from '@/types/auth';
+import { useSessionManager } from '@/hooks/auth/useSessionManager';
 
 const initialState: AuthState = {
   session: null,
@@ -19,6 +18,7 @@ const initialState: AuthState = {
   isInitialized: false
 };
 
+// Constants
 const AUTO_REFRESH_THRESHOLD_MS = 10 * 60 * 1000; // 10 minutes in milliseconds
 const INACTIVITY_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes in milliseconds
 
@@ -42,17 +42,6 @@ export function useAuthProvider() {
     updateState({ error });
   }, [toast, updateState]);
 
-  const refreshProfile = useCallback(async () => {
-    if (!state.user) return;
-    
-    try {
-      const profile = await fetchUserProfile(state.user.id);
-      updateState({ profile });
-    } catch (error) {
-      console.error('Error refreshing profile:', error);
-    }
-  }, [state.user, updateState]);
-
   // Fetch user profile helper function
   const fetchUserProfile = useCallback(async (userId: string) => {
     const { data, error } = await supabase
@@ -64,6 +53,37 @@ export function useAuthProvider() {
     if (error) throw error;
     return data;
   }, []);
+
+  const refreshProfile = useCallback(async () => {
+    if (!state.user) return;
+    
+    try {
+      const profile = await fetchUserProfile(state.user.id);
+      updateState({ profile });
+    } catch (error) {
+      console.error('Error refreshing profile:', error);
+    }
+  }, [state.user, updateState, fetchUserProfile]);
+
+  // Sign out helper function
+  const signOut = useCallback(async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Session expired",
+        description: "You've been logged out due to inactivity.",
+      });
+    } catch (error) {
+      console.error('Auto logout error:', error);
+    }
+  }, [toast]);
+
+  // Use the session manager hook
+  const { monitorInactivity, setupTokenRefresh } = useSessionManager(
+    updateState,
+    handleError,
+    lastActivity
+  );
 
   // Handle user activity
   useEffect(() => {
@@ -84,65 +104,16 @@ export function useAuthProvider() {
     };
   }, []);
 
-  // Auto logout on inactivity
+  // Auto logout on inactivity and setup token refresh
   useEffect(() => {
-    if (!state.session) return;
-
-    const checkInactivity = setInterval(() => {
-      const now = Date.now();
-      const timeSinceLastActivity = now - lastActivity;
-
-      if (timeSinceLastActivity > INACTIVITY_TIMEOUT_MS) {
-        // Auto logout due to inactivity
-        clearInterval(checkInactivity);
-        signOut();
-      }
-    }, 60000); // Check every minute
-
-    return () => clearInterval(checkInactivity);
-  }, [state.session, lastActivity]);
-
-  // Sign out helper function
-  const signOut = useCallback(async () => {
-    try {
-      await supabase.auth.signOut();
-      toast({
-        title: "Session expired",
-        description: "You've been logged out due to inactivity.",
-      });
-    } catch (error) {
-      console.error('Auto logout error:', error);
-    }
-  }, [toast]);
-
-  // Token refresh logic - optimized to reduce unnecessary refresh checks
-  useEffect(() => {
-    if (!state.session) return;
-
-    // Calculate initial time until token expiry to set appropriate timer
-    const expiresAt = state.session.expires_at ? state.session.expires_at * 1000 : 0;
-    const timeUntilExpiry = expiresAt - Date.now();
-    const timeUntilRefresh = Math.max(1000, timeUntilExpiry - AUTO_REFRESH_THRESHOLD_MS);
+    const cleanupInactivity = monitorInactivity(state.session, INACTIVITY_TIMEOUT_MS, signOut);
+    const cleanupTokenRefresh = setupTokenRefresh(state.session, AUTO_REFRESH_THRESHOLD_MS);
     
-    // Set single timeout instead of repeated interval
-    const refreshTimeout = setTimeout(async () => {
-      try {
-        console.log("Refreshing authentication token...");
-        const { data, error } = await supabase.auth.refreshSession();
-        
-        if (error) {
-          console.error('Token refresh error:', error);
-        } else if (data?.session) {
-          console.log("Token refreshed successfully");
-          updateState({ session: data.session, user: data.session.user });
-        }
-      } catch (error) {
-        console.error('Token refresh error:', error);
-      }
-    }, timeUntilRefresh);
-
-    return () => clearTimeout(refreshTimeout);
-  }, [state.session, updateState]);
+    return () => {
+      cleanupInactivity();
+      cleanupTokenRefresh();
+    };
+  }, [state.session, monitorInactivity, setupTokenRefresh, signOut]);
 
   // Initialize auth state
   useEffect(() => {

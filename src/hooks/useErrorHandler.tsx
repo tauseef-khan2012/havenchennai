@@ -6,6 +6,7 @@ interface ErrorHandlerOptions {
   showToast?: boolean;
   logError?: boolean;
   fallbackMessage?: string;
+  title?: string;
 }
 
 export function useErrorHandler() {
@@ -18,7 +19,8 @@ export function useErrorHandler() {
     const {
       showToast = true,
       logError = true,
-      fallbackMessage = 'An unexpected error occurred'
+      fallbackMessage = 'An unexpected error occurred',
+      title = 'Error'
     } = options;
 
     let errorMessage = fallbackMessage;
@@ -37,7 +39,7 @@ export function useErrorHandler() {
 
     if (showToast) {
       toast({
-        title: 'Error',
+        title,
         description: errorMessage,
         variant: 'destructive',
       });
@@ -46,20 +48,52 @@ export function useErrorHandler() {
     return errorMessage;
   }, [toast]);
 
-  const handleAsyncError = useCallback(async (
-    asyncOperation: () => Promise<any>,
+  const handleAsyncError = useCallback(async <T,>(
+    asyncOperation: () => Promise<T>,
     options: ErrorHandlerOptions = {}
-  ) => {
+  ): Promise<T | null> => {
     try {
       return await asyncOperation();
     } catch (error) {
       handleError(error, options);
-      throw error;
+      return null;
     }
+  }, [handleError]);
+
+  // Add a retry capability for operations that might fail
+  const withRetry = useCallback(async <T,>(
+    operation: () => Promise<T>,
+    options: {
+      maxRetries?: number;
+      retryDelay?: number;
+      errorOptions?: ErrorHandlerOptions;
+    } = {}
+  ): Promise<T | null> => {
+    const { maxRetries = 3, retryDelay = 1000, errorOptions } = options;
+    let retries = 0;
+
+    const attempt = async (): Promise<T | null> => {
+      try {
+        return await operation();
+      } catch (error) {
+        if (retries < maxRetries) {
+          retries++;
+          console.log(`Retry attempt ${retries}/${maxRetries}`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          return attempt();
+        }
+        
+        handleError(error, errorOptions);
+        return null;
+      }
+    };
+
+    return attempt();
   }, [handleError]);
 
   return {
     handleError,
-    handleAsyncError
+    handleAsyncError,
+    withRetry
   };
 }

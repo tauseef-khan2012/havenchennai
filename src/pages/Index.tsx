@@ -10,6 +10,7 @@ import StickyBookingWidget from '@/components/home/StickyBookingWidget';
 import CallToAction from '@/components/home/CallToAction';
 import NewsletterSignup from '@/components/home/NewsletterSignup';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 
 // Hero slides data
 const heroSlides = [
@@ -49,27 +50,29 @@ const heroSlides = [
 ];
 
 const Index = () => {
-  // Implement network-aware image loading
+  const { handleError } = useErrorHandler();
+
+  // Implement network-aware image loading and animations
   useEffect(() => {
-    const checkNetworkSpeed = () => {
-      // Use a type-safe way to check for connection API
-      const nav = navigator as any;
-      if (nav.connection && typeof nav.connection.downlink === 'number') {
-        if (nav.connection.downlink < 1) {
-          document.querySelectorAll('img[data-lowres]').forEach(img => {
-            const element = img as HTMLImageElement;
-            if (element.dataset.lowres) {
-              element.src = element.dataset.lowres;
-            }
-          });
+    try {
+      // Network speed detection
+      const checkNetworkSpeed = () => {
+        const nav = navigator as any;
+        if (nav.connection && typeof nav.connection.downlink === 'number') {
+          if (nav.connection.downlink < 1) {
+            document.querySelectorAll('img[data-lowres]').forEach(img => {
+              const element = img as HTMLImageElement;
+              if (element.dataset.lowres) {
+                element.src = element.dataset.lowres;
+              }
+            });
+          }
         }
-      }
-    };
-    
-    checkNetworkSpeed();
-    
-    // Implement intersection observer for animations
-    const observeElements = () => {
+      };
+      
+      checkNetworkSpeed();
+      
+      // Intersection observer for animations
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
@@ -83,20 +86,19 @@ const Index = () => {
         section.classList.add('opacity-0', 'translate-y-8', 'transition-all', 'duration-700');
         observer.observe(section);
       });
-    };
-    
-    observeElements();
-    
-    return () => {
-      // Cleanup if needed
-    };
-  }, []);
+      
+      return () => observer.disconnect();
+    } catch (error) {
+      handleError(error, { showToast: false, title: "Animation setup failed" });
+    }
+  }, [handleError]);
   
   return (
     <ErrorBoundary>
       <Navbar />
       <main>
         <EnhancedHeroSlider slides={heroSlides} />
+        
         <ErrorBoundary fallback={
           <div className="py-16 text-center">
             <p>Unable to load container home section</p>

@@ -4,20 +4,29 @@ import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { Button } from './button';
 import { Alert, AlertDescription, AlertTitle } from './alert';
 
+export interface FallbackProps {
+  error: Error | null;
+  resetErrorBoundary: () => void;
+}
+
 interface Props {
   children: ReactNode;
+  fallbackComponent?: React.ComponentType<FallbackProps>;
   fallback?: ReactNode;
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  onReset?: () => void;
+  resetKeys?: any[];
 }
 
 interface State {
   hasError: boolean;
-  error?: Error;
+  error: Error | null;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
   public state: State = {
-    hasError: false
+    hasError: false,
+    error: null
   };
 
   public static getDerivedStateFromError(error: Error): State {
@@ -29,14 +38,36 @@ export class ErrorBoundary extends Component<Props, State> {
     this.props.onError?.(error, errorInfo);
   }
 
-  private handleRetry = () => {
-    this.setState({ hasError: false, error: undefined });
+  public componentDidUpdate(prevProps: Props) {
+    const { resetKeys } = this.props;
+    
+    if (resetKeys && this.state.hasError) {
+      // Check if any of resetKeys have changed
+      if (resetKeys.some((key, index) => key !== prevProps.resetKeys?.[index])) {
+        this.resetErrorBoundary();
+      }
+    }
+  }
+
+  private resetErrorBoundary = () => {
+    this.props.onReset?.();
+    this.setState({ hasError: false, error: null });
   };
 
   public render() {
-    if (this.state.hasError) {
-      if (this.props.fallback) {
-        return this.props.fallback;
+    const { hasError, error } = this.state;
+    const { children, fallback, fallbackComponent: FallbackComponent } = this.props;
+
+    if (hasError) {
+      if (FallbackComponent) {
+        return <FallbackComponent 
+          error={error} 
+          resetErrorBoundary={this.resetErrorBoundary} 
+        />;
+      }
+
+      if (fallback) {
+        return fallback;
       }
 
       return (
@@ -45,12 +76,12 @@ export class ErrorBoundary extends Component<Props, State> {
           <AlertTitle>Something went wrong</AlertTitle>
           <AlertDescription className="mt-2">
             <p className="mb-4">
-              {this.state.error?.message || 'An unexpected error occurred. Please try again.'}
+              {error?.message || 'An unexpected error occurred. Please try again.'}
             </p>
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={this.handleRetry}
+              onClick={this.resetErrorBoundary}
               className="gap-2"
             >
               <RefreshCw className="h-3 w-3" />
@@ -61,6 +92,21 @@ export class ErrorBoundary extends Component<Props, State> {
       );
     }
 
-    return this.props.children;
+    return children;
   }
 }
+
+// Function component wrapper for easier usage with hooks
+export const withErrorBoundary = <P extends object>(
+  Component: React.ComponentType<P>,
+  errorBoundaryProps: Omit<Props, 'children'>
+): React.FC<P> => {
+  const WithErrorBoundary: React.FC<P> = (props) => (
+    <ErrorBoundary {...errorBoundaryProps}>
+      <Component {...props} />
+    </ErrorBoundary>
+  );
+  
+  WithErrorBoundary.displayName = `WithErrorBoundary(${Component.displayName || Component.name || 'Component'})`;
+  return WithErrorBoundary;
+};
