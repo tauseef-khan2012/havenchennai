@@ -24,6 +24,8 @@ export function useAuthSignup(
           title: "Account created!",
           description: "Please check your email to confirm your account before logging in.",
         });
+        
+        return true; // Return a value to indicate success
       },
       {
         title: "Sign up failed",
@@ -49,6 +51,8 @@ export function useAuthSignup(
           title: "Confirmation email sent",
           description: "Please check your inbox and follow the link to confirm your email.",
         });
+        
+        return true; // Return a value to indicate success
       },
       {
         title: "Failed to resend confirmation",

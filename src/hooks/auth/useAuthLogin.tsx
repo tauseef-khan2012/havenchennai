@@ -29,6 +29,7 @@ export function useAuthLogin(
         });
         
         navigate('/dashboard');
+        return true; // Return a value to indicate success
       },
       {
         title: "Login failed",
@@ -56,6 +57,7 @@ export function useAuthLogin(
         });
         
         navigate('/dashboard');
+        return true; // Return a value to indicate success
       },
       {
         title: "Login failed",
@@ -76,7 +78,7 @@ export function useAuthLogin(
     const result = await handleAsyncError(
       async () => {
         await authService.signInWithProvider(provider);
-        // No toast or navigate here as OAuth will redirect
+        return true; // Return a value to indicate success
       },
       {
         title: "Login failed",
