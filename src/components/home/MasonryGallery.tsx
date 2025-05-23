@@ -3,6 +3,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { getNetworkAwareImageUrl } from '@/utils/formatters';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import LazyImage from '@/components/shared/LazyImage';
 
 interface GalleryImage {
   id: string;
@@ -134,7 +135,7 @@ const MasonryGallery = () => {
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredImages.map((image) => (
+          {filteredImages.map((image, index) => (
             <div 
               key={image.id}
               className={`overflow-hidden rounded-lg cursor-pointer hover-lift ${
@@ -142,13 +143,13 @@ const MasonryGallery = () => {
               }`}
               onClick={() => setSelectedImage(image)}
             >
-              <img 
-                src={getNetworkAwareImageUrl(image.src, image.lowResSrc || image.src)}
+              <LazyImage 
+                src={image.src}
                 alt={image.alt}
-                className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                loading="lazy"
-                width={image.width * 100}
-                height={image.height * 100}
+                aspectRatio="auto"
+                priority={index < 6} // Prioritize first 6 images
+                className="w-full h-full transition-transform duration-500 hover:scale-105"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
             </div>
           ))}
@@ -165,10 +166,11 @@ const MasonryGallery = () => {
         {selectedImage && (
           <DialogContent className="max-w-5xl p-0 overflow-hidden">
             <div className="relative">
-              <img 
+              <LazyImage 
                 src={selectedImage.src}
                 alt={selectedImage.alt}
                 className="w-full max-h-[80vh] object-contain"
+                priority={true}
               />
               <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-2 rounded text-sm">
                 {selectedImage.alt}

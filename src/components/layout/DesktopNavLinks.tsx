@@ -2,6 +2,7 @@
 import NavLink from "./NavLink";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import UserProfileDropdown from "./UserProfileDropdown";
 
 interface DesktopNavLinksProps {
   isActive: (path: string) => boolean;
@@ -31,11 +32,7 @@ const DesktopNavLinks = ({ isActive, user }: DesktopNavLinksProps) => {
       
       <div className="flex items-center gap-4 ml-4">
         {user ? (
-          <Link to="/dashboard">
-            <Button variant="outline" className="border-haven-teal text-haven-teal font-medium min-h-[44px] px-5">
-              Dashboard
-            </Button>
-          </Link>
+          <UserProfileDropdown user={user} />
         ) : (
           <Link to="/login">
             <Button variant="outline" className="border-haven-teal text-haven-teal font-medium min-h-[44px] px-5">

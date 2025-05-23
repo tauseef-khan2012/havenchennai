@@ -1,6 +1,6 @@
 
 import { useCallback } from 'react';
-import { AuthError } from '@/types/auth';
+import { AuthError, AuthSession, AuthUser } from '@/types/auth';
 import * as authService from '@/services/authService';
 
 export function useAuthSession(
@@ -27,7 +27,7 @@ export function useAuthSession(
     }
   }, [updateState, handleError, navigate, toast]);
 
-  const refreshSession = useCallback(async () => {
+  const refreshSession = useCallback(async (): Promise<boolean> => {
     try {
       updateState({ isLoading: true, error: null });
       const { session } = await authService.refreshSession();
@@ -45,12 +45,8 @@ export function useAuthSession(
     }
   }, [updateState, handleError]);
 
-  // Mock user data for now - this would come from the actual auth context in a real app
-  const user = { id: '1', email: 'user@example.com' };
-
   return {
     signOut,
-    refreshSession,
-    user
+    refreshSession
   };
 }

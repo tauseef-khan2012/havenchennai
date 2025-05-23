@@ -1,13 +1,11 @@
-
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { getNetworkAwareImageUrl } from '@/utils/formatters';
-import { Filter, X } from 'lucide-react';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import Navbar from '@/components/layout/Navbar';
+import Footer from '@/components/layout/Footer';
+import LazyImage from '@/components/shared/LazyImage';
+import GallerySearch from '@/components/gallery/GallerySearch';
 
 // Use the same interface from MasonryGallery for consistency
 interface GalleryImage {
@@ -205,17 +203,11 @@ const Gallery = () => {
   const [activeSection, setActiveSection] = useState<'all' | 'interiors' | 'lakeside' | 'highlights'>('all');
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [viewStyle, setViewStyle] = useState<'grid' | 'masonry'>('masonry');
+  const [filteredImages, setFilteredImages] = useState<GalleryImage[]>(galleryImages);
   
-  const filteredImages = activeSection === 'all' 
-    ? galleryImages 
-    : galleryImages.filter(img => img.section === activeSection);
-  
-  const sectionLabels = {
-    all: 'All Photos',
-    interiors: 'Container Interiors',
-    lakeside: 'Lakeside & Deck Life',
-    highlights: 'ECR & Chennai Highlights'
-  };
+  const handleFilteredImagesChange = useCallback((images: GalleryImage[]) => {
+    setFilteredImages(images);
+  }, []);
   
   return (
     <>
@@ -230,23 +222,22 @@ const Gallery = () => {
               Explore our container home's unique design, lakeside views, and nearby attractions through these captivating images.
             </p>
             
-            {/* Desktop Filters */}
-            <div className="hidden md:flex justify-between items-center mb-8">
-              <div className="flex space-x-2">
-                {Object.entries(sectionLabels).map(([key, label]) => (
-                  <Button
-                    key={key}
-                    variant={activeSection === key ? "default" : "outline"}
-                    className={activeSection === key ? "bg-haven-teal" : ""}
-                    onClick={() => setActiveSection(key as any)}
-                  >
-                    {label}
-                  </Button>
-                ))}
-              </div>
+            {/* Search and Filter Component */}
+            <div className="mb-8">
+              <GallerySearch
+                images={galleryImages}
+                onFilteredImagesChange={handleFilteredImagesChange}
+                activeSection={activeSection}
+                onSectionChange={setActiveSection}
+              />
+            </div>
+            
+            {/* View Style Toggle */}
+            <div className="flex justify-end mb-6">
               <div className="flex space-x-2">
                 <Button 
                   variant="outline" 
+                  size="sm"
                   className={viewStyle === 'grid' ? 'border-haven-teal text-haven-teal' : ''}
                   onClick={() => setViewStyle('grid')}
                 >
@@ -254,6 +245,7 @@ const Gallery = () => {
                 </Button>
                 <Button 
                   variant="outline"
+                  size="sm"
                   className={viewStyle === 'masonry' ? 'border-haven-teal text-haven-teal' : ''}
                   onClick={() => setViewStyle('masonry')}
                 >
@@ -262,83 +254,24 @@ const Gallery = () => {
               </div>
             </div>
             
-            {/* Mobile Filters */}
-            <div className="md:hidden flex justify-between items-center mb-8">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button variant="outline" className="flex items-center">
-                    <Filter className="mr-2 h-4 w-4" />
-                    Filters
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left">
-                  <SheetHeader>
-                    <SheetTitle>Gallery Filters</SheetTitle>
-                  </SheetHeader>
-                  <div className="py-4 flex flex-col space-y-2">
-                    <h3 className="text-sm font-medium mb-2">Categories</h3>
-                    {Object.entries(sectionLabels).map(([key, label]) => (
-                      <Button
-                        key={key}
-                        variant={activeSection === key ? "default" : "outline"}
-                        className={`justify-start ${activeSection === key ? "bg-haven-teal" : ""}`}
-                        onClick={() => {
-                          setActiveSection(key as any);
-                        }}
-                      >
-                        {label}
-                      </Button>
-                    ))}
-                    
-                    <h3 className="text-sm font-medium mt-4 mb-2">View Style</h3>
-                    <div className="flex space-x-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className={viewStyle === 'grid' ? 'border-haven-teal text-haven-teal' : ''}
-                        onClick={() => setViewStyle('grid')}
-                      >
-                        Grid
-                      </Button>
-                      <Button 
-                        variant="outline"
-                        size="sm"
-                        className={viewStyle === 'masonry' ? 'border-haven-teal text-haven-teal' : ''}
-                        onClick={() => setViewStyle('masonry')}
-                      >
-                        Masonry
-                      </Button>
-                    </div>
-                  </div>
-                </SheetContent>
-              </Sheet>
-              
-              <Badge variant="outline" className="px-3 py-1">
-                {sectionLabels[activeSection]} ({filteredImages.length})
-              </Badge>
-            </div>
-            
-            {/* Active filters display */}
-            {activeSection !== 'all' && (
-              <div className="flex items-center mb-6">
-                <span className="text-sm text-gray-500 mr-2">Active filters:</span>
-                <Badge 
-                  variant="secondary" 
-                  className="flex items-center gap-1"
-                >
-                  {sectionLabels[activeSection]}
-                  <X 
-                    className="h-3 w-3 cursor-pointer" 
-                    onClick={() => setActiveSection('all')}
-                  />
-                </Badge>
-              </div>
-            )}
-            
             {/* Gallery layout based on selected view */}
-            {viewStyle === 'masonry' ? (
+            {filteredImages.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-500 text-lg">No images found matching your search.</p>
+                <Button 
+                  variant="outline" 
+                  className="mt-4"
+                  onClick={() => {
+                    setActiveSection('all');
+                    // This will trigger the search component to clear filters
+                  }}
+                >
+                  Clear all filters
+                </Button>
+              </div>
+            ) : viewStyle === 'masonry' ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredImages.map((image) => (
+                {filteredImages.map((image, index) => (
                   <div 
                     key={image.id}
                     className={`overflow-hidden rounded-lg cursor-pointer hover-lift ${
@@ -346,40 +279,37 @@ const Gallery = () => {
                     }`}
                     onClick={() => setSelectedImage(image)}
                   >
-                    <img 
-                      src={getNetworkAwareImageUrl(image.src, image.lowResSrc || image.src)}
+                    <LazyImage 
+                      src={image.src}
                       alt={image.alt}
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                      loading="lazy"
-                      width={image.width * 100}
-                      height={image.height * 100}
+                      aspectRatio="auto"
+                      priority={index < 6} // Prioritize first 6 images
+                      className="w-full h-full transition-transform duration-500 hover:scale-105"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                   </div>
                 ))}
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {filteredImages.map((image) => (
+                {filteredImages.map((image, index) => (
                   <div 
                     key={image.id}
                     className="aspect-square overflow-hidden rounded-lg cursor-pointer hover-lift"
                     onClick={() => setSelectedImage(image)}
                   >
-                    <img 
-                      src={getNetworkAwareImageUrl(image.src, image.lowResSrc || image.src)}
+                    <LazyImage 
+                      src={image.src}
                       alt={image.alt}
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                      loading="lazy"
+                      aspectRatio="square"
+                      priority={index < 8} // Prioritize first 8 images
+                      className="w-full h-full transition-transform duration-500 hover:scale-105"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
                   </div>
                 ))}
               </div>
             )}
-            
-            {/* Image count summary */}
-            <div className="mt-8 text-center text-gray-500">
-              Showing {filteredImages.length} of {galleryImages.length} images
-            </div>
           </div>
         </section>
       </main>
@@ -389,10 +319,11 @@ const Gallery = () => {
         {selectedImage && (
           <DialogContent className="max-w-5xl p-0 overflow-hidden">
             <div className="relative">
-              <img 
+              <LazyImage 
                 src={selectedImage.src}
                 alt={selectedImage.alt}
                 className="w-full max-h-[80vh] object-contain"
+                priority={true}
               />
               <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-2 rounded text-sm">
                 {selectedImage.alt}

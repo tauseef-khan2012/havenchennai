@@ -5,32 +5,13 @@ import { cn } from "@/lib/utils";
 import DesktopNavLinks from "./DesktopNavLinks";
 import MobileNavLinks from "./MobileNavLinks";
 import MobileMenuButton from "./MobileMenuButton";
-import { useAuthSession } from "@/hooks/auth/useAuthSession";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  
-  // This is a temporary solution until we properly fix the useAuthSession hook
-  // by adding the correct type definitions and ensuring it works correctly
-  const authSession = useAuthSession((state: any) => {}, 
-    (error: any, title: string) => {
-      toast({
-        title,
-        description: error.message,
-        variant: "destructive",
-      });
-    }, 
-    navigate, 
-    toast
-  );
-  
-  const user = authSession?.user;
+  const { user, isLoading } = useAuth();
   
   const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(`${path}/`);

@@ -2,6 +2,7 @@
 import NavLink from "./NavLink";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import UserProfileDropdown from "./UserProfileDropdown";
 
 interface MobileNavLinksProps {
   isOpen: boolean;
@@ -53,11 +54,10 @@ const MobileNavLinks = ({ isOpen, isActive, user }: MobileNavLinksProps) => {
         
         <div className="flex flex-col space-y-2 pt-2 border-t border-gray-100">
           {user ? (
-            <Link to="/dashboard" className="w-full">
-              <Button variant="outline" className="w-full border-haven-teal text-haven-teal">
-                Dashboard
-              </Button>
-            </Link>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Welcome back!</span>
+              <UserProfileDropdown user={user} />
+            </div>
           ) : (
             <Link to="/login" className="w-full">
               <Button variant="outline" className="w-full border-haven-teal text-haven-teal">

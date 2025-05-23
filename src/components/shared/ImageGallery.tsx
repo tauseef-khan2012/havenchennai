@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Expand } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import LazyImage from './LazyImage';
 
 interface ImageGalleryProps {
   images: string[];
@@ -50,31 +51,34 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
         getAspectRatioClass(aspectRatio),
         className
       )}>
-        <img
+        <LazyImage
           src={images[currentIndex]}
           alt={`Image ${currentIndex + 1}`}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-          loading={priority ? 'eager' : 'lazy'}
+          aspectRatio={aspectRatio}
+          priority={priority}
+          className="w-full h-full group-hover:scale-105 transition-transform duration-500"
         />
         
         {/* Navigation buttons */}
-        <div className="absolute inset-0 flex items-center justify-between p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button 
-            onClick={prevImage}
-            className="bg-white/80 p-2 rounded-full shadow-md hover:bg-white transition-colors"
-            aria-label="Previous image"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          
-          <button 
-            onClick={nextImage}
-            className="bg-white/80 p-2 rounded-full shadow-md hover:bg-white transition-colors"
-            aria-label="Next image"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        </div>
+        {images.length > 1 && (
+          <div className="absolute inset-0 flex items-center justify-between p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button 
+              onClick={prevImage}
+              className="bg-white/80 p-2 rounded-full shadow-md hover:bg-white transition-colors"
+              aria-label="Previous image"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            
+            <button 
+              onClick={nextImage}
+              className="bg-white/80 p-2 rounded-full shadow-md hover:bg-white transition-colors"
+              aria-label="Next image"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        )}
         
         {/* Fullscreen button */}
         <button 
@@ -86,40 +90,47 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
         </button>
         
         {/* Image counter */}
-        <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded-md text-xs">
-          {currentIndex + 1} / {images.length}
-        </div>
+        {images.length > 1 && (
+          <div className="absolute bottom-2 left-2 bg-black/50 text-white px-2 py-1 rounded-md text-xs">
+            {currentIndex + 1} / {images.length}
+          </div>
+        )}
       </div>
       
       {/* Fullscreen overlay */}
       {isFullscreen && (
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center" onClick={toggleFullscreen}>
           <div className="relative w-full h-full flex items-center justify-center p-4">
-            <img
+            <LazyImage
               src={images[currentIndex]}
               alt={`Image ${currentIndex + 1} fullscreen`}
               className="max-w-full max-h-full object-contain"
+              priority={true}
             />
             
-            <button 
-              onClick={(e) => { e.stopPropagation(); prevImage(); }}
-              className="absolute left-4 bg-white/20 p-3 rounded-full hover:bg-white/40 transition-colors"
-              aria-label="Previous image"
-            >
-              <ChevronLeft className="h-6 w-6 text-white" />
-            </button>
-            
-            <button 
-              onClick={(e) => { e.stopPropagation(); nextImage(); }}
-              className="absolute right-4 bg-white/20 p-3 rounded-full hover:bg-white/40 transition-colors"
-              aria-label="Next image"
-            >
-              <ChevronRight className="h-6 w-6 text-white" />
-            </button>
-            
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-3 py-2 rounded-md">
-              {currentIndex + 1} / {images.length}
-            </div>
+            {images.length > 1 && (
+              <>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); prevImage(); }}
+                  className="absolute left-4 bg-white/20 p-3 rounded-full hover:bg-white/40 transition-colors"
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft className="h-6 w-6 text-white" />
+                </button>
+                
+                <button 
+                  onClick={(e) => { e.stopPropagation(); nextImage(); }}
+                  className="absolute right-4 bg-white/20 p-3 rounded-full hover:bg-white/40 transition-colors"
+                  aria-label="Next image"
+                >
+                  <ChevronRight className="h-6 w-6 text-white" />
+                </button>
+                
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-3 py-2 rounded-md">
+                  {currentIndex + 1} / {images.length}
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
