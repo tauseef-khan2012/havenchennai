@@ -8,6 +8,7 @@ import {
   AuthError,
 } from '@/types/auth';
 import { useSessionManager } from '@/hooks/auth/useSessionManager';
+import { useAuthStateManager } from '@/hooks/auth/useAuthStateManager';
 
 const initialState: AuthState = {
   session: null,
@@ -27,6 +28,9 @@ export function useAuthProvider() {
   const [lastActivity, setLastActivity] = useState(Date.now());
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  // Use the new state manager
+  const { setLoading, setError, setSuccess } = useAuthStateManager(setState);
 
   const updateState = useCallback((newState: Partial<AuthState>) => {
     setState(prevState => ({ ...prevState, ...newState }));
@@ -39,8 +43,8 @@ export function useAuthProvider() {
       description: error.message || "An error occurred",
       variant: "destructive",
     });
-    updateState({ error });
-  }, [toast, updateState]);
+    setError(error);
+  }, [toast, setError]);
 
   // Fetch user profile helper function
   const fetchUserProfile = useCallback(async (userId: string) => {
@@ -149,10 +153,9 @@ export function useAuthProvider() {
 
         // THEN check for existing session
         const { data } = await supabase.auth.getSession();
-        updateState({
+        setSuccess({
           session: data.session,
           user: data.session?.user ?? null,
-          isLoading: false,
           isInitialized: true
         });
         
@@ -162,10 +165,11 @@ export function useAuthProvider() {
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
-        updateState({ isLoading: false, isInitialized: true });
+        setSuccess({ isInitialized: true });
       }
     };
 
+    setLoading(true);
     initAuth();
 
     return () => {
@@ -173,7 +177,7 @@ export function useAuthProvider() {
         subscription.unsubscribe();
       }
     };
-  }, [updateState, fetchUserProfile]);
+  }, [updateState, fetchUserProfile, setLoading, setSuccess]);
 
   return {
     state,

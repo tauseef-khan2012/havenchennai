@@ -2,12 +2,15 @@
 import { useCallback } from 'react';
 import { AuthError, AuthSession } from '@/types/auth';
 import * as authService from '@/services/authService';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 
 export function useSessionManager(
   updateState: (state: any) => void,
   handleError: (error: AuthError, title: string) => void,
   lastActivity: number
 ) {
+  const { handleAsyncError } = useErrorHandler();
+
   // Auto logout on inactivity
   const monitorInactivity = useCallback((session: AuthSession | null, inactivityTimeoutMs: number, onLogout: () => void) => {
     if (!session) return () => {};
@@ -37,22 +40,26 @@ export function useSessionManager(
     
     // Set single timeout instead of repeated interval
     const refreshTimeout = setTimeout(async () => {
-      try {
-        console.log("Refreshing authentication token...");
-        const result = await authService.refreshSession();
-        
-        if (result && result.session) {
-          console.log("Token refreshed successfully");
-          updateState({ session: result.session, user: result.session.user });
+      await handleAsyncError(
+        async () => {
+          console.log("Refreshing authentication token...");
+          const result = await authService.refreshSession();
+          
+          if (result && result.session) {
+            console.log("Token refreshed successfully");
+            updateState({ session: result.session, user: result.session.user });
+          }
+          return result;
+        },
+        {
+          title: 'Token refresh failed',
+          fallbackMessage: 'Failed to refresh your session. You may need to log in again.'
         }
-      } catch (error) {
-        console.error('Token refresh error:', error);
-        handleError(error as AuthError, 'Token refresh failed');
-      }
+      );
     }, timeUntilRefresh);
 
     return () => clearTimeout(refreshTimeout);
-  }, [updateState, handleError]);
+  }, [updateState, handleAsyncError]);
 
   return {
     monitorInactivity,
