@@ -2,77 +2,94 @@
 import { useCallback } from 'react';
 import { AuthError } from '@/types/auth';
 import * as authService from '@/services/authService';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 
 export function useAuthVerification(
   updateState: (state: any) => void,
-  handleError: (error: AuthError, title: string) => void,
   navigate: (path: string) => void,
   toast: any
 ) {
+  const { handleAsyncError } = useErrorHandler();
+
   const signInWithOtp = useCallback(async (phone: string) => {
-    try {
-      updateState({ isLoading: true, error: null });
-      const result = await authService.sendOtpToPhone(phone);
-      
-      if (result) {
-        toast({
-          title: "OTP Sent",
-          description: "A verification code has been sent to your phone number.",
-        });
+    updateState({ isLoading: true, error: null });
+    
+    const result = await handleAsyncError(
+      async () => {
+        const success = await authService.sendOtpToPhone(phone);
+        
+        if (success) {
+          toast({
+            title: "OTP Sent",
+            description: "A verification code has been sent to your phone number.",
+          });
+        }
+        
+        return success;
+      },
+      {
+        title: "Failed to send verification code",
+        fallbackMessage: "Could not send OTP. Please check your phone number."
       }
-      
-      return result;
-    } catch (error: any) {
-      handleError(error, "Failed to send verification code");
-      return false;
-    } finally {
-      updateState({ isLoading: false });
-    }
-  }, [updateState, handleError, toast]);
+    );
+
+    updateState({ isLoading: false });
+    return result || false;
+  }, [updateState, toast, handleAsyncError]);
 
   const verifyOtp = useCallback(async (phone: string, otp: string) => {
-    try {
-      updateState({ isLoading: true, error: null });
-      const result = await authService.verifyOtp(phone, otp);
-      
-      if (result) {
-        toast({
-          title: "Verification successful",
-          description: "Your phone number has been verified successfully.",
-        });
+    updateState({ isLoading: true, error: null });
+    
+    const result = await handleAsyncError(
+      async () => {
+        const success = await authService.verifyOtp(phone, otp);
         
-        navigate('/dashboard');
+        if (success) {
+          toast({
+            title: "Verification successful",
+            description: "Your phone number has been verified successfully.",
+          });
+          
+          navigate('/dashboard');
+        }
+        
+        return success;
+      },
+      {
+        title: "OTP verification failed",
+        fallbackMessage: "Invalid verification code. Please try again."
       }
-      
-      return result;
-    } catch (error: any) {
-      handleError(error, "OTP verification failed");
-      return false;
-    } finally {
-      updateState({ isLoading: false });
-    }
-  }, [updateState, handleError, navigate, toast]);
+    );
+
+    updateState({ isLoading: false });
+    return result || false;
+  }, [updateState, navigate, toast, handleAsyncError]);
 
   const resetPassword = useCallback(async (email: string) => {
-    try {
-      updateState({ isLoading: true, error: null });
-      const result = await authService.resetPassword(email);
-      
-      if (result) {
-        toast({
-          title: "Reset instructions sent",
-          description: "If an account with that email exists, you will receive password reset instructions.",
-        });
+    updateState({ isLoading: true, error: null });
+    
+    const result = await handleAsyncError(
+      async () => {
+        const success = await authService.resetPassword(email);
+        
+        if (success) {
+          toast({
+            title: "Reset instructions sent",
+            description: "If an account with that email exists, you will receive password reset instructions.",
+          });
+        }
+        
+        return success;
+      },
+      {
+        title: "Password reset failed",
+        fallbackMessage: "Could not send reset email. Please try again."
       }
-      
-      return result;
-    } catch (error: any) {
-      handleError(error, "Password reset failed");
-      return false;
-    } finally {
-      updateState({ isLoading: false });
-    }
-  }, [updateState, handleError, toast]);
+    );
+
+    updateState({ isLoading: false });
+    return result || false;
+  }, [updateState, toast, handleAsyncError]);
 
   return {
     signInWithOtp,

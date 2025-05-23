@@ -7,71 +7,89 @@ import {
   AuthError,
 } from '@/types/auth';
 import * as authService from '@/services/authService';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 
 export function useAuthLogin(
   updateState: (state: any) => void,
-  handleError: (error: AuthError, title: string) => void,
   navigate: (path: string) => void,
   toast: any
 ) {
+  const { handleAsyncError } = useErrorHandler();
+
   const signIn = useCallback(async (credentials: SignInCredentials) => {
-    try {
-      updateState({ isLoading: true, error: null });
-      await authService.signInWithEmail(credentials);
-      
-      toast({
-        title: "Success!",
-        description: "You've been logged in successfully.",
-      });
-      
-      navigate('/dashboard');
-    } catch (error: any) {
-      if (error.message === 'Email not confirmed') {
+    updateState({ isLoading: true, error: null });
+    
+    const result = await handleAsyncError(
+      async () => {
+        await authService.signInWithEmail(credentials);
+        
         toast({
-          title: "Email not confirmed",
-          description: "Please check your inbox and confirm your email before logging in.",
-          variant: "destructive",
+          title: "Success!",
+          description: "You've been logged in successfully.",
         });
-      } else {
-        handleError(error, "Login failed");
+        
+        navigate('/dashboard');
+      },
+      {
+        title: "Login failed",
+        fallbackMessage: "Failed to sign in. Please check your credentials."
       }
-      throw error;
-    } finally {
-      updateState({ isLoading: false });
+    );
+
+    updateState({ isLoading: false });
+    
+    if (!result) {
+      throw new Error("Login failed");
     }
-  }, [updateState, handleError, navigate, toast]);
+  }, [updateState, navigate, toast, handleAsyncError]);
 
   const signInWithPhone = useCallback(async (credentials: PhoneSignInCredentials) => {
-    try {
-      updateState({ isLoading: true, error: null });
-      await authService.signInWithPhone(credentials);
-      
-      toast({
-        title: "Success!",
-        description: "You've been logged in successfully.",
-      });
-      
-      navigate('/dashboard');
-    } catch (error: any) {
-      handleError(error, "Login failed");
-      throw error;
-    } finally {
-      updateState({ isLoading: false });
+    updateState({ isLoading: true, error: null });
+    
+    const result = await handleAsyncError(
+      async () => {
+        await authService.signInWithPhone(credentials);
+        
+        toast({
+          title: "Success!",
+          description: "You've been logged in successfully.",
+        });
+        
+        navigate('/dashboard');
+      },
+      {
+        title: "Login failed",
+        fallbackMessage: "Failed to sign in with phone. Please check your credentials."
+      }
+    );
+
+    updateState({ isLoading: false });
+    
+    if (!result) {
+      throw new Error("Phone login failed");
     }
-  }, [updateState, handleError, navigate, toast]);
+  }, [updateState, navigate, toast, handleAsyncError]);
 
   const signInWithProvider = useCallback(async (provider: AuthProvider) => {
-    try {
-      updateState({ isLoading: true, error: null });
-      await authService.signInWithProvider(provider);
-      // No toast or navigate here as OAuth will redirect
-    } catch (error: any) {
-      handleError(error, "Login failed");
-      throw error;
-    } finally {
-      updateState({ isLoading: false });
+    updateState({ isLoading: true, error: null });
+    
+    const result = await handleAsyncError(
+      async () => {
+        await authService.signInWithProvider(provider);
+        // No toast or navigate here as OAuth will redirect
+      },
+      {
+        title: "Login failed",
+        fallbackMessage: `Failed to sign in with ${provider}. Please try again.`
+      }
+    );
+
+    updateState({ isLoading: false });
+    
+    if (!result) {
+      throw new Error(`${provider} login failed`);
     }
-  }, [updateState, handleError]);
+  }, [updateState, handleAsyncError]);
 
   return {
     signIn,

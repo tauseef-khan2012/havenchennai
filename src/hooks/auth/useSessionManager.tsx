@@ -39,21 +39,20 @@ export function useSessionManager(
     const refreshTimeout = setTimeout(async () => {
       try {
         console.log("Refreshing authentication token...");
-        const { data, error } = await authService.refreshSession();
+        const result = await authService.refreshSession();
         
-        if (error) {
-          console.error('Token refresh error:', error);
-        } else if (data?.session) {
+        if (result && result.session) {
           console.log("Token refreshed successfully");
-          updateState({ session: data.session, user: data.session.user });
+          updateState({ session: result.session, user: result.session.user });
         }
       } catch (error) {
         console.error('Token refresh error:', error);
+        handleError(error as AuthError, 'Token refresh failed');
       }
     }, timeUntilRefresh);
 
     return () => clearTimeout(refreshTimeout);
-  }, [updateState]);
+  }, [updateState, handleError]);
 
   return {
     monitorInactivity,

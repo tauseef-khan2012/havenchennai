@@ -25,7 +25,7 @@ export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({
   const severityConfig = {
     warning: {
       icon: <AlertCircle className="h-4 w-4" />,
-      variant: 'default',
+      variant: 'default' as const,
       bgClass: 'bg-yellow-50',
       textClass: 'text-yellow-800',
     },

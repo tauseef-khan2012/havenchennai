@@ -13,20 +13,17 @@ export function useAuthActions(
 ) {
   const { signIn, signInWithProvider } = useAuthLogin(
     updateState,
-    handleError,
     navigate,
     toast
   );
 
   const { signUp, resendConfirmationEmail } = useAuthSignup(
     updateState,
-    handleError,
     toast
   );
 
   const { signInWithOtp, verifyOtp, resetPassword } = useAuthVerification(
     updateState,
-    handleError,
     navigate,
     toast
   );
