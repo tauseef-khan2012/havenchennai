@@ -1,340 +1,237 @@
-import { useState, useCallback } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+
+import { useState, useMemo } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
+import PageHero from '@/components/shared/PageHero';
 import LazyImage from '@/components/shared/LazyImage';
-import GallerySearch from '@/components/gallery/GallerySearch';
+import { ErrorBoundary } from '@/components/ui/error-boundary';
+import { LoadingState } from '@/components/ui/loading-state';
+import { GallerySearchAndFilter, GalleryFilters, GallerySortOption } from '@/components/gallery/GallerySearchAndFilter';
+import { Card } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 
-// Use the same interface from MasonryGallery for consistency
 interface GalleryImage {
   id: string;
   src: string;
-  alt: string;
   lowResSrc?: string;
-  section: 'interiors' | 'lakeside' | 'highlights';
-  width: number;
-  height: number;
+  alt: string;
+  title: string;
+  category: string;
+  date: string;
+  description?: string;
 }
 
-// Expanded gallery images collection with all uploaded images
-const galleryImages: GalleryImage[] = [
+// Mock gallery data - replace with real data from your CMS/database
+const GALLERY_IMAGES: GalleryImage[] = [
   {
     id: '1',
-    src: '/lovable-uploads/d1148760-0de0-44d6-ae11-98a16c4b61fc.png',
-    alt: 'Container interior workspace with natural light',
-    section: 'interiors',
-    width: 4,
-    height: 3
+    src: '/lovable-uploads/ba10980e-eaed-41d2-950b-de5ba0f75e97.png',
+    alt: 'Haven container home exterior view',
+    title: 'Container Home Exterior',
+    category: 'Exterior Views',
+    date: '2024-01-15',
+    description: 'Beautiful exterior view of our sustainable container home'
   },
   {
     id: '2',
-    src: '/lovable-uploads/e4f31ab2-de64-417b-af9f-97d3d17e2f47.png',
-    alt: 'Bedroom with minimalist design and large window',
-    section: 'interiors',
-    width: 4,
-    height: 3
+    src: '/lovable-uploads/deda06e0-1382-4f56-875d-f5715e78fc08.png',
+    alt: 'Haven container home deck area',
+    title: 'Deck & Outdoor Living',
+    category: 'Exterior Views',
+    date: '2024-01-20',
+    description: 'Spacious deck perfect for relaxation and entertainment'
   },
   {
     id: '3',
-    src: '/lovable-uploads/92fdb568-68f2-4ac8-9908-e0db6e29b56d.png',
-    alt: 'Panoramic view of Muttukadu Lake from deck',
-    section: 'lakeside',
-    width: 6,
-    height: 4
+    src: '/lovable-uploads/d2fe6d2c-b060-49a3-99d0-62891571bc97.png',
+    alt: 'Haven container home interior',
+    title: 'Modern Interior Design',
+    category: 'Interior Spaces',
+    date: '2024-02-01',
+    description: 'Thoughtfully designed interior spaces with modern amenities'
   },
   {
     id: '4',
-    src: '/lovable-uploads/2d7b66e7-63b3-4b13-a6f3-9d253a5609aa.png',
-    alt: 'Sunset view from rooftop deck',
-    section: 'lakeside',
-    width: 6,
-    height: 4
+    src: '/lovable-uploads/e017493d-c2c0-467e-a191-28fe62a406ab.png',
+    alt: 'Haven container home kitchen',
+    title: 'Gourmet Kitchen',
+    category: 'Interior Spaces',
+    date: '2024-02-05',
+    description: 'Fully equipped kitchen with high-end appliances'
   },
   {
     id: '5',
-    src: '/lovable-uploads/a768b355-2a53-4898-91c5-3372bc1fe662.png',
-    alt: 'Container home exterior during golden hour',
-    section: 'interiors',
-    width: 4,
-    height: 3
+    src: '/lovable-uploads/c23dc9bb-c7f4-47d3-8c31-2c792d241ee2.png',
+    alt: 'Haven outdoor activities',
+    title: 'Outdoor Adventures',
+    category: 'Activities',
+    date: '2024-02-10',
+    description: 'Endless outdoor activities in pristine natural surroundings'
   },
   {
     id: '6',
-    src: '/lovable-uploads/ea3b40a2-e087-4627-aecc-211b123dc269.png',
-    alt: 'Deck with outdoor furniture overlooking lake',
-    section: 'lakeside',
-    width: 4,
-    height: 3
-  },
-  {
-    id: '7',
-    src: '/lovable-uploads/deda06e0-1382-4f56-875d-f5715e78fc08.png',
-    alt: 'Morning mist over Muttukadu Lake',
-    section: 'lakeside',
-    width: 4,
-    height: 3
-  },
-  {
-    id: '8',
-    src: '/lovable-uploads/8446db9f-ec1d-4876-adb8-84f568a58892.png',
-    alt: 'Shore Temple at Mahabalipuram',
-    section: 'highlights',
-    width: 4,
-    height: 3
-  },
-  {
-    id: '9',
-    src: '/lovable-uploads/3d09a878-2b77-4c76-b9dc-916c5572305e.png',
-    alt: 'Boating at Muttukadu backwaters',
-    section: 'highlights',
-    width: 4,
-    height: 3
-  },
-  // Additional uploaded images
-  {
-    id: '10',
-    src: '/lovable-uploads/0f776507-f284-4d7c-9893-068e9aafd374.png',
-    alt: 'Cozy reading nook in the container home',
-    section: 'interiors',
-    width: 4,
-    height: 3
-  },
-  {
-    id: '11',
-    src: '/lovable-uploads/15811ea8-1b7c-41c0-9b75-05f249f60154.png',
-    alt: 'Outdoor dining setup on the lakeside deck',
-    section: 'lakeside',
-    width: 4,
-    height: 3
-  },
-  {
-    id: '12',
-    src: '/lovable-uploads/15b485a2-1d79-4783-ba80-f0cf6d9d7a20.png',
-    alt: 'Sunrise view from the container home bedroom',
-    section: 'lakeside',
-    width: 4,
-    height: 3
-  },
-  {
-    id: '13',
-    src: '/lovable-uploads/3f68b7dc-fc1b-4cab-ac65-013e5c1e074f.png',
-    alt: 'Kitchen area with modern appliances',
-    section: 'interiors',
-    width: 4,
-    height: 3
-  },
-  {
-    id: '14',
-    src: '/lovable-uploads/43aa0007-941b-4b51-b1a0-a2b67f4bc6d2.png',
-    alt: 'Birds flying over Muttukadu Lake at dusk',
-    section: 'lakeside',
-    width: 6,
-    height: 4
-  },
-  {
-    id: '15',
-    src: '/lovable-uploads/6f37f539-1310-49d2-965a-0c02228f5ced.png',
-    alt: 'Crocodile Bank attraction near the property',
-    section: 'highlights',
-    width: 4,
-    height: 3
-  },
-  {
-    id: '16',
-    src: '/lovable-uploads/7ef10cc7-1183-4067-8e12-ead8cd47788f.png',
-    alt: 'Local fishermen on traditional boats',
-    section: 'highlights',
-    width: 4,
-    height: 3
-  },
-  {
-    id: '17',
-    src: '/lovable-uploads/98e46d57-3441-4761-9cdf-18542ba4837c.png',
-    alt: 'Bathroom with eco-friendly fixtures',
-    section: 'interiors',
-    width: 3,
-    height: 4
-  },
-  {
-    id: '18',
-    src: '/lovable-uploads/ba10980e-eaed-41d2-950b-de5ba0f75e97.png',
-    alt: 'Sunset kayaking experience on Muttukadu Lake',
-    section: 'highlights',
-    width: 4,
-    height: 3
-  },
-  {
-    id: '19',
-    src: '/lovable-uploads/c23dc9bb-c7f4-47d3-8c31-2c792d241ee2.png',
-    alt: 'Living area with panoramic lake view',
-    section: 'interiors',
-    width: 4,
-    height: 3
-  },
-  {
-    id: '20',
-    src: '/lovable-uploads/d2fe6d2c-b060-49a3-99d0-62891571bc97.png',
-    alt: 'Container home at night with ambient lighting',
-    section: 'interiors',
-    width: 4,
-    height: 3
-  },
-  {
-    id: '21',
-    src: '/lovable-uploads/d7acb4b7-3f86-425c-acc9-a34b740cb105.png',
-    alt: 'Mahabalipuram dance festival, local attraction',
-    section: 'highlights',
-    width: 4,
-    height: 3
-  },
-  {
-    id: '22',
-    src: '/lovable-uploads/e017493d-c2c0-467e-a191-28fe62a406ab.png',
-    alt: 'Morning yoga session on the lakeside deck',
-    section: 'lakeside',
-    width: 4,
-    height: 3
+    src: '/lovable-uploads/92fdb568-68f2-4ac8-9908-e0db6e29b56d.png',
+    alt: 'Haven sunset view',
+    title: 'Spectacular Sunsets',
+    category: 'Surrounding Area',
+    date: '2024-02-15',
+    description: 'Breathtaking sunset views from your private haven'
   }
 ];
 
 const Gallery = () => {
-  const [activeSection, setActiveSection] = useState<'all' | 'interiors' | 'lakeside' | 'highlights'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilters, setActiveFilters] = useState<GalleryFilters>({ categories: [] });
+  const [currentSort, setCurrentSort] = useState<GallerySortOption>({ field: 'date', direction: 'desc' });
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
-  const [viewStyle, setViewStyle] = useState<'grid' | 'masonry'>('masonry');
-  const [filteredImages, setFilteredImages] = useState<GalleryImage[]>(galleryImages);
-  
-  const handleFilteredImagesChange = useCallback((images: GalleryImage[]) => {
-    setFilteredImages(images);
-  }, []);
-  
+
+  // Filter and sort images
+  const filteredAndSortedImages = useMemo(() => {
+    let filtered = GALLERY_IMAGES.filter(image => {
+      // Search filter
+      const matchesSearch = !searchQuery || 
+        image.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        image.alt.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        image.description?.toLowerCase().includes(searchQuery.toLowerCase());
+
+      // Category filter
+      const matchesCategory = activeFilters.categories.length === 0 ||
+        activeFilters.categories.includes(image.category);
+
+      return matchesSearch && matchesCategory;
+    });
+
+    // Sort images
+    filtered.sort((a, b) => {
+      let aValue: string | number;
+      let bValue: string | number;
+
+      switch (currentSort.field) {
+        case 'name':
+          aValue = a.title;
+          bValue = b.title;
+          break;
+        case 'date':
+          aValue = new Date(a.date).getTime();
+          bValue = new Date(b.date).getTime();
+          break;
+        case 'category':
+          aValue = a.category;
+          bValue = b.category;
+          break;
+        default:
+          aValue = a.title;
+          bValue = b.title;
+      }
+
+      if (currentSort.direction === 'asc') {
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      } else {
+        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+      }
+    });
+
+    return filtered;
+  }, [searchQuery, activeFilters, currentSort]);
+
   return (
-    <>
+    <ErrorBoundary>
       <Navbar />
-      <main>
-        <section className="py-20 bg-gray-50">
-          <div className="container-custom">
-            <h1 className="font-serif text-4xl md:text-5xl font-bold text-haven-dark text-center mb-4">
-              Our Gallery
-            </h1>
-            <p className="text-gray-600 text-center max-w-2xl mx-auto mb-10">
-              Explore our container home's unique design, lakeside views, and nearby attractions through these captivating images.
-            </p>
-            
-            {/* Search and Filter Component */}
-            <div className="mb-8">
-              <GallerySearch
-                images={galleryImages}
-                onFilteredImagesChange={handleFilteredImagesChange}
-                activeSection={activeSection}
-                onSectionChange={setActiveSection}
-              />
+      <main className="min-h-screen bg-haven-beige bg-opacity-10">
+        <PageHero
+          title="Gallery"
+          subtitle="Discover the beauty of Haven through our curated collection of images"
+          backgroundImage="/lovable-uploads/ba10980e-eaed-41d2-950b-de5ba0f75e97.png"
+        />
+        
+        <div className="container-custom py-16">
+          {/* Search and Filter Controls */}
+          <GallerySearchAndFilter
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            activeFilters={activeFilters}
+            onFilterChange={setActiveFilters}
+            currentSort={currentSort}
+            onSortChange={setCurrentSort}
+            totalResults={filteredAndSortedImages.length}
+            className="mb-8"
+          />
+
+          {/* Loading State */}
+          {isLoading && (
+            <LoadingState 
+              size="lg" 
+              message="Loading gallery images..." 
+              className="py-16"
+            />
+          )}
+
+          {/* Gallery Grid */}
+          {!isLoading && filteredAndSortedImages.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredAndSortedImages.map((image) => (
+                <Dialog key={image.id}>
+                  <DialogTrigger asChild>
+                    <Card className="group overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                      <div className="aspect-square relative">
+                        <LazyImage
+                          src={image.src}
+                          lowResSrc={image.lowResSrc}
+                          alt={image.alt}
+                          aspectRatio="square"
+                          className="group-hover:scale-105 transition-transform duration-300"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
+                          <div className="text-white text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4">
+                            <h3 className="font-semibold text-lg mb-2">{image.title}</h3>
+                            <p className="text-sm">{image.category}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl w-full p-0">
+                    <div className="relative">
+                      <LazyImage
+                        src={image.src}
+                        alt={image.alt}
+                        className="w-full h-auto max-h-[80vh] object-contain"
+                        priority={true}
+                      />
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 text-white">
+                        <h3 className="text-xl font-bold mb-2">{image.title}</h3>
+                        <p className="text-sm opacity-90 mb-1">{image.category}</p>
+                        {image.description && (
+                          <p className="text-sm opacity-80">{image.description}</p>
+                        )}
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              ))}
             </div>
-            
-            {/* View Style Toggle */}
-            <div className="flex justify-end mb-6">
-              <div className="flex space-x-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className={viewStyle === 'grid' ? 'border-haven-teal text-haven-teal' : ''}
-                  onClick={() => setViewStyle('grid')}
-                >
-                  Grid View
-                </Button>
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  className={viewStyle === 'masonry' ? 'border-haven-teal text-haven-teal' : ''}
-                  onClick={() => setViewStyle('masonry')}
-                >
-                  Masonry View
-                </Button>
+          )}
+
+          {/* No Results */}
+          {!isLoading && filteredAndSortedImages.length === 0 && (
+            <div className="text-center py-16">
+              <div className="text-gray-400 mb-4">
+                <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
               </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No images found</h3>
+              <p className="text-gray-600 mb-4">
+                Try adjusting your search terms or filters to find what you're looking for.
+              </p>
             </div>
-            
-            {/* Gallery layout based on selected view */}
-            {filteredImages.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-500 text-lg">No images found matching your search.</p>
-                <Button 
-                  variant="outline" 
-                  className="mt-4"
-                  onClick={() => {
-                    setActiveSection('all');
-                    // This will trigger the search component to clear filters
-                  }}
-                >
-                  Clear all filters
-                </Button>
-              </div>
-            ) : viewStyle === 'masonry' ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredImages.map((image, index) => (
-                  <div 
-                    key={image.id}
-                    className={`overflow-hidden rounded-lg cursor-pointer hover-lift ${
-                      image.width > image.height ? 'row-span-1' : 'row-span-2'
-                    }`}
-                    onClick={() => setSelectedImage(image)}
-                  >
-                    <LazyImage 
-                      src={image.src}
-                      alt={image.alt}
-                      aspectRatio="auto"
-                      priority={index < 6} // Prioritize first 6 images
-                      className="w-full h-full transition-transform duration-500 hover:scale-105"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {filteredImages.map((image, index) => (
-                  <div 
-                    key={image.id}
-                    className="aspect-square overflow-hidden rounded-lg cursor-pointer hover-lift"
-                    onClick={() => setSelectedImage(image)}
-                  >
-                    <LazyImage 
-                      src={image.src}
-                      alt={image.alt}
-                      aspectRatio="square"
-                      priority={index < 8} // Prioritize first 8 images
-                      className="w-full h-full transition-transform duration-500 hover:scale-105"
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
+          )}
+        </div>
       </main>
-      
-      {/* Lightbox Dialog */}
-      <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-        {selectedImage && (
-          <DialogContent className="max-w-5xl p-0 overflow-hidden">
-            <div className="relative">
-              <LazyImage 
-                src={selectedImage.src}
-                alt={selectedImage.alt}
-                className="w-full max-h-[80vh] object-contain"
-                priority={true}
-              />
-              <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-2 rounded text-sm">
-                {selectedImage.alt}
-              </div>
-            </div>
-          </DialogContent>
-        )}
-      </Dialog>
-      
       <Footer />
-    </>
+    </ErrorBoundary>
   );
 };
 
