@@ -354,6 +354,45 @@ export type Database = {
         }
         Relationships: []
       }
+      external_rates: {
+        Row: {
+          created_at: string
+          currency: string
+          date: string
+          fetched_at: string
+          id: string
+          is_available: boolean
+          platform: string
+          property_id: string
+          rate_per_night: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          date: string
+          fetched_at?: string
+          id?: string
+          is_available?: boolean
+          platform: string
+          property_id: string
+          rate_per_night: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          date?: string
+          fetched_at?: string
+          id?: string
+          is_available?: boolean
+          platform?: string
+          property_id?: string
+          rate_per_night?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       inquiries: {
         Row: {
           created_at: string
@@ -565,6 +604,51 @@ export type Database = {
           },
         ]
       }
+      pricing_rules: {
+        Row: {
+          conditions: Json | null
+          created_at: string
+          discount_percentage: number | null
+          experience_id: string | null
+          id: string
+          is_active: boolean
+          markup_percentage: number | null
+          priority: number
+          property_id: string | null
+          rule_name: string
+          rule_type: string
+          updated_at: string
+        }
+        Insert: {
+          conditions?: Json | null
+          created_at?: string
+          discount_percentage?: number | null
+          experience_id?: string | null
+          id?: string
+          is_active?: boolean
+          markup_percentage?: number | null
+          priority?: number
+          property_id?: string | null
+          rule_name: string
+          rule_type: string
+          updated_at?: string
+        }
+        Update: {
+          conditions?: Json | null
+          created_at?: string
+          discount_percentage?: number | null
+          experience_id?: string | null
+          id?: string
+          is_active?: boolean
+          markup_percentage?: number | null
+          priority?: number
+          property_id?: string | null
+          rule_name?: string
+          rule_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -648,6 +732,51 @@ export type Database = {
           name?: string
           short_description?: string | null
           type?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      rate_calendar: {
+        Row: {
+          applied_discounts: Json | null
+          base_rate: number
+          competitor_rates: Json | null
+          created_at: string
+          date: string
+          demand_score: number | null
+          experience_instance_id: string | null
+          final_rate: number
+          gst_amount: number
+          id: string
+          property_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          applied_discounts?: Json | null
+          base_rate: number
+          competitor_rates?: Json | null
+          created_at?: string
+          date: string
+          demand_score?: number | null
+          experience_instance_id?: string | null
+          final_rate: number
+          gst_amount: number
+          id?: string
+          property_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          applied_discounts?: Json | null
+          base_rate?: number
+          competitor_rates?: Json | null
+          created_at?: string
+          date?: string
+          demand_score?: number | null
+          experience_instance_id?: string | null
+          final_rate?: number
+          gst_amount?: number
+          id?: string
+          property_id?: string | null
           updated_at?: string
         }
         Relationships: []
