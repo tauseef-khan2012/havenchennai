@@ -7,10 +7,9 @@ import {
 import { 
   calculateNights, 
   getPropertyBasePricing, 
-  getExperienceInstancePricing,
-  calculateAddonExperiencesTotal
+  getExperienceInstancePricing
 } from './pricing/basePriceService';
-import { calculateAddonExperiencesTotal as getAddonTotal } from './pricing/addonCalculationService';
+import { calculateAddonExperiencesTotal } from './pricing/addonCalculationService';
 
 /**
  * Enhanced pricing service with GST compliance and dynamic pricing
@@ -227,8 +226,8 @@ export const calculateEnhancedPropertyBookingPrice = async (
     // Add cleaning fee
     const cleaningFee = property.cleaning_fee || 0;
     
-    // Calculate addon experiences cost using the new modular service
-    const addonExperiencesTotal = await getAddonTotal(selectedAddonExperiences);
+    // Calculate addon experiences cost using the correct modular service
+    const addonExperiencesTotal = await calculateAddonExperiencesTotal(selectedAddonExperiences);
     
     // Calculate subtotal before GST
     const subtotalBeforeGST = discountedPrice + cleaningFee + addonExperiencesTotal;
