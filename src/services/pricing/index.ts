@@ -8,3 +8,7 @@ export {
   getPropertyBasePricing, 
   getExperienceInstancePricing 
 } from './basePriceService';
+export { getExternalRates } from './externalRatesService';
+export { getPricingRules } from './pricingRulesService';
+export { calculateGST } from './gstCalculationService';
+export { applyPricingRules } from './discountApplicationService';
