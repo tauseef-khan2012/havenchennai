@@ -20,6 +20,7 @@ import NotFound from "./pages/NotFound";
 import BookingPage from "./pages/BookingPage";
 import BookingConfirmationPage from "./components/booking/BookingConfirmationPage";
 import { AuthProvider } from "./contexts/AuthContext";
+import { CurrencyProvider } from "./contexts/CurrencyContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Location from "./pages/Location";
 import Gallery from "./pages/Gallery";
@@ -30,33 +31,35 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/about" element={<AboutUs />} />
-            <Route path="/stay" element={<Stay />} />
-            <Route path="/stay/amenities" element={<StayAmenities />} />
-            <Route path="/stay/deck-views" element={<StayDeckViews />} />
-            <Route path="/stay/location" element={<StayLocation />} />
-            <Route path="/location" element={<Location />} />
-            <Route path="/gallery" element={<Gallery />} />
-            <Route path="/booking" element={<BookingPage />} />
-            <Route path="/booking/confirmation" element={<BookingConfirmationPage />} />
-            <Route path="/experiences" element={<Experiences />} />
-            <Route path="/experiences/:id" element={<ExperienceDetail />} />
-            <Route path="/packages" element={<Packages />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </TooltipProvider>
+        <CurrencyProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/about" element={<AboutUs />} />
+              <Route path="/stay" element={<Stay />} />
+              <Route path="/stay/amenities" element={<StayAmenities />} />
+              <Route path="/stay/deck-views" element={<StayDeckViews />} />
+              <Route path="/stay/location" element={<StayLocation />} />
+              <Route path="/location" element={<Location />} />
+              <Route path="/gallery" element={<Gallery />} />
+              <Route path="/booking" element={<BookingPage />} />
+              <Route path="/booking/confirmation" element={<BookingConfirmationPage />} />
+              <Route path="/experiences" element={<Experiences />} />
+              <Route path="/experiences/:id" element={<ExperienceDetail />} />
+              <Route path="/packages" element={<Packages />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </TooltipProvider>
+        </CurrencyProvider>
       </AuthProvider>
     </BrowserRouter>
   </QueryClientProvider>

@@ -1,5 +1,6 @@
 
 import { Link } from 'react-router-dom';
+import { CurrencySelector } from '@/components/shared/CurrencySelector';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -67,7 +68,8 @@ const Footer = () => {
         
         <div className="border-t border-gray-700 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-gray-400">© {currentYear} Haven. All rights reserved.</p>
-          <div className="mt-4 md:mt-0">
+          <div className="mt-4 md:mt-0 flex items-center gap-6">
+            <CurrencySelector />
             <ul className="flex space-x-6">
               <li><Link to="#" className="text-sm text-gray-400 hover:text-white transition-colors">Privacy Policy</Link></li>
               <li><Link to="#" className="text-sm text-gray-400 hover:text-white transition-colors">Terms of Service</Link></li>

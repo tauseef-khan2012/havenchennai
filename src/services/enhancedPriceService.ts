@@ -45,20 +45,18 @@ export const calculateEnhancedPropertyBookingPrice = async (
   selectedAddonExperiences?: {instanceId: UUID, attendees: number}[]
 ): Promise<EnhancedPriceBreakdown> => {
   try {
-    // Get property details using the new modular service
-    const property = await getPropertyBasePricing(propertyId);
-
     // Calculate number of nights using the new utility
     const nights = calculateNights(checkInDate, checkOutDate);
+    
+    // Set base price to ₹4000 per night (hardcoded as requested)
+    const basePricePerNight = 4000;
+    const originalBasePrice = basePricePerNight * nights;
     
     // Get external rates and pricing rules
     const [externalRates, pricingRules] = await Promise.all([
       getExternalRates(propertyId, checkInDate, checkOutDate),
       getPricingRules(propertyId)
     ]);
-
-    // Original base price
-    const originalBasePrice = property.base_price_per_night * nights;
     
     // Apply pricing rules for discounts
     const { discountedPrice, appliedDiscounts, savingsFromCompetitors } = applyPricingRules(
@@ -67,8 +65,8 @@ export const calculateEnhancedPropertyBookingPrice = async (
       externalRates
     );
     
-    // Add cleaning fee
-    const cleaningFee = property.cleaning_fee || 0;
+    // Add cleaning fee (set to ₹500)
+    const cleaningFee = 500;
     
     // Calculate addon experiences cost using the correct modular service
     const addonExperiencesTotal = await calculateAddonExperiencesTotal(selectedAddonExperiences);
@@ -94,7 +92,7 @@ export const calculateEnhancedPropertyBookingPrice = async (
       cleaningFee,
       addonExperiencesTotal: addonExperiencesTotal > 0 ? addonExperiencesTotal : undefined,
       totalAmountDue,
-      currency: property.currency,
+      currency: 'INR',
       gstBreakdown: {
         cgst: gstBreakdown.cgst,
         sgst: gstBreakdown.sgst,

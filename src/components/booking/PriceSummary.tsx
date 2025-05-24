@@ -8,10 +8,18 @@ interface PriceSummaryProps {
 }
 
 export const PriceSummary = ({ priceBreakdown, nights }: PriceSummaryProps) => {
-  // Use the enhanced price summary component for better functionality
+  // Convert PriceBreakdown to EnhancedPriceBreakdown format
+  const enhancedPriceBreakdown = {
+    ...priceBreakdown,
+    gstBreakdown: {
+      cgst: priceBreakdown.taxAmount / 2,
+      sgst: priceBreakdown.taxAmount / 2,
+    },
+  };
+
   return (
     <EnhancedPriceSummary 
-      priceBreakdown={priceBreakdown} 
+      priceBreakdown={enhancedPriceBreakdown} 
       nights={nights}
       showCompetitorComparison={true}
     />

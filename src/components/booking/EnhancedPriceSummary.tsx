@@ -4,6 +4,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { TrendingDown } from 'lucide-react';
 import { EnhancedPriceBreakdown } from '@/services/enhancedPriceService';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 export interface EnhancedPriceSummaryProps {
   priceBreakdown: EnhancedPriceBreakdown;
@@ -18,14 +19,7 @@ export const EnhancedPriceSummary: React.FC<EnhancedPriceSummaryProps> = ({
   showCompetitorComparison = false,
   showPlatformComparison = false
 }) => {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: priceBreakdown.currency || 'INR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
+  const { formatPrice, currentCurrency } = useCurrency();
 
   const pricePerNight = nights > 0 ? priceBreakdown.basePrice / nights : priceBreakdown.basePrice;
 
@@ -34,9 +28,9 @@ export const EnhancedPriceSummary: React.FC<EnhancedPriceSummaryProps> = ({
       {/* Base pricing */}
       <div className="flex justify-between">
         <span>
-          {formatCurrency(pricePerNight)} × {nights} {nights === 1 ? 'night' : 'nights'}
+          {formatPrice(pricePerNight, priceBreakdown.currency)} × {nights} {nights === 1 ? 'night' : 'nights'}
         </span>
-        <span>{formatCurrency(priceBreakdown.basePrice)}</span>
+        <span>{formatPrice(priceBreakdown.basePrice, priceBreakdown.currency)}</span>
       </div>
 
       {/* Discounts */}
@@ -44,12 +38,12 @@ export const EnhancedPriceSummary: React.FC<EnhancedPriceSummaryProps> = ({
         <>
           <div className="flex justify-between text-green-600">
             <span>Discounts</span>
-            <span>-{formatCurrency(priceBreakdown.discountAmount)}</span>
+            <span>-{formatPrice(priceBreakdown.discountAmount, priceBreakdown.currency)}</span>
           </div>
           {priceBreakdown.appliedDiscounts && priceBreakdown.appliedDiscounts.map((discount, index) => (
             <div key={index} className="flex justify-between text-sm text-green-600 ml-4">
               <span>• {discount.name}</span>
-              <span>-{formatCurrency(discount.amount)}</span>
+              <span>-{formatPrice(discount.amount, priceBreakdown.currency)}</span>
             </div>
           ))}
         </>
@@ -59,7 +53,7 @@ export const EnhancedPriceSummary: React.FC<EnhancedPriceSummaryProps> = ({
       {priceBreakdown.cleaningFee && priceBreakdown.cleaningFee > 0 && (
         <div className="flex justify-between">
           <span>Cleaning fee</span>
-          <span>{formatCurrency(priceBreakdown.cleaningFee)}</span>
+          <span>{formatPrice(priceBreakdown.cleaningFee, priceBreakdown.currency)}</span>
         </div>
       )}
 
@@ -67,7 +61,7 @@ export const EnhancedPriceSummary: React.FC<EnhancedPriceSummaryProps> = ({
       {priceBreakdown.addonExperiencesTotal && priceBreakdown.addonExperiencesTotal > 0 && (
         <div className="flex justify-between">
           <span>Add-on experiences</span>
-          <span>{formatCurrency(priceBreakdown.addonExperiencesTotal)}</span>
+          <span>{formatPrice(priceBreakdown.addonExperiencesTotal, priceBreakdown.currency)}</span>
         </div>
       )}
 
@@ -76,29 +70,29 @@ export const EnhancedPriceSummary: React.FC<EnhancedPriceSummaryProps> = ({
       {/* Subtotal */}
       <div className="flex justify-between font-medium">
         <span>Subtotal</span>
-        <span>{formatCurrency(priceBreakdown.subtotalAfterDiscount)}</span>
+        <span>{formatPrice(priceBreakdown.subtotalAfterDiscount, priceBreakdown.currency)}</span>
       </div>
 
       {/* GST breakdown */}
       <div className="flex justify-between">
         <span>GST ({priceBreakdown.taxPercentage}%)</span>
-        <span>{formatCurrency(priceBreakdown.taxAmount)}</span>
+        <span>{formatPrice(priceBreakdown.taxAmount, priceBreakdown.currency)}</span>
       </div>
 
       {priceBreakdown.gstBreakdown && (
         <div className="ml-4 space-y-1 text-sm text-gray-600">
           <div className="flex justify-between">
             <span>• CGST (9%)</span>
-            <span>{formatCurrency(priceBreakdown.gstBreakdown.cgst)}</span>
+            <span>{formatPrice(priceBreakdown.gstBreakdown.cgst, priceBreakdown.currency)}</span>
           </div>
           <div className="flex justify-between">
             <span>• SGST (9%)</span>
-            <span>{formatCurrency(priceBreakdown.gstBreakdown.sgst)}</span>
+            <span>{formatPrice(priceBreakdown.gstBreakdown.sgst, priceBreakdown.currency)}</span>
           </div>
           {priceBreakdown.gstBreakdown.igst && (
             <div className="flex justify-between">
               <span>• IGST (18%)</span>
-              <span>{formatCurrency(priceBreakdown.gstBreakdown.igst)}</span>
+              <span>{formatPrice(priceBreakdown.gstBreakdown.igst, priceBreakdown.currency)}</span>
             </div>
           )}
         </div>
@@ -109,7 +103,7 @@ export const EnhancedPriceSummary: React.FC<EnhancedPriceSummaryProps> = ({
       {/* Total */}
       <div className="flex justify-between text-lg font-bold">
         <span>Total</span>
-        <span>{formatCurrency(priceBreakdown.totalAmountDue)}</span>
+        <span>{formatPrice(priceBreakdown.totalAmountDue, priceBreakdown.currency)}</span>
       </div>
 
       {/* Competitor comparison */}
@@ -118,7 +112,7 @@ export const EnhancedPriceSummary: React.FC<EnhancedPriceSummaryProps> = ({
           <div className="flex items-center gap-2 text-green-800">
             <TrendingDown className="h-4 w-4" />
             <span className="text-sm font-medium">
-              You save {formatCurrency(priceBreakdown.savingsFromCompetitors)} vs other platforms!
+              You save {formatPrice(priceBreakdown.savingsFromCompetitors, priceBreakdown.currency)} vs other platforms!
             </span>
           </div>
         </div>
