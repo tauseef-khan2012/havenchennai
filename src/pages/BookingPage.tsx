@@ -4,15 +4,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
-import AvailabilityCalendar from '@/components/booking/AvailabilityCalendar';
-import PlatformComparison from '@/components/booking/PlatformComparison';
-import DiscountCodeInput from '@/components/booking/DiscountCodeInput';
-import { EnhancedPriceSummary } from '@/components/booking/EnhancedPriceSummary';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PropertyHeader } from '@/components/booking/PropertyHeader';
+import { BookingContent } from '@/components/booking/BookingContent';
+import { BookingSidebar } from '@/components/booking/BookingSidebar';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { MapPin, Users, Calendar, Star } from 'lucide-react';
 import { UUID } from '@/types/booking';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -237,170 +232,34 @@ const BookingPage: React.FC = () => {
       <Navbar />
       <main className="py-8 bg-gray-50 min-h-screen">
         <div className="container mx-auto max-w-6xl px-4">
-          {/* Property Header */}
-          <div className="mb-8">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h1 className="text-3xl font-serif font-bold mb-2">{property.name}</h1>
-                <div className="flex items-center gap-4 text-gray-600">
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4" />
-                    <span className="text-sm">{property.location_details || 'Haven Resort'}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Users className="h-4 w-4" />
-                    <span className="text-sm">Up to {property.max_guests} guests</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Star className="h-4 w-4 text-yellow-500" />
-                    <span className="text-sm">4.8 (24 reviews)</span>
-                  </div>
-                </div>
-              </div>
-              <Badge variant="secondary" className="bg-haven-teal text-white">
-                {property.type || 'Premium'}
-              </Badge>
-            </div>
-
-            {property.image_urls && property.image_urls.length > 0 && (
-              <div className="aspect-video rounded-lg overflow-hidden mb-6">
-                <img
-                  src={property.image_urls[0]}
-                  alt={property.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
-
-            <p className="text-gray-600 mb-6">
-              {property.short_description || property.long_description}
-            </p>
-
-            {/* Amenities */}
-            {property.amenities && property.amenities.length > 0 && (
-              <div className="mb-6">
-                <h3 className="font-semibold mb-3">Amenities</h3>
-                <div className="flex flex-wrap gap-2">
-                  {property.amenities.map((amenity: string, index: number) => (
-                    <Badge key={index} variant="outline">
-                      {amenity}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          <PropertyHeader property={property} />
 
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* Left Column - Calendar and Platform Comparison */}
-            <div className="lg:col-span-2 space-y-6">
-              <AvailabilityCalendar
-                propertyId={propertyId}
-                onDateRangeSelect={handleDateRangeSelect}
-                selectedCheckIn={selectedCheckIn}
-                selectedCheckOut={selectedCheckOut}
-              />
+            <BookingContent
+              propertyId={propertyId}
+              property={property}
+              selectedCheckIn={selectedCheckIn}
+              selectedCheckOut={selectedCheckOut}
+              priceBreakdown={priceBreakdown}
+              platformComparisons={platformComparisons}
+              onDateRangeSelect={handleDateRangeSelect}
+              onPlatformBooking={handlePlatformBooking}
+            />
 
-              {selectedCheckIn && selectedCheckOut && priceBreakdown && (
-                <PlatformComparison
-                  directPrice={priceBreakdown.totalAmountDue}
-                  platformComparisons={platformComparisons}
-                  currency={property.currency}
-                  onPlatformSelect={handlePlatformBooking}
-                />
-              )}
-            </div>
-
-            {/* Right Column - Booking Summary */}
-            <div className="space-y-6">
-              {/* Guest Selection */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5" />
-                    Guests
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <select
-                    value={guestCount}
-                    onChange={(e) => setGuestCount(parseInt(e.target.value))}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2"
-                  >
-                    {Array.from({ length: property.max_guests }, (_, i) => i + 1).map(num => (
-                      <option key={num} value={num}>
-                        {num} {num === 1 ? 'Guest' : 'Guests'}
-                      </option>
-                    ))}
-                  </select>
-                </CardContent>
-              </Card>
-
-              {/* Discount Code */}
-              {selectedCheckIn && selectedCheckOut && priceBreakdown && (
-                <DiscountCodeInput
-                  bookingType="property"
-                  itemId={propertyId}
-                  totalAmount={priceBreakdown.subtotalAfterDiscount}
-                  onDiscountApplied={handleDiscountApplied}
-                  appliedDiscount={appliedDiscount}
-                />
-              )}
-
-              {/* Price Summary */}
-              {selectedCheckIn && selectedCheckOut && priceBreakdown && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Booking Summary</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex justify-between text-sm">
-                        <span>Check-in</span>
-                        <span>{selectedCheckIn.toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Check-out</span>
-                        <span>{selectedCheckOut.toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Nights</span>
-                        <span>{nights}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Guests</span>
-                        <span>{guestCount}</span>
-                      </div>
-                      
-                      <Separator />
-                      
-                      <EnhancedPriceSummary 
-                        priceBreakdown={priceBreakdown} 
-                        nights={nights}
-                        showCompetitorComparison={false}
-                      />
-                      
-                      <Button 
-                        onClick={handleProceedToPayment}
-                        className="w-full bg-haven-teal hover:bg-haven-teal/90"
-                        disabled={isCalculatingPrice}
-                      >
-                        {isCalculatingPrice ? 'Calculating...' : 'Proceed to Payment'}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {!selectedCheckIn || !selectedCheckOut ? (
-                <Card>
-                  <CardContent className="p-6 text-center">
-                    <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">Select your dates to see pricing and book</p>
-                  </CardContent>
-                </Card>
-              ) : null}
-            </div>
+            <BookingSidebar
+              property={property}
+              propertyId={propertyId}
+              guestCount={guestCount}
+              setGuestCount={setGuestCount}
+              selectedCheckIn={selectedCheckIn}
+              selectedCheckOut={selectedCheckOut}
+              priceBreakdown={priceBreakdown}
+              appliedDiscount={appliedDiscount}
+              nights={nights}
+              isCalculatingPrice={isCalculatingPrice}
+              onDiscountApplied={handleDiscountApplied}
+              onProceedToPayment={handleProceedToPayment}
+            />
           </div>
         </div>
       </main>
