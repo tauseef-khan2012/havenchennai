@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -5,7 +6,7 @@ import DesktopNavLinks from "./DesktopNavLinks";
 import MobileNavLinks from "./MobileNavLinks";
 import MobileMenuButton from "./MobileMenuButton";
 import { useAuth } from "@/contexts/AuthContext";
-import CurrencySelector from '@/components/shared/CurrencySelector';
+import { CurrencySelector } from '@/components/shared/CurrencySelector';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
