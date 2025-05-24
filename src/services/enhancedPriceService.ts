@@ -15,9 +15,10 @@ import { getExternalRates } from './pricing/externalRatesService';
 import { getPricingRules } from './pricing/pricingRulesService';
 import { calculateGST } from './pricing/gstCalculationService';
 import { applyPricingRules } from './pricing/discountApplicationService';
+import { CurrencyConfig, convertFromINR } from './currencyService';
 
 /**
- * Enhanced pricing service with GST compliance and dynamic pricing
+ * Enhanced pricing service with GST compliance, dynamic pricing, and international currency support
  */
 
 export interface EnhancedPriceBreakdown extends PriceBreakdown {
@@ -33,16 +34,20 @@ export interface EnhancedPriceBreakdown extends PriceBreakdown {
     amount: number;
   }[];
   savingsFromCompetitors?: number;
+  originalCurrency: string; // Original currency (INR)
+  displayCurrency: string; // Currency being displayed to user
+  exchangeRate: number; // Rate used for conversion
 }
 
 /**
- * Enhanced property booking price calculation
+ * Enhanced property booking price calculation with currency support
  */
 export const calculateEnhancedPropertyBookingPrice = async (
   propertyId: UUID,
   checkInDate: Date,
   checkOutDate: Date,
-  selectedAddonExperiences?: {instanceId: UUID, attendees: number}[]
+  selectedAddonExperiences?: {instanceId: UUID, attendees: number}[],
+  targetCurrency?: CurrencyConfig
 ): Promise<EnhancedPriceBreakdown> => {
   try {
     // Get property details using the new modular service
@@ -57,7 +62,7 @@ export const calculateEnhancedPropertyBookingPrice = async (
       getPricingRules(propertyId)
     ]);
 
-    // Original base price
+    // Original base price in INR
     const originalBasePrice = property.base_price_per_night * nights;
     
     // Apply pricing rules for discounts
@@ -73,19 +78,18 @@ export const calculateEnhancedPropertyBookingPrice = async (
     // Calculate addon experiences cost using the correct modular service
     const addonExperiencesTotal = await calculateAddonExperiencesTotal(selectedAddonExperiences);
     
-    // Calculate subtotal before GST
+    // Calculate subtotal before GST (in INR)
     const subtotalBeforeGST = discountedPrice + cleaningFee + addonExperiencesTotal;
     
-    // Calculate GST (18%)
+    // Calculate GST (18%) - always in INR for Indian business
     const gstBreakdown = calculateGST(subtotalBeforeGST);
     
-    // Calculate total
-    const totalAmountDue = subtotalBeforeGST + gstBreakdown.total;
-
-    // Calculate total discount amount
+    // Calculate total in INR
+    const totalAmountDueINR = subtotalBeforeGST + gstBreakdown.total;
     const totalDiscountAmount = appliedDiscounts.reduce((sum, discount) => sum + discount.amount, 0);
 
-    return {
+    // Base breakdown in INR
+    let breakdown: EnhancedPriceBreakdown = {
       basePrice: originalBasePrice,
       discountAmount: totalDiscountAmount,
       subtotalAfterDiscount: discountedPrice,
@@ -93,8 +97,11 @@ export const calculateEnhancedPropertyBookingPrice = async (
       taxAmount: gstBreakdown.total,
       cleaningFee,
       addonExperiencesTotal: addonExperiencesTotal > 0 ? addonExperiencesTotal : undefined,
-      totalAmountDue,
-      currency: property.currency,
+      totalAmountDue: totalAmountDueINR,
+      currency: 'INR',
+      originalCurrency: 'INR',
+      displayCurrency: 'INR',
+      exchangeRate: 1,
       gstBreakdown: {
         cgst: gstBreakdown.cgst,
         sgst: gstBreakdown.sgst,
@@ -104,6 +111,35 @@ export const calculateEnhancedPropertyBookingPrice = async (
       appliedDiscounts,
       savingsFromCompetitors
     };
+
+    // Convert to target currency if specified and different from INR
+    if (targetCurrency && targetCurrency.code !== 'INR') {
+      breakdown = {
+        ...breakdown,
+        basePrice: convertFromINR(breakdown.basePrice, targetCurrency),
+        discountAmount: convertFromINR(breakdown.discountAmount, targetCurrency),
+        subtotalAfterDiscount: convertFromINR(breakdown.subtotalAfterDiscount, targetCurrency),
+        taxAmount: convertFromINR(breakdown.taxAmount, targetCurrency),
+        cleaningFee: breakdown.cleaningFee ? convertFromINR(breakdown.cleaningFee, targetCurrency) : undefined,
+        addonExperiencesTotal: breakdown.addonExperiencesTotal ? convertFromINR(breakdown.addonExperiencesTotal, targetCurrency) : undefined,
+        totalAmountDue: convertFromINR(totalAmountDueINR, targetCurrency),
+        currency: targetCurrency.code,
+        displayCurrency: targetCurrency.code,
+        exchangeRate: targetCurrency.exchangeRate,
+        savingsFromCompetitors: breakdown.savingsFromCompetitors ? convertFromINR(breakdown.savingsFromCompetitors, targetCurrency) : undefined,
+        gstBreakdown: breakdown.gstBreakdown ? {
+          cgst: convertFromINR(breakdown.gstBreakdown.cgst, targetCurrency),
+          sgst: convertFromINR(breakdown.gstBreakdown.sgst, targetCurrency),
+          igst: breakdown.gstBreakdown.igst ? convertFromINR(breakdown.gstBreakdown.igst, targetCurrency) : undefined
+        } : undefined,
+        appliedDiscounts: breakdown.appliedDiscounts?.map(discount => ({
+          ...discount,
+          amount: convertFromINR(discount.amount, targetCurrency)
+        }))
+      };
+    }
+
+    return breakdown;
   } catch (error) {
     console.error('Error in calculateEnhancedPropertyBookingPrice:', error);
     throw error;
@@ -111,11 +147,12 @@ export const calculateEnhancedPropertyBookingPrice = async (
 };
 
 /**
- * Enhanced experience booking price calculation
+ * Enhanced experience booking price calculation with currency support
  */
 export const calculateEnhancedExperienceBookingPrice = async (
   instanceId: UUID,
-  numberOfAttendees: number
+  numberOfAttendees: number,
+  targetCurrency?: CurrencyConfig
 ): Promise<EnhancedPriceBreakdown> => {
   try {
     // Get experience instance details using the new modular service
@@ -124,7 +161,7 @@ export const calculateEnhancedExperienceBookingPrice = async (
     // Get pricing rules for experience
     const pricingRules = await getPricingRules(undefined, instance.experience?.id);
     
-    // Determine pricing model and base price
+    // Determine pricing model and base price (in INR)
     const useFlatFee = instance.flat_fee_price_override !== null || 
                         (instance.experience?.flat_fee_price !== null && instance.price_per_person_override === null);
     
@@ -139,21 +176,25 @@ export const calculateEnhancedExperienceBookingPrice = async (
     // Apply pricing rules
     const { discountedPrice, appliedDiscounts } = applyPricingRules(basePrice, pricingRules, []);
     
-    // Calculate GST (18%)
+    // Calculate GST (18%) - always in INR for Indian business
     const gstBreakdown = calculateGST(discountedPrice);
     
-    // Calculate total
-    const totalAmountDue = discountedPrice + gstBreakdown.total;
+    // Calculate total in INR
+    const totalAmountDueINR = discountedPrice + gstBreakdown.total;
     const totalDiscountAmount = appliedDiscounts.reduce((sum, discount) => sum + discount.amount, 0);
 
-    return {
+    // Base breakdown in INR
+    let breakdown: EnhancedPriceBreakdown = {
       basePrice,
       discountAmount: totalDiscountAmount,
       subtotalAfterDiscount: discountedPrice,
       taxPercentage: 18,
       taxAmount: gstBreakdown.total,
-      totalAmountDue,
-      currency: instance.experience?.currency || 'INR',
+      totalAmountDue: totalAmountDueINR,
+      currency: 'INR',
+      originalCurrency: 'INR',
+      displayCurrency: 'INR',
+      exchangeRate: 1,
       gstBreakdown: {
         cgst: gstBreakdown.cgst,
         sgst: gstBreakdown.sgst,
@@ -161,6 +202,32 @@ export const calculateEnhancedExperienceBookingPrice = async (
       },
       appliedDiscounts
     };
+
+    // Convert to target currency if specified and different from INR
+    if (targetCurrency && targetCurrency.code !== 'INR') {
+      breakdown = {
+        ...breakdown,
+        basePrice: convertFromINR(breakdown.basePrice, targetCurrency),
+        discountAmount: convertFromINR(breakdown.discountAmount, targetCurrency),
+        subtotalAfterDiscount: convertFromINR(breakdown.subtotalAfterDiscount, targetCurrency),
+        taxAmount: convertFromINR(breakdown.taxAmount, targetCurrency),
+        totalAmountDue: convertFromINR(totalAmountDueINR, targetCurrency),
+        currency: targetCurrency.code,
+        displayCurrency: targetCurrency.code,
+        exchangeRate: targetCurrency.exchangeRate,
+        gstBreakdown: breakdown.gstBreakdown ? {
+          cgst: convertFromINR(breakdown.gstBreakdown.cgst, targetCurrency),
+          sgst: convertFromINR(breakdown.gstBreakdown.sgst, targetCurrency),
+          igst: breakdown.gstBreakdown.igst ? convertFromINR(breakdown.gstBreakdown.igst, targetCurrency) : undefined
+        } : undefined,
+        appliedDiscounts: breakdown.appliedDiscounts?.map(discount => ({
+          ...discount,
+          amount: convertFromINR(discount.amount, targetCurrency)
+        }))
+      };
+    }
+
+    return breakdown;
   } catch (error) {
     console.error('Error in calculateEnhancedExperienceBookingPrice:', error);
     throw error;
