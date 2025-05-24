@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -6,6 +5,7 @@ import DesktopNavLinks from "./DesktopNavLinks";
 import MobileNavLinks from "./MobileNavLinks";
 import MobileMenuButton from "./MobileMenuButton";
 import { useAuth } from "@/contexts/AuthContext";
+import CurrencySelector from '@/components/shared/CurrencySelector';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -44,8 +44,9 @@ const Navbar = () => {
             <DesktopNavLinks isActive={isActive} user={user} />
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="lg:hidden">
+          {/* Right side items */}
+          <div className="flex items-center space-x-4">
+            <CurrencySelector />
             <MobileMenuButton 
               isOpen={isMenuOpen} 
               onClick={() => setIsMenuOpen(!isMenuOpen)} 
