@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
@@ -14,14 +15,12 @@ import { calculateEnhancedPropertyBookingPrice, EnhancedPriceBreakdown } from '@
 import { getPlatformRatesForProperty, comparePlatformPricing } from '@/services/platformRatesService';
 import { DiscountApplication } from '@/services/discountService';
 import { calculateNights } from '@/utils/bookingUtils';
-import { useCurrency } from '@/contexts/CurrencyContext';
 
 const BookingPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { user } = useAuth();
-  const { currentCurrency } = useCurrency();
 
   const propertyId = searchParams.get('propertyId') as UUID;
   const [property, setProperty] = useState<any | null>(null);
@@ -92,24 +91,18 @@ const BookingPage: React.FC = () => {
       const pricing = await calculateEnhancedPropertyBookingPrice(
         propertyId,
         checkIn,
-        checkOut,
-        undefined, // selectedAddonExperiences
-        currentCurrency // Pass current currency
+        checkOut
       );
       
       // Apply discount if one exists
       let finalPricing = pricing;
       if (appliedDiscount?.isValid && appliedDiscount.discountAmount > 0) {
-        const discountAmountInDisplayCurrency = pricing.displayCurrency !== 'INR' 
-          ? appliedDiscount.discountAmount * currentCurrency.exchangeRate
-          : appliedDiscount.discountAmount;
-          
-        const subtotalAfterDiscount = pricing.subtotalAfterDiscount - discountAmountInDisplayCurrency;
+        const subtotalAfterDiscount = pricing.subtotalAfterDiscount - appliedDiscount.discountAmount;
         const gstAmount = subtotalAfterDiscount * 0.18;
         
         finalPricing = {
           ...pricing,
-          discountAmount: pricing.discountAmount + discountAmountInDisplayCurrency,
+          discountAmount: pricing.discountAmount + appliedDiscount.discountAmount,
           subtotalAfterDiscount,
           taxAmount: gstAmount,
           totalAmountDue: subtotalAfterDiscount + gstAmount + (pricing.cleaningFee || 0)
@@ -170,20 +163,12 @@ const BookingPage: React.FC = () => {
       return;
     }
 
-    // Convert amount to INR for payment processing (Razorpay processes in INR)
-    const amountInINR = priceBreakdown.displayCurrency !== 'INR' 
-      ? priceBreakdown.totalAmountDue / currentCurrency.exchangeRate
-      : priceBreakdown.totalAmountDue;
-
     // Navigate to payment with booking details
     const bookingParams = new URLSearchParams({
       propertyId,
       checkIn: selectedCheckIn.toISOString(),
       checkOut: selectedCheckOut.toISOString(),
       guests: guestCount.toString(),
-      amount: amountInINR.toString(),
-      currency: 'INR', // Always process payment in INR
-      displayCurrency: currentCurrency.code,
       ...(appliedDiscount?.isValid && { discountCode: appliedDiscount.discountCode?.code || '' })
     });
 

@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -22,48 +23,43 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Location from "./pages/Location";
 import Gallery from "./pages/Gallery";
-import { CurrencyProvider } from '@/contexts/CurrencyContext';
-import PaymentPage from '@/pages/PaymentPage';
 
 const queryClient = new QueryClient();
 
-function App() {
-  return (
+const App = () => (
+  <QueryClientProvider client={queryClient}>
     <BrowserRouter>
       <AuthProvider>
-        <CurrencyProvider>
-          <QueryClientProvider client={queryClient}>
-            <Toaster />
-            <Sonner />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/about" element={<AboutUs />} />
-              <Route path="/stay" element={<Stay />} />
-              <Route path="/stay/amenities" element={<StayAmenities />} />
-              <Route path="/stay/deck-views" element={<StayDeckViews />} />
-              <Route path="/stay/location" element={<StayLocation />} />
-              <Route path="/location" element={<Location />} />
-              <Route path="/gallery" element={<Gallery />} />
-              <Route path="/booking" element={<BookingPage />} />
-              <Route path="/booking/confirmation" element={<BookingConfirmationPage />} />
-              <Route path="/booking/payment" element={<PaymentPage />} />
-              <Route path="/experiences" element={<Experiences />} />
-              <Route path="/experiences/:id" element={<ExperienceDetail />} />
-              <Route path="/packages" element={<Packages />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </QueryClientProvider>
-        </CurrencyProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/stay" element={<Stay />} />
+            <Route path="/stay/amenities" element={<StayAmenities />} />
+            <Route path="/stay/deck-views" element={<StayDeckViews />} />
+            <Route path="/stay/location" element={<StayLocation />} />
+            <Route path="/location" element={<Location />} />
+            <Route path="/gallery" element={<Gallery />} />
+            <Route path="/booking" element={<BookingPage />} />
+            <Route path="/booking/confirmation" element={<BookingConfirmationPage />} />
+            <Route path="/experiences" element={<Experiences />} />
+            <Route path="/experiences/:id" element={<ExperienceDetail />} />
+            <Route path="/packages" element={<Packages />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </TooltipProvider>
       </AuthProvider>
     </BrowserRouter>
-  );
-}
+  </QueryClientProvider>
+);
 
 export default App;
