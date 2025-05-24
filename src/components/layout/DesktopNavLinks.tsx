@@ -11,7 +11,8 @@ interface DesktopNavLinksProps {
 
 const DesktopNavLinks = ({ isActive, user }: DesktopNavLinksProps) => {
   return (
-    <nav className="hidden md:flex items-center gap-8">
+    <>
+      {/* Navigation Links */}
       <div className="flex items-center gap-8">
         <NavLink to="/stay" isActive={isActive("/stay")}>
           The Stay
@@ -30,6 +31,7 @@ const DesktopNavLinks = ({ isActive, user }: DesktopNavLinksProps) => {
         </NavLink>
       </div>
       
+      {/* Action Buttons */}
       <div className="flex items-center gap-4 ml-4">
         {user ? (
           <UserProfileDropdown user={user} />
@@ -47,7 +49,7 @@ const DesktopNavLinks = ({ isActive, user }: DesktopNavLinksProps) => {
           </Button>
         </Link>
       </div>
-    </nav>
+    </>
   );
 };
 
