@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { PropertyHeader } from '@/components/booking/PropertyHeader';
 import { BookingContent } from '@/components/booking/BookingContent';
-import { BookingSidebar } from '@/components/booking/BookingSidebar';
+import { EnhancedBookingSidebar } from '@/components/booking/EnhancedBookingSidebar';
 import { Button } from '@/components/ui/button';
 import { UUID } from '@/types/booking';
 import { supabase } from '@/integrations/supabase/client';
@@ -105,7 +105,7 @@ const BookingPage: React.FC = () => {
           discountAmount: pricing.discountAmount + appliedDiscount.discountAmount,
           subtotalAfterDiscount,
           taxAmount: gstAmount,
-          totalAmountDue: subtotalAfterDiscount + gstAmount + (pricing.cleaningFee || 0)
+          totalAmountDue: subtotalAfterDiscount + gstAmount
         };
       }
       
@@ -191,13 +191,13 @@ const BookingPage: React.FC = () => {
     return (
       <>
         <Navbar />
-        <main className="py-16 bg-gray-50">
-          <div className="container mx-auto max-w-6xl px-4">
+        <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+          <div className="container mx-auto max-w-7xl px-4 py-8">
             <div className="animate-pulse space-y-8">
               <div className="h-8 bg-gray-200 rounded w-1/2"></div>
-              <div className="grid md:grid-cols-2 gap-8">
-                <div className="h-96 bg-gray-200 rounded"></div>
-                <div className="h-96 bg-gray-200 rounded"></div>
+              <div className="grid lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 h-96 bg-gray-200 rounded-xl"></div>
+                <div className="h-96 bg-gray-200 rounded-xl"></div>
               </div>
             </div>
           </div>
@@ -211,8 +211,8 @@ const BookingPage: React.FC = () => {
     return (
       <>
         <Navbar />
-        <main className="py-16 bg-gray-50">
-          <div className="container mx-auto max-w-6xl px-4 text-center">
+        <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+          <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Property Not Found</h1>
             <p className="text-gray-600 mb-8">The property you're looking for could not be found.</p>
             <Button onClick={() => navigate('/stay')}>
@@ -230,36 +230,44 @@ const BookingPage: React.FC = () => {
   return (
     <>
       <Navbar />
-      <main className="py-8 bg-gray-50 min-h-screen">
-        <div className="container mx-auto max-w-6xl px-4">
+      <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="container mx-auto max-w-7xl px-4 py-8">
           <PropertyHeader property={property} />
 
-          <div className="grid lg:grid-cols-3 gap-8">
-            <BookingContent
-              propertyId={propertyId}
-              property={property}
-              selectedCheckIn={selectedCheckIn}
-              selectedCheckOut={selectedCheckOut}
-              priceBreakdown={priceBreakdown}
-              platformComparisons={platformComparisons}
-              onDateRangeSelect={handleDateRangeSelect}
-              onPlatformBooking={handlePlatformBooking}
-            />
+          <div className="grid lg:grid-cols-12 gap-8 mt-8">
+            {/* Main Content */}
+            <div className="lg:col-span-8">
+              <BookingContent
+                propertyId={propertyId}
+                property={property}
+                selectedCheckIn={selectedCheckIn}
+                selectedCheckOut={selectedCheckOut}
+                priceBreakdown={priceBreakdown}
+                platformComparisons={platformComparisons}
+                onDateRangeSelect={handleDateRangeSelect}
+                onPlatformBooking={handlePlatformBooking}
+              />
+            </div>
 
-            <BookingSidebar
-              property={property}
-              propertyId={propertyId}
-              guestCount={guestCount}
-              setGuestCount={setGuestCount}
-              selectedCheckIn={selectedCheckIn}
-              selectedCheckOut={selectedCheckOut}
-              priceBreakdown={priceBreakdown}
-              appliedDiscount={appliedDiscount}
-              nights={nights}
-              isCalculatingPrice={isCalculatingPrice}
-              onDiscountApplied={handleDiscountApplied}
-              onProceedToPayment={handleProceedToPayment}
-            />
+            {/* Enhanced Sidebar */}
+            <div className="lg:col-span-4">
+              <div className="sticky top-4">
+                <EnhancedBookingSidebar
+                  property={property}
+                  propertyId={propertyId}
+                  guestCount={guestCount}
+                  setGuestCount={setGuestCount}
+                  selectedCheckIn={selectedCheckIn}
+                  selectedCheckOut={selectedCheckOut}
+                  priceBreakdown={priceBreakdown}
+                  appliedDiscount={appliedDiscount}
+                  nights={nights}
+                  isCalculatingPrice={isCalculatingPrice}
+                  onDiscountApplied={handleDiscountApplied}
+                  onProceedToPayment={handleProceedToPayment}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </main>

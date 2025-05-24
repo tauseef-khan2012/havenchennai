@@ -65,8 +65,8 @@ export const calculateEnhancedPropertyBookingPrice = async (
       externalRates
     );
     
-    // Add cleaning fee (set to ₹500)
-    const cleaningFee = 500;
+    // Remove cleaning fee (set to 0 as requested)
+    const cleaningFee = 0;
     
     // Calculate addon experiences cost using the correct modular service
     const addonExperiencesTotal = await calculateAddonExperiencesTotal(selectedAddonExperiences);
@@ -89,7 +89,7 @@ export const calculateEnhancedPropertyBookingPrice = async (
       subtotalAfterDiscount: discountedPrice,
       taxPercentage: 18,
       taxAmount: gstBreakdown.total,
-      cleaningFee,
+      cleaningFee: cleaningFee > 0 ? cleaningFee : undefined, // Only include if > 0
       addonExperiencesTotal: addonExperiencesTotal > 0 ? addonExperiencesTotal : undefined,
       totalAmountDue,
       currency: 'INR',
