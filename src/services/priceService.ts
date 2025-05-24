@@ -1,43 +1,17 @@
 
-import { supabase } from '@/integrations/supabase/client';
 import { 
   UUID, 
   BookingType, 
   PriceBreakdown
 } from '@/types/booking';
 import { 
-  calculateEnhancedPropertyBookingPrice, 
-  calculateEnhancedExperienceBookingPrice 
-} from './enhancedPriceService';
+  calculatePropertyBookingPrice,
+  calculateExperienceBookingPrice
+} from './pricing';
 
 /**
- * Calculates the price breakdown for a property booking (updated for GST compliance)
+ * Main price service that orchestrates all pricing calculations
  */
-export const calculatePropertyBookingPrice = async (
-  propertyId: UUID,
-  checkInDate: Date,
-  checkOutDate: Date,
-  selectedAddonExperiences?: {instanceId: UUID, attendees: number}[]
-): Promise<PriceBreakdown> => {
-  // Use enhanced pricing service which includes GST and dynamic discounts
-  return await calculateEnhancedPropertyBookingPrice(
-    propertyId, 
-    checkInDate, 
-    checkOutDate, 
-    selectedAddonExperiences
-  );
-};
-
-/**
- * Calculates the price breakdown for an experience booking (updated for GST compliance)
- */
-export const calculateExperienceBookingPrice = async (
-  instanceId: UUID,
-  numberOfAttendees: number
-): Promise<PriceBreakdown> => {
-  // Use enhanced pricing service which includes GST and dynamic discounts
-  return await calculateEnhancedExperienceBookingPrice(instanceId, numberOfAttendees);
-};
 
 /**
  * Calculates the price for a booking based on type
@@ -83,10 +57,5 @@ export const calculateBookingPrice = async (
   }
 };
 
-/**
- * Calculates the number of nights between two dates
- */
-const calculateNights = (checkInDate: Date, checkOutDate: Date): number => {
-  const differenceInTime = checkOutDate.getTime() - checkInDate.getTime();
-  return Math.ceil(differenceInTime / (1000 * 3600 * 24));
-};
+// Re-export specific functions for backward compatibility
+export { calculatePropertyBookingPrice, calculateExperienceBookingPrice } from './pricing';

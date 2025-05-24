@@ -4,6 +4,13 @@ import {
   BookingType, 
   PriceBreakdown
 } from '@/types/booking';
+import { 
+  calculateNights, 
+  getPropertyBasePricing, 
+  getExperienceInstancePricing,
+  calculateAddonExperiencesTotal
+} from './pricing/basePriceService';
+import { calculateAddonExperiencesTotal as getAddonTotal } from './pricing/addonCalculationService';
 
 /**
  * Enhanced pricing service with GST compliance and dynamic pricing
@@ -195,20 +202,11 @@ export const calculateEnhancedPropertyBookingPrice = async (
   selectedAddonExperiences?: {instanceId: UUID, attendees: number}[]
 ): Promise<EnhancedPriceBreakdown> => {
   try {
-    // Get property details
-    const { data: property, error } = await supabase
-      .from('properties')
-      .select('base_price_per_night, cleaning_fee, currency')
-      .eq('id', propertyId)
-      .single();
+    // Get property details using the new modular service
+    const property = await getPropertyBasePricing(propertyId);
 
-    if (error || !property) {
-      console.error('Error fetching property details:', error);
-      throw new Error('Error calculating price: Property not found');
-    }
-
-    // Calculate number of nights
-    const nights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 3600 * 24));
+    // Calculate number of nights using the new utility
+    const nights = calculateNights(checkInDate, checkOutDate);
     
     // Get external rates and pricing rules
     const [externalRates, pricingRules] = await Promise.all([
@@ -229,46 +227,8 @@ export const calculateEnhancedPropertyBookingPrice = async (
     // Add cleaning fee
     const cleaningFee = property.cleaning_fee || 0;
     
-    // Calculate addon experiences cost
-    let addonExperiencesTotal = 0;
-    if (selectedAddonExperiences && selectedAddonExperiences.length > 0) {
-      const instanceIds = selectedAddonExperiences.map(addon => addon.instanceId);
-      
-      const { data: experienceInstances, error: experiencesError } = await supabase
-        .from('experience_instances')
-        .select(`
-          id,
-          price_per_person_override,
-          flat_fee_price_override,
-          experience:experience_id (
-            price_per_person,
-            flat_fee_price
-          )
-        `)
-        .in('id', instanceIds);
-      
-      if (experiencesError) {
-        console.error('Error fetching addon experiences:', experiencesError);
-        throw new Error('Error calculating price: Could not fetch addon experiences');
-      }
-      
-      if (experienceInstances) {
-        for (const instance of experienceInstances) {
-          const addon = selectedAddonExperiences.find(a => a.instanceId === instance.id);
-          
-          if (addon) {
-            if (instance.flat_fee_price_override !== null) {
-              addonExperiencesTotal += instance.flat_fee_price_override;
-            } else if (instance.experience?.flat_fee_price !== null) {
-              addonExperiencesTotal += instance.experience.flat_fee_price;
-            } else {
-              const pricePerPerson = instance.price_per_person_override ?? instance.experience?.price_per_person ?? 0;
-              addonExperiencesTotal += pricePerPerson * addon.attendees;
-            }
-          }
-        }
-      }
-    }
+    // Calculate addon experiences cost using the new modular service
+    const addonExperiencesTotal = await getAddonTotal(selectedAddonExperiences);
     
     // Calculate subtotal before GST
     const subtotalBeforeGST = discountedPrice + cleaningFee + addonExperiencesTotal;
@@ -315,27 +275,8 @@ export const calculateEnhancedExperienceBookingPrice = async (
   numberOfAttendees: number
 ): Promise<EnhancedPriceBreakdown> => {
   try {
-    // Get experience instance details
-    const { data: instance, error: instanceError } = await supabase
-      .from('experience_instances')
-      .select(`
-        id,
-        price_per_person_override, 
-        flat_fee_price_override,
-        experience:experience_id (
-          id,
-          price_per_person,
-          flat_fee_price,
-          currency
-        )
-      `)
-      .eq('id', instanceId)
-      .single();
-
-    if (instanceError || !instance) {
-      console.error('Error fetching experience instance:', instanceError);
-      throw new Error('Error calculating price: Experience instance not found');
-    }
+    // Get experience instance details using the new modular service
+    const instance = await getExperienceInstancePricing(instanceId);
 
     // Get pricing rules for experience
     const pricingRules = await getPricingRules(undefined, instance.experience?.id);
