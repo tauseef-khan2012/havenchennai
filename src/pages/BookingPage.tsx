@@ -377,7 +377,7 @@ const BookingPage: React.FC = () => {
                       <EnhancedPriceSummary 
                         priceBreakdown={priceBreakdown} 
                         nights={nights}
-                        showPlatformComparison={false}
+                        showCompetitorComparison={false}
                       />
                       
                       <Button 

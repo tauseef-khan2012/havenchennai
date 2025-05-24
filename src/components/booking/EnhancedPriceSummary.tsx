@@ -1,194 +1,127 @@
 
-import { PriceBreakdown } from '@/types/booking';
-import { formatPrice } from '@/utils/bookingUtils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, TrendingDown } from 'lucide-react';
+import { TrendingDown } from 'lucide-react';
+import { EnhancedPriceBreakdown } from '@/services/enhancedPriceService';
 
-interface EnhancedPriceBreakdown extends PriceBreakdown {
-  gstBreakdown?: {
-    cgst: number;
-    sgst: number;
-    igst?: number;
-  };
-  competitorRates?: {
-    platform: string;
-    rate_per_night: number;
-    is_available: boolean;
-  }[];
-  appliedDiscounts?: {
-    name: string;
-    percentage: number;
-    amount: number;
-  }[];
-  savingsFromCompetitors?: number;
-}
-
-interface EnhancedPriceSummaryProps {
+export interface EnhancedPriceSummaryProps {
   priceBreakdown: EnhancedPriceBreakdown;
   nights?: number;
   showCompetitorComparison?: boolean;
+  showPlatformComparison?: boolean;
 }
 
-export const EnhancedPriceSummary = ({ 
-  priceBreakdown, 
-  nights,
-  showCompetitorComparison = true 
-}: EnhancedPriceSummaryProps) => {
-  const {
-    basePrice,
-    discountAmount,
-    subtotalAfterDiscount,
-    taxAmount,
-    cleaningFee,
-    totalAmountDue,
-    currency,
-    gstBreakdown,
-    competitorRates,
-    appliedDiscounts,
-    savingsFromCompetitors
-  } = priceBreakdown;
+export const EnhancedPriceSummary: React.FC<EnhancedPriceSummaryProps> = ({
+  priceBreakdown,
+  nights = 1,
+  showCompetitorComparison = false,
+  showPlatformComparison = false
+}) => {
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: priceBreakdown.currency || 'INR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
 
-  const airbnbRate = competitorRates?.find(rate => rate.platform === 'airbnb');
+  const pricePerNight = nights > 0 ? priceBreakdown.basePrice / nights : priceBreakdown.basePrice;
 
   return (
-    <div className="space-y-4">
-      <Card className="bg-white shadow-md border-haven-green/20">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl font-serif">Price Summary</CardTitle>
-          {appliedDiscounts && appliedDiscounts.length > 0 && (
-            <div className="flex items-center gap-2">
-              <TrendingDown className="h-4 w-4 text-haven-green" />
-              <span className="text-sm text-haven-green font-medium">
-                {appliedDiscounts.length} discount{appliedDiscounts.length > 1 ? 's' : ''} applied
-              </span>
+    <div className="space-y-3">
+      {/* Base pricing */}
+      <div className="flex justify-between">
+        <span>
+          {formatCurrency(pricePerNight)} × {nights} {nights === 1 ? 'night' : 'nights'}
+        </span>
+        <span>{formatCurrency(priceBreakdown.basePrice)}</span>
+      </div>
+
+      {/* Discounts */}
+      {priceBreakdown.discountAmount > 0 && (
+        <>
+          <div className="flex justify-between text-green-600">
+            <span>Discounts</span>
+            <span>-{formatCurrency(priceBreakdown.discountAmount)}</span>
+          </div>
+          {priceBreakdown.appliedDiscounts && priceBreakdown.appliedDiscounts.map((discount, index) => (
+            <div key={index} className="flex justify-between text-sm text-green-600 ml-4">
+              <span>• {discount.name}</span>
+              <span>-{formatCurrency(discount.amount)}</span>
             </div>
-          )}
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            {nights && (
-              <div className="flex justify-between">
-                <span>Base price</span>
-                <div className="text-right">
-                  <span className={discountAmount > 0 ? "line-through text-gray-500" : ""}>
-                    {formatPrice(basePrice / nights, currency)}
-                  </span>
-                  <span className="text-sm text-gray-600"> × {nights} nights</span>
-                </div>
-              </div>
-            )}
-            
-            {!nights && (
-              <div className="flex justify-between">
-                <span>Base price</span>
-                <span className={discountAmount > 0 ? "line-through text-gray-500" : ""}>
-                  {formatPrice(basePrice, currency)}
-                </span>
-              </div>
-            )}
+          ))}
+        </>
+      )}
 
-            {appliedDiscounts && appliedDiscounts.map((discount, index) => (
-              <div key={index} className="flex justify-between text-haven-green">
-                <span>{discount.name} ({discount.percentage}%)</span>
-                <span>-{formatPrice(discount.amount, currency)}</span>
-              </div>
-            ))}
+      {/* Cleaning fee */}
+      {priceBreakdown.cleaningFee && priceBreakdown.cleaningFee > 0 && (
+        <div className="flex justify-between">
+          <span>Cleaning fee</span>
+          <span>{formatCurrency(priceBreakdown.cleaningFee)}</span>
+        </div>
+      )}
 
-            {cleaningFee && cleaningFee > 0 && (
-              <div className="flex justify-between">
-                <span>Cleaning fee</span>
-                <span>{formatPrice(cleaningFee, currency)}</span>
-              </div>
-            )}
+      {/* Addon experiences */}
+      {priceBreakdown.addonExperiencesTotal && priceBreakdown.addonExperiencesTotal > 0 && (
+        <div className="flex justify-between">
+          <span>Add-on experiences</span>
+          <span>{formatCurrency(priceBreakdown.addonExperiencesTotal)}</span>
+        </div>
+      )}
+
+      <Separator />
+
+      {/* Subtotal */}
+      <div className="flex justify-between font-medium">
+        <span>Subtotal</span>
+        <span>{formatCurrency(priceBreakdown.subtotalAfterDiscount)}</span>
+      </div>
+
+      {/* GST breakdown */}
+      <div className="flex justify-between">
+        <span>GST ({priceBreakdown.taxPercentage}%)</span>
+        <span>{formatCurrency(priceBreakdown.taxAmount)}</span>
+      </div>
+
+      {priceBreakdown.gstBreakdown && (
+        <div className="ml-4 space-y-1 text-sm text-gray-600">
+          <div className="flex justify-between">
+            <span>• CGST (9%)</span>
+            <span>{formatCurrency(priceBreakdown.gstBreakdown.cgst)}</span>
           </div>
-          
-          <Separator />
-          
-          <div className="flex justify-between font-medium">
-            <span>Subtotal</span>
-            <span>{formatPrice(subtotalAfterDiscount + (cleaningFee || 0), currency)}</span>
+          <div className="flex justify-between">
+            <span>• SGST (9%)</span>
+            <span>{formatCurrency(priceBreakdown.gstBreakdown.sgst)}</span>
           </div>
-          
-          <div className="space-y-1">
+          {priceBreakdown.gstBreakdown.igst && (
             <div className="flex justify-between">
-              <span>GST (18%)</span>
-              <span>{formatPrice(taxAmount, currency)}</span>
-            </div>
-            {gstBreakdown && (
-              <div className="ml-4 text-sm text-gray-600">
-                {gstBreakdown.igst > 0 ? (
-                  <div>IGST: {formatPrice(gstBreakdown.igst, currency)}</div>
-                ) : (
-                  <>
-                    <div>CGST: {formatPrice(gstBreakdown.cgst, currency)}</div>
-                    <div>SGST: {formatPrice(gstBreakdown.sgst, currency)}</div>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-          
-          <Separator />
-          
-          <div className="flex justify-between font-bold text-lg">
-            <span>Total</span>
-            <span>{formatPrice(totalAmountDue, currency)}</span>
-          </div>
-
-          {savingsFromCompetitors && savingsFromCompetitors > 0 && (
-            <div className="bg-haven-green/10 p-3 rounded-lg">
-              <div className="flex items-center gap-2 text-haven-green font-medium">
-                <TrendingDown className="h-4 w-4" />
-                <span>You save {formatPrice(savingsFromCompetitors, currency)} vs Airbnb</span>
-              </div>
+              <span>• IGST (18%)</span>
+              <span>{formatCurrency(priceBreakdown.gstBreakdown.igst)}</span>
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      )}
 
-      {/* Competitor Comparison */}
-      {showCompetitorComparison && airbnbRate && (
-        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg font-serif flex items-center gap-2">
-              <ExternalLink className="h-5 w-5" />
-              Compare with Airbnb
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex justify-between items-center">
-              <div>
-                <div className="font-medium">Airbnb Price</div>
-                <div className="text-sm text-gray-600">
-                  {nights ? `${formatPrice(airbnbRate.rate_per_night, currency)} × ${nights} nights` : 'Per booking'}
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="font-semibold">
-                  {formatPrice(nights ? airbnbRate.rate_per_night * nights : airbnbRate.rate_per_night, currency)}
-                </div>
-                {savingsFromCompetitors && savingsFromCompetitors > 0 && (
-                  <Badge variant="secondary" className="bg-green-100 text-green-800">
-                    Save {formatPrice(savingsFromCompetitors, currency)}
-                  </Badge>
-                )}
-              </div>
-            </div>
-            
-            <div className="mt-3 pt-3 border-t border-blue-200">
-              <a 
-                href={`https://www.airbnb.com/`}
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1"
-              >
-                View on Airbnb <ExternalLink className="h-3 w-3" />
-              </a>
-            </div>
-          </CardContent>
-        </Card>
+      <Separator />
+
+      {/* Total */}
+      <div className="flex justify-between text-lg font-bold">
+        <span>Total</span>
+        <span>{formatCurrency(priceBreakdown.totalAmountDue)}</span>
+      </div>
+
+      {/* Competitor comparison */}
+      {(showCompetitorComparison || showPlatformComparison) && priceBreakdown.savingsFromCompetitors && priceBreakdown.savingsFromCompetitors > 0 && (
+        <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+          <div className="flex items-center gap-2 text-green-800">
+            <TrendingDown className="h-4 w-4" />
+            <span className="text-sm font-medium">
+              You save {formatCurrency(priceBreakdown.savingsFromCompetitors)} vs other platforms!
+            </span>
+          </div>
+        </div>
       )}
     </div>
   );

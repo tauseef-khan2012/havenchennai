@@ -57,7 +57,10 @@ export const getPlatformRatesForProperty = async (
       return [];
     }
 
-    return rates || [];
+    return (rates || []).map(rate => ({
+      ...rate,
+      platform: rate.platform as 'airbnb' | 'booking_com' | 'agoda'
+    })) as PlatformRate[];
   } catch (error) {
     console.error('Error in getPlatformRatesForProperty:', error);
     return [];
@@ -86,7 +89,10 @@ export const getPlatformRatesForExperience = async (
       return [];
     }
 
-    return rates || [];
+    return (rates || []).map(rate => ({
+      ...rate,
+      platform: rate.platform as 'airbnb' | 'booking_com' | 'agoda'
+    })) as PlatformRate[];
   } catch (error) {
     console.error('Error in getPlatformRatesForExperience:', error);
     return [];

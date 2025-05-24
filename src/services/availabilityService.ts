@@ -82,6 +82,44 @@ export const checkPropertyAvailabilityDetailed = async (
 };
 
 /**
+ * Simple availability check for backward compatibility
+ */
+export const checkPropertyAvailability = async (
+  propertyId: UUID,
+  startDate: Date,
+  endDate: Date
+): Promise<boolean> => {
+  const availability = await checkPropertyAvailabilityDetailed(propertyId, startDate, endDate);
+  return availability.every(day => day.isAvailable);
+};
+
+/**
+ * Checks if experience instance has capacity
+ */
+export const checkExperienceInstanceAvailability = async (
+  instanceId: UUID,
+  numberOfAttendees: number
+): Promise<boolean> => {
+  try {
+    const { data: instance, error } = await supabase
+      .from('experience_instances')
+      .select('max_capacity, current_attendees')
+      .eq('id', instanceId)
+      .single();
+
+    if (error || !instance) {
+      console.error('Error checking experience instance:', error);
+      return false;
+    }
+
+    return (instance.current_attendees + numberOfAttendees) <= instance.max_capacity;
+  } catch (error) {
+    console.error('Error in checkExperienceInstanceAvailability:', error);
+    return false;
+  }
+};
+
+/**
  * Checks if a date range is available for booking
  */
 export const isDateRangeAvailable = (

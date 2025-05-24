@@ -52,10 +52,13 @@ export const validateDiscountCode = async (
       };
     }
 
+    // Cast to proper type
+    const typedDiscountCode = discountCode as unknown as DiscountCode;
+
     // Check if code is still valid
     const now = new Date();
-    const validFrom = new Date(discountCode.valid_from);
-    const validUntil = discountCode.valid_until ? new Date(discountCode.valid_until) : null;
+    const validFrom = new Date(typedDiscountCode.valid_from);
+    const validUntil = typedDiscountCode.valid_until ? new Date(typedDiscountCode.valid_until) : null;
 
     if (now < validFrom || (validUntil && now > validUntil)) {
       return {
@@ -66,7 +69,7 @@ export const validateDiscountCode = async (
     }
 
     // Check usage limit
-    if (discountCode.usage_limit && discountCode.used_count >= discountCode.usage_limit) {
+    if (typedDiscountCode.usage_limit && typedDiscountCode.used_count >= typedDiscountCode.usage_limit) {
       return {
         isValid: false,
         discountAmount: 0,
@@ -75,24 +78,24 @@ export const validateDiscountCode = async (
     }
 
     // Check minimum amount
-    if (totalAmount < discountCode.minimum_amount) {
+    if (totalAmount < typedDiscountCode.minimum_amount) {
       return {
         isValid: false,
         discountAmount: 0,
-        errorMessage: `Minimum order amount of ₹${discountCode.minimum_amount} required`
+        errorMessage: `Minimum order amount of ₹${typedDiscountCode.minimum_amount} required`
       };
     }
 
     // Check applicability
-    if (discountCode.applicable_to !== 'all') {
-      if (bookingType === 'property' && discountCode.applicable_to !== 'properties') {
+    if (typedDiscountCode.applicable_to !== 'all') {
+      if (bookingType === 'property' && typedDiscountCode.applicable_to !== 'properties') {
         return {
           isValid: false,
           discountAmount: 0,
           errorMessage: 'Discount code not applicable to properties'
         };
       }
-      if (bookingType === 'experience' && discountCode.applicable_to !== 'experiences') {
+      if (bookingType === 'experience' && typedDiscountCode.applicable_to !== 'experiences') {
         return {
           isValid: false,
           discountAmount: 0,
@@ -101,16 +104,16 @@ export const validateDiscountCode = async (
       }
 
       // Check specific property/experience IDs
-      if (bookingType === 'property' && discountCode.property_ids && 
-          !discountCode.property_ids.includes(itemId)) {
+      if (bookingType === 'property' && typedDiscountCode.property_ids && 
+          !typedDiscountCode.property_ids.includes(itemId)) {
         return {
           isValid: false,
           discountAmount: 0,
           errorMessage: 'Discount code not applicable to this property'
         };
       }
-      if (bookingType === 'experience' && discountCode.experience_ids && 
-          !discountCode.experience_ids.includes(itemId)) {
+      if (bookingType === 'experience' && typedDiscountCode.experience_ids && 
+          !typedDiscountCode.experience_ids.includes(itemId)) {
         return {
           isValid: false,
           discountAmount: 0,
@@ -121,13 +124,13 @@ export const validateDiscountCode = async (
 
     // Calculate discount amount
     let discountAmount = 0;
-    if (discountCode.discount_type === 'percentage') {
-      discountAmount = (totalAmount * discountCode.discount_value) / 100;
-      if (discountCode.maximum_discount) {
-        discountAmount = Math.min(discountAmount, discountCode.maximum_discount);
+    if (typedDiscountCode.discount_type === 'percentage') {
+      discountAmount = (totalAmount * typedDiscountCode.discount_value) / 100;
+      if (typedDiscountCode.maximum_discount) {
+        discountAmount = Math.min(discountAmount, typedDiscountCode.maximum_discount);
       }
     } else {
-      discountAmount = discountCode.discount_value;
+      discountAmount = typedDiscountCode.discount_value;
     }
 
     // Ensure discount doesn't exceed total amount
@@ -136,7 +139,7 @@ export const validateDiscountCode = async (
     return {
       isValid: true,
       discountAmount,
-      discountCode
+      discountCode: typedDiscountCode
     };
   } catch (error) {
     console.error('Error validating discount code:', error);
@@ -153,13 +156,26 @@ export const validateDiscountCode = async (
  */
 export const useDiscountCode = async (codeId: UUID): Promise<void> => {
   try {
-    const { error } = await supabase
+    // Get current usage count
+    const { data: currentCode, error: fetchError } = await supabase
       .from('discount_codes')
-      .update({ used_count: supabase.rpc('increment', { x: 1 }) })
+      .select('used_count')
+      .eq('id', codeId)
+      .single();
+
+    if (fetchError || !currentCode) {
+      console.error('Error fetching current discount code:', fetchError);
+      return;
+    }
+
+    // Update with incremented count
+    const { error: updateError } = await supabase
+      .from('discount_codes')
+      .update({ used_count: currentCode.used_count + 1 })
       .eq('id', codeId);
 
-    if (error) {
-      console.error('Error updating discount code usage:', error);
+    if (updateError) {
+      console.error('Error updating discount code usage:', updateError);
     }
   } catch (error) {
     console.error('Error in useDiscountCode:', error);
