@@ -9,6 +9,60 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      availability_calendar: {
+        Row: {
+          created_at: string
+          date: string
+          experience_instance_id: string | null
+          id: string
+          is_available: boolean
+          minimum_stay: number | null
+          notes: string | null
+          property_id: string | null
+          rate_override: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          experience_instance_id?: string | null
+          id?: string
+          is_available?: boolean
+          minimum_stay?: number | null
+          notes?: string | null
+          property_id?: string | null
+          rate_override?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          experience_instance_id?: string | null
+          id?: string
+          is_available?: boolean
+          minimum_stay?: number | null
+          notes?: string | null
+          property_id?: string | null
+          rate_override?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "availability_calendar_experience_instance_id_fkey"
+            columns: ["experience_instance_id"]
+            isOneToOne: false
+            referencedRelation: "experience_instances"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "availability_calendar_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       booking_guests: {
         Row: {
           booking_id: string
@@ -158,6 +212,66 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      discount_codes: {
+        Row: {
+          applicable_to: string
+          code: string
+          created_at: string
+          description: string | null
+          discount_type: string
+          discount_value: number
+          experience_ids: string[] | null
+          id: string
+          is_active: boolean
+          maximum_discount: number | null
+          minimum_amount: number | null
+          property_ids: string[] | null
+          updated_at: string
+          usage_limit: number | null
+          used_count: number
+          valid_from: string
+          valid_until: string | null
+        }
+        Insert: {
+          applicable_to?: string
+          code: string
+          created_at?: string
+          description?: string | null
+          discount_type: string
+          discount_value: number
+          experience_ids?: string[] | null
+          id?: string
+          is_active?: boolean
+          maximum_discount?: number | null
+          minimum_amount?: number | null
+          property_ids?: string[] | null
+          updated_at?: string
+          usage_limit?: number | null
+          used_count?: number
+          valid_from?: string
+          valid_until?: string | null
+        }
+        Update: {
+          applicable_to?: string
+          code?: string
+          created_at?: string
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          experience_ids?: string[] | null
+          id?: string
+          is_active?: boolean
+          maximum_discount?: number | null
+          minimum_amount?: number | null
+          property_ids?: string[] | null
+          updated_at?: string
+          usage_limit?: number | null
+          used_count?: number
+          valid_from?: string
+          valid_until?: string | null
+        }
+        Relationships: []
       }
       experience_bookings: {
         Row: {
@@ -600,6 +714,75 @@ export type Database = {
             columns: ["experience_booking_id"]
             isOneToOne: false
             referencedRelation: "experience_bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      platform_rates: {
+        Row: {
+          base_rate: number
+          booking_url: string | null
+          commission_rate: number
+          created_at: string
+          date: string
+          experience_id: string | null
+          external_listing_id: string | null
+          fetched_at: string
+          id: string
+          is_available: boolean
+          platform: string
+          platform_fee: number
+          property_id: string | null
+          total_guest_pays: number
+          updated_at: string
+        }
+        Insert: {
+          base_rate: number
+          booking_url?: string | null
+          commission_rate?: number
+          created_at?: string
+          date: string
+          experience_id?: string | null
+          external_listing_id?: string | null
+          fetched_at?: string
+          id?: string
+          is_available?: boolean
+          platform: string
+          platform_fee?: number
+          property_id?: string | null
+          total_guest_pays: number
+          updated_at?: string
+        }
+        Update: {
+          base_rate?: number
+          booking_url?: string | null
+          commission_rate?: number
+          created_at?: string
+          date?: string
+          experience_id?: string | null
+          external_listing_id?: string | null
+          fetched_at?: string
+          id?: string
+          is_available?: boolean
+          platform?: string
+          platform_fee?: number
+          property_id?: string | null
+          total_guest_pays?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "platform_rates_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "experiences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "platform_rates_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
             referencedColumns: ["id"]
           },
         ]

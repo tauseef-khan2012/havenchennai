@@ -22,7 +22,6 @@ const StickyBookingWidget = () => {
         setIsVisible(true);
       } else {
         setIsVisible(false);
-        // Close the widget when scrolling back to top
         setIsOpen(false);
       }
     };
@@ -37,12 +36,10 @@ const StickyBookingWidget = () => {
     setIsOpen(!isOpen);
   };
   
-  // Function to disable past dates
   const disablePastDates = (date: Date) => {
     return date < new Date();
   };
   
-  // Function to disable checkout dates before checkin
   const disableCheckoutDates = (date: Date) => {
     return checkIn ? date <= checkIn : false;
   };
@@ -126,10 +123,7 @@ const StickyBookingWidget = () => {
               </div>
               
               <Link 
-                to={{
-                  pathname: "/booking",
-                  search: `?checkin=${checkIn ? format(checkIn, 'yyyy-MM-dd') : ''}&checkout=${checkOut ? format(checkOut, 'yyyy-MM-dd') : ''}&guests=${guests}`
-                }}
+                to={`/booking?checkin=${checkIn ? format(checkIn, 'yyyy-MM-dd') : ''}&checkout=${checkOut ? format(checkOut, 'yyyy-MM-dd') : ''}&guests=${guests}`}
               >
                 <Button className="bg-haven-teal text-white hover:bg-opacity-90">
                   Continue

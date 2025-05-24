@@ -1,90 +1,141 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import ImageGallery from './ImageGallery';
-import { formatCurrency } from '@/utils/formatters';
+import { MapPin, Users, Star, Calendar } from 'lucide-react';
 
 interface PropertyCardProps {
   id: string;
   name: string;
-  shortDescription?: string;
+  type: string;
+  location: string;
+  maxGuests: number;
   basePrice: number;
   currency: string;
-  imageUrls: string[];
-  maxGuests: number;
-  type?: string;
+  imageUrl: string;
   amenities?: string[];
-  className?: string;
+  rating?: number;
+  reviewCount?: number;
+  isAvailable?: boolean;
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({
   id,
   name,
-  shortDescription,
+  type,
+  location,
+  maxGuests,
   basePrice,
   currency,
-  imageUrls,
-  maxGuests,
-  type,
+  imageUrl,
   amenities = [],
-  className
+  rating = 4.8,
+  reviewCount = 24,
+  isAvailable = true
 }) => {
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
   return (
-    <Card className={`h-full overflow-hidden hover:shadow-lg transition-shadow ${className}`}>
+    <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group">
       <div className="relative">
-        <ImageGallery 
-          images={imageUrls.length > 0 ? imageUrls : ['/placeholder.svg']}
-          aspectRatio="landscape"
-        />
-        
-        {type && (
-          <Badge className="absolute top-2 left-2 bg-white/80 text-black hover:bg-white/90">
-            {type}
+        <div className="aspect-video overflow-hidden">
+          <img
+            src={imageUrl}
+            alt={name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+        </div>
+        <Badge className="absolute top-3 left-3 bg-haven-teal text-white">
+          {type}
+        </Badge>
+        {!isAvailable && (
+          <Badge className="absolute top-3 right-3 bg-red-500 text-white">
+            Unavailable
           </Badge>
         )}
       </div>
-      
-      <CardContent className="pt-4">
-        <h3 className="text-xl font-serif font-semibold mb-1 line-clamp-1">{name}</h3>
-        
-        {shortDescription && (
-          <p className="text-gray-600 text-sm mb-2 line-clamp-2">{shortDescription}</p>
-        )}
-        
-        <div className="flex flex-wrap gap-1 mb-2">
-          <Badge variant="outline" className="text-xs">
-            Up to {maxGuests} guests
-          </Badge>
-          
-          {amenities.slice(0, 3).map((amenity, index) => (
-            <Badge key={index} variant="secondary" className="text-xs">
-              {amenity}
-            </Badge>
-          ))}
-          
-          {amenities.length > 3 && (
-            <Badge variant="secondary" className="text-xs">
-              +{amenities.length - 3} more
-            </Badge>
+
+      <CardContent className="p-4">
+        <div className="space-y-3">
+          <div>
+            <h3 className="font-serif font-semibold text-lg group-hover:text-haven-teal transition-colors">
+              {name}
+            </h3>
+            <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
+              <div className="flex items-center gap-1">
+                <MapPin className="h-4 w-4" />
+                <span>{location}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Users className="h-4 w-4" />
+                <span>Up to {maxGuests}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1">
+              <Star className="h-4 w-4 text-yellow-500 fill-current" />
+              <span className="text-sm font-medium">{rating}</span>
+              <span className="text-sm text-gray-500">({reviewCount})</span>
+            </div>
+            <div className="text-right">
+              <div className="text-lg font-bold text-haven-teal">
+                {formatCurrency(basePrice)}
+              </div>
+              <div className="text-xs text-gray-500">per night</div>
+            </div>
+          </div>
+
+          {amenities.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {amenities.slice(0, 3).map((amenity, index) => (
+                <Badge key={index} variant="outline" className="text-xs">
+                  {amenity}
+                </Badge>
+              ))}
+              {amenities.length > 3 && (
+                <Badge variant="outline" className="text-xs">
+                  +{amenities.length - 3} more
+                </Badge>
+              )}
+            </div>
           )}
+
+          <div className="flex gap-2 pt-2">
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="flex-1"
+            >
+              <Link to={`/stay/${id}`}>
+                View Details
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="sm"
+              className="flex-1 bg-haven-teal hover:bg-haven-teal/90"
+              disabled={!isAvailable}
+            >
+              <Link to={`/booking?propertyId=${id}`}>
+                <Calendar className="h-4 w-4 mr-1" />
+                Book Now
+              </Link>
+            </Button>
+          </div>
         </div>
       </CardContent>
-      
-      <CardFooter className="flex justify-between items-center pt-0">
-        <div>
-          <span className="font-semibold">{formatCurrency(basePrice, currency)}</span>
-          <span className="text-gray-500 text-sm"> / night</span>
-        </div>
-        
-        <Link 
-          to={`/booking?propertyId=${id}`}
-          className="bg-haven-green hover:bg-haven-green/90 text-white px-4 py-2 rounded-md text-sm transition-colors"
-        >
-          Book Now
-        </Link>
-      </CardFooter>
     </Card>
   );
 };
