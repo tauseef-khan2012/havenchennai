@@ -5,6 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Users, Star, Calendar } from 'lucide-react';
+import { useCurrency } from '@/contexts/CurrencyContext';
 
 interface PropertyCardProps {
   id: string;
@@ -35,14 +36,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   reviewCount = 24,
   isAvailable = true
 }) => {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
+  const { formatPrice } = useCurrency();
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group">
@@ -90,7 +84,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             </div>
             <div className="text-right">
               <div className="text-lg font-bold text-haven-teal">
-                {formatCurrency(basePrice)}
+                {formatPrice(basePrice, currency)}
               </div>
               <div className="text-xs text-gray-500">per night</div>
             </div>
@@ -118,7 +112,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               size="sm"
               className="flex-1"
             >
-              <Link to={`/stay/${id}`}>
+              <Link to={`/stay`}>
                 View Details
               </Link>
             </Button>

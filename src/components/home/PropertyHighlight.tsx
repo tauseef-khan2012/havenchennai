@@ -10,6 +10,9 @@ interface PropertyHighlightProps {
 }
 
 const PropertyHighlight = ({ title, description, imageUrl, reverse = false }: PropertyHighlightProps) => {
+  // Use consistent property ID for Haven
+  const havenPropertyId = "550e8400-e29b-41d4-a716-446655440000";
+
   return (
     <div className={`grid md:grid-cols-2 gap-8 items-center ${reverse ? 'md:flex-row-reverse' : ''}`}>
       <div className={`${reverse ? 'md:order-2' : ''}`}>
@@ -24,7 +27,7 @@ const PropertyHighlight = ({ title, description, imageUrl, reverse = false }: Pr
       <div className={`${reverse ? 'md:order-1' : ''}`}>
         <h2 className="font-serif text-3xl font-bold mb-4">{title}</h2>
         <p className="text-gray-700 mb-6">{description}</p>
-        <Link to="/stay">
+        <Link to={`/booking?propertyId=${havenPropertyId}`}>
           <Button className="btn-primary">Book Now</Button>
         </Link>
       </div>

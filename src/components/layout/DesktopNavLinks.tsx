@@ -10,8 +10,11 @@ interface DesktopNavLinksProps {
 }
 
 const DesktopNavLinks = ({ isActive, user }: DesktopNavLinksProps) => {
+  // Use consistent property ID for Haven
+  const havenPropertyId = "550e8400-e29b-41d4-a716-446655440000";
+
   return (
-    <nav className="hidden md:flex items-center gap-8">
+    <nav className="flex items-center gap-8">
       <div className="flex items-center gap-8">
         <NavLink to="/stay" isActive={isActive("/stay")}>
           The Stay
@@ -41,7 +44,7 @@ const DesktopNavLinks = ({ isActive, user }: DesktopNavLinksProps) => {
           </Link>
         )}
         
-        <Link to="/booking">
+        <Link to={`/booking?propertyId=${havenPropertyId}`}>
           <Button className="bg-haven-teal hover:bg-haven-teal/90 font-medium min-h-[44px] px-5">
             Book Now
           </Button>

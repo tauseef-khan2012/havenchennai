@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 const Hero = () => {
+  // Use consistent property ID for Haven
+  const havenPropertyId = "550e8400-e29b-41d4-a716-446655440000";
+
   return (
     <div className="relative h-[90vh] bg-black overflow-hidden">
       <div 
@@ -18,7 +21,7 @@ const Hero = () => {
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">Escape to Lakeside Intimacy at Haven</h1>
           <p className="text-xl text-white mb-8">Experience our unique stacked container home retreat beside Muttukadu Lake, where minimal living meets expansive views and meaningful connections.</p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link to="/stay">
+            <Link to={`/booking?propertyId=${havenPropertyId}`}>
               <Button className="btn-primary text-lg">Book Your Stay</Button>
             </Link>
             <Link to="/experiences">

@@ -1,25 +1,13 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { useToast } from '@/components/ui/use-toast';
 import StayNavigation from '@/components/stay/StayNavigation';
-import { ArrowDown, X } from 'lucide-react';
+import { ArrowDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Stay = () => {
-  // State for booking form
-  const [checkInDate, setCheckInDate] = useState('');
-  const [checkOutDate, setCheckOutDate] = useState('');
-  const [guests, setGuests] = useState(1);
-  const [bookingModalOpen, setBookingModalOpen] = useState(false);
-  const { toast } = useToast();
   const navigate = useNavigate();
   
   // Refs for scroll sections
@@ -39,24 +27,11 @@ const Stay = () => {
     visible: { opacity: 1, transition: { duration: 0.8 } }
   };
 
-  const handleBooking = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!checkInDate || !checkOutDate) {
-      toast({
-        title: "Error",
-        description: "Please select check-in and check-out dates.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    // Since we don't have multiple properties in the database yet,
-    // we'll hardcode a sample property ID for demonstration
-    const samplePropertyId = "d290f1ee-6c54-4b01-90e6-d701748f0851";
-    
-    // Navigate to the booking page with property ID
-    navigate(`/booking?propertyId=${samplePropertyId}`);
+  // Use a consistent property ID for the Haven property
+  const havenPropertyId = "550e8400-e29b-41d4-a716-446655440000";
+
+  const handleBookNowClick = () => {
+    navigate(`/booking?propertyId=${havenPropertyId}`);
   };
   
   const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
@@ -95,7 +70,7 @@ const Stay = () => {
             </p>
             <Button 
               className="bg-white text-haven-green hover:bg-opacity-90 text-lg px-8 py-6"
-              onClick={() => setBookingModalOpen(true)}
+              onClick={handleBookNowClick}
             >
               Book Your Escape
             </Button>
@@ -222,7 +197,6 @@ const Stay = () => {
             </motion.div>
           </div>
           
-          {/* Testimonials */}
           <div className="mt-24">
             <motion.div 
               initial="hidden"
@@ -337,121 +311,10 @@ const Stay = () => {
         </div>
       </section>
       
-      {/* Book Now Modal */}
-      <Dialog open={bookingModalOpen} onOpenChange={setBookingModalOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="font-serif text-2xl">Book Your Stay</DialogTitle>
-            <DialogDescription>
-              Select your dates and complete your reservation to secure your lakeside escape.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <form onSubmit={handleBooking} className="space-y-4 mt-4">
-            <div>
-              <Label htmlFor="check-in">Check-in Date</Label>
-              <Input 
-                id="check-in" 
-                type="date" 
-                value={checkInDate}
-                onChange={(e) => setCheckInDate(e.target.value)}
-                className="mt-1"
-                min={new Date().toISOString().split('T')[0]}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="check-out">Check-out Date</Label>
-              <Input 
-                id="check-out" 
-                type="date"
-                value={checkOutDate}
-                onChange={(e) => setCheckOutDate(e.target.value)}
-                className="mt-1"
-                min={checkInDate || new Date().toISOString().split('T')[0]}
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="guests">Guests</Label>
-              <select 
-                id="guests"
-                value={guests}
-                onChange={(e) => setGuests(Number(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md mt-1"
-              >
-                <option value={1}>1 Guest</option>
-                <option value={2}>2 Guests</option>
-                <option value={3}>3 Guests</option>
-                <option value={4}>4 Guests</option>
-              </select>
-            </div>
-            
-            <div className="bg-haven-beige bg-opacity-20 p-4 rounded-md">
-              <div className="flex justify-between mb-2">
-                <span>$249 × 2 nights</span>
-                <span>$498</span>
-              </div>
-              <div className="flex justify-between mb-2">
-                <span>Cleaning fee</span>
-                <span>$50</span>
-              </div>
-              <div className="flex justify-between mb-2">
-                <span>Service fee</span>
-                <span>$25</span>
-              </div>
-              <Separator className="my-2" />
-              <div className="flex justify-between font-semibold">
-                <span>Total</span>
-                <span>$573</span>
-              </div>
-            </div>
-            
-            <Button type="submit" className="w-full btn-primary">
-              Request to Book
-            </Button>
-          </form>
-          
-          <div className="mt-4">
-            <details className="group">
-              <summary className="flex cursor-pointer items-center justify-between font-medium">
-                <span>Cancellation Policy</span>
-                <span className="transition group-open:rotate-180">
-                  <svg fill="none" height="24" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="24">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                  </svg>
-                </span>
-              </summary>
-              <p className="mt-2 text-gray-600 text-sm">
-                Free cancellation up to 7 days before check-in. After that, 50% of the total booking amount is refundable.
-              </p>
-            </details>
-            
-            <details className="group mt-2">
-              <summary className="flex cursor-pointer items-center justify-between font-medium">
-                <span>House Rules</span>
-                <span className="transition group-open:rotate-180">
-                  <svg fill="none" height="24" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="24">
-                    <polyline points="6 9 12 15 18 9"></polyline>
-                  </svg>
-                </span>
-              </summary>
-              <ul className="mt-2 text-gray-600 text-sm space-y-1">
-                <li>Check-in: 3:00 PM - 8:00 PM</li>
-                <li>Checkout: 11:00 AM</li>
-                <li>No smoking</li>
-                <li>No pets</li>
-                <li>No parties or events</li>
-              </ul>
-            </details>
-          </div>
-        </DialogContent>
-      </Dialog>
-      
       {/* Floating Book Now Button */}
       <div className="fixed bottom-8 right-8 z-40">
         <Button 
-          onClick={() => setBookingModalOpen(true)}
+          onClick={handleBookNowClick}
           className="bg-haven-green text-white hover:bg-opacity-90 shadow-lg px-6 py-6 rounded-full text-lg font-medium"
         >
           Book Now

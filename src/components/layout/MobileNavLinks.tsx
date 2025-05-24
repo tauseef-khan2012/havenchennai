@@ -11,6 +11,9 @@ interface MobileNavLinksProps {
 }
 
 const MobileNavLinks = ({ isOpen, isActive, user }: MobileNavLinksProps) => {
+  // Use consistent property ID for Haven
+  const havenPropertyId = "550e8400-e29b-41d4-a716-446655440000";
+
   if (!isOpen) return null;
   
   return (
@@ -66,7 +69,7 @@ const MobileNavLinks = ({ isOpen, isActive, user }: MobileNavLinksProps) => {
             </Link>
           )}
           
-          <Link to="/booking" className="w-full">
+          <Link to={`/booking?propertyId=${havenPropertyId}`} className="w-full">
             <Button className="w-full bg-haven-teal hover:bg-haven-teal/90">
               Book Now
             </Button>
