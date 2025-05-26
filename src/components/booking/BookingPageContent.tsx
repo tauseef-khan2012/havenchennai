@@ -56,7 +56,7 @@ export const BookingPageContent: React.FC<BookingPageContentProps> = ({
           {/* Property Images */}
           <PropertyImageSlider property={property} />
 
-          {/* Booking Content */}
+          {/* Booking Content with integrated summary */}
           <BookingContent
             propertyId={propertyId}
             property={property}
@@ -66,25 +66,31 @@ export const BookingPageContent: React.FC<BookingPageContentProps> = ({
             platformComparisons={platformComparisons}
             onDateRangeSelect={onDateRangeSelect}
             onPlatformBooking={onPlatformBooking}
+            guestCount={guestCount}
+            setGuestCount={setGuestCount}
+            isCalculatingPrice={isCalculatingPrice}
+            onProceedToPayment={onProceedToPayment}
           />
         </BookingContentColumn>
 
-        {/* Right Column - Desktop Booking Summary */}
+        {/* Right Column - Desktop Booking Summary (hidden on mobile) */}
         <BookingSummaryColumn>
-          <DesktopBookingSummary
-            property={property}
-            propertyId={propertyId}
-            guestCount={guestCount}
-            setGuestCount={setGuestCount}
-            selectedCheckIn={selectedCheckIn}
-            selectedCheckOut={selectedCheckOut}
-            priceBreakdown={priceBreakdown}
-            appliedDiscount={appliedDiscount}
-            nights={nights}
-            isCalculatingPrice={isCalculatingPrice}
-            onDiscountApplied={onDiscountApplied}
-            onProceedToPayment={onProceedToPayment}
-          />
+          <div className="hidden lg:block">
+            <DesktopBookingSummary
+              property={property}
+              propertyId={propertyId}
+              guestCount={guestCount}
+              setGuestCount={setGuestCount}
+              selectedCheckIn={selectedCheckIn}
+              selectedCheckOut={selectedCheckOut}
+              priceBreakdown={priceBreakdown}
+              appliedDiscount={appliedDiscount}
+              nights={nights}
+              isCalculatingPrice={isCalculatingPrice}
+              onDiscountApplied={onDiscountApplied}
+              onProceedToPayment={onProceedToPayment}
+            />
+          </div>
         </BookingSummaryColumn>
       </BookingPageGrid>
 

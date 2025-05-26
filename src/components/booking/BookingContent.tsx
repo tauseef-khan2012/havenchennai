@@ -2,6 +2,7 @@
 import React from 'react';
 import AvailabilityCalendar from './AvailabilityCalendar';
 import PlatformComparison from './PlatformComparison';
+import { CompactBookingSummary } from './CompactBookingSummary';
 import { UUID } from '@/types/booking';
 import { EnhancedPriceBreakdown } from '@/services/enhancedPriceService';
 
@@ -14,6 +15,10 @@ interface BookingContentProps {
   platformComparisons: any[];
   onDateRangeSelect: (checkIn: Date, checkOut: Date) => void;
   onPlatformBooking: (platform: string, url?: string) => void;
+  guestCount: number;
+  setGuestCount: (count: number) => void;
+  isCalculatingPrice: boolean;
+  onProceedToPayment: () => void;
 }
 
 export const BookingContent: React.FC<BookingContentProps> = ({
@@ -24,19 +29,48 @@ export const BookingContent: React.FC<BookingContentProps> = ({
   priceBreakdown,
   platformComparisons,
   onDateRangeSelect,
-  onPlatformBooking
+  onPlatformBooking,
+  guestCount,
+  setGuestCount,
+  isCalculatingPrice,
+  onProceedToPayment
 }) => {
+  const nights = selectedCheckIn && selectedCheckOut ? 
+    Math.ceil((selectedCheckOut.getTime() - selectedCheckIn.getTime()) / (1000 * 60 * 60 * 24)) : 0;
+
   return (
     <div className="space-y-8">
-      {/* Availability Calendar */}
+      {/* Calendar and Booking Summary Side by Side */}
       <div className="bg-white rounded-2xl shadow-lg p-6 lg:p-8">
         <h2 className="text-2xl lg:text-3xl font-serif font-bold mb-6 text-gray-900">Select Your Dates</h2>
-        <AvailabilityCalendar
-          propertyId={propertyId}
-          onDateRangeSelect={onDateRangeSelect}
-          selectedCheckIn={selectedCheckIn}
-          selectedCheckOut={selectedCheckOut}
-        />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Calendar Section */}
+          <div>
+            <AvailabilityCalendar
+              propertyId={propertyId}
+              onDateRangeSelect={onDateRangeSelect}
+              selectedCheckIn={selectedCheckIn}
+              selectedCheckOut={selectedCheckOut}
+            />
+          </div>
+          
+          {/* Compact Booking Summary */}
+          <div>
+            <CompactBookingSummary
+              property={property}
+              propertyId={propertyId}
+              guestCount={guestCount}
+              setGuestCount={setGuestCount}
+              selectedCheckIn={selectedCheckIn}
+              selectedCheckOut={selectedCheckOut}
+              priceBreakdown={priceBreakdown}
+              nights={nights}
+              isCalculatingPrice={isCalculatingPrice}
+              onProceedToPayment={onProceedToPayment}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Platform Comparison */}
