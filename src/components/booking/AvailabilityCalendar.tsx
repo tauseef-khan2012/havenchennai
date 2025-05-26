@@ -1,13 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Calendar } from '@/components/ui/calendar';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { CalendarDays, AlertCircle, Users } from 'lucide-react';
 import { UUID } from '@/types/booking';
 import { checkPropertyAvailabilityDetailed, AvailabilityInfo, isDateRangeAvailable } from '@/services/availabilityService';
-import { addDays, format, isBefore, isAfter } from 'date-fns';
+import { addDays, isBefore } from 'date-fns';
+import { CalendarDatePicker } from './calendar/CalendarDatePicker';
+import { GuestSelector } from './calendar/GuestSelector';
+import { CalendarLegend } from './calendar/CalendarLegend';
+import { DateSelectionStatus } from './calendar/DateSelectionStatus';
 
 interface AvailabilityCalendarProps {
   propertyId: UUID;
@@ -97,45 +96,6 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
     setSelectingCheckOut(false);
   };
 
-  const isDateDisabled = (date: Date): boolean => {
-    const dateStr = date.toISOString().split('T')[0];
-    const availabilityInfo = availabilityData.find(info => info.date === dateStr);
-    
-    // Disable past dates
-    if (isBefore(date, new Date())) {
-      return true;
-    }
-    
-    // Disable unavailable dates
-    if (availabilityInfo && !availabilityInfo.isAvailable) {
-      return true;
-    }
-
-    return false;
-  };
-
-  const getDateModifiers = () => {
-    const modifiers: any = {};
-    
-    // Unavailable dates
-    modifiers.unavailable = (date: Date) => {
-      const dateStr = date.toISOString().split('T')[0];
-      const availabilityInfo = availabilityData.find(info => info.date === dateStr);
-      return availabilityInfo && !availabilityInfo.isAvailable;
-    };
-
-    // Selected range
-    if (selectedCheckIn && selectedCheckOut) {
-      modifiers.selected = (date: Date) => {
-        return date >= selectedCheckIn && date <= selectedCheckOut;
-      };
-    } else if (tempCheckIn && selectingCheckOut) {
-      modifiers.selected = tempCheckIn;
-    }
-
-    return modifiers;
-  };
-
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -148,88 +108,30 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
 
   return (
     <div className="space-y-4">
-      {selectingCheckOut && tempCheckIn && (
-        <div className="flex items-center gap-2 text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
-          <AlertCircle className="h-4 w-4" />
-          Check-in: {format(tempCheckIn, 'MMM dd')} - Now select check-out date
-        </div>
-      )}
-      
-      <Calendar
-        mode="single"
-        selected={tempCheckIn}
-        onSelect={handleDateSelect}
-        disabled={isDateDisabled}
-        modifiers={getDateModifiers()}
-        modifiersStyles={{
-          unavailable: { 
-            backgroundColor: '#fee2e2', 
-            color: '#dc2626',
-            textDecoration: 'line-through'
-          },
-          selected: { 
-            backgroundColor: '#0891b2', 
-            color: 'white' 
-          }
-        }}
-        className="rounded-md border"
+      <DateSelectionStatus
+        tempCheckIn={tempCheckIn}
+        selectedCheckIn={selectedCheckIn}
+        selectedCheckOut={selectedCheckOut}
+        selectingCheckOut={selectingCheckOut}
+        onClearSelection={clearSelection}
       />
       
-      {/* Guest Selection */}
-      <div className="mt-4">
-        <label className="text-sm font-medium text-gray-700 mb-2 block flex items-center gap-2">
-          <Users className="h-4 w-4" />
-          Guests
-        </label>
-        <select
-          value={guestCount}
-          onChange={(e) => setGuestCount(parseInt(e.target.value))}
-          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-haven-teal focus:ring-2 focus:ring-haven-teal focus:ring-opacity-20 transition-all"
-        >
-          {Array.from({ length: maxGuests }, (_, i) => i + 1).map(num => (
-            <option key={num} value={num}>
-              {num} {num === 1 ? 'Guest' : 'Guests'}
-            </option>
-          ))}
-        </select>
-      </div>
+      <CalendarDatePicker
+        availabilityData={availabilityData}
+        tempCheckIn={tempCheckIn}
+        selectedCheckIn={selectedCheckIn}
+        selectedCheckOut={selectedCheckOut}
+        selectingCheckOut={selectingCheckOut}
+        onDateSelect={handleDateSelect}
+      />
       
-      <div className="flex items-center gap-4 text-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-green-200 border border-green-400 rounded"></div>
-          <span>Available</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-red-200 border border-red-400 rounded"></div>
-          <span>Unavailable</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-haven-teal rounded"></div>
-          <span>Selected</span>
-        </div>
-      </div>
-
-      {(tempCheckIn || selectedCheckIn) && (
-        <div className="flex gap-2">
-          <Button onClick={clearSelection} variant="outline" size="sm">
-            Clear Selection
-          </Button>
-        </div>
-      )}
-
-      {selectedCheckIn && selectedCheckOut && (
-        <div className="p-3 bg-haven-teal/10 rounded-lg">
-          <div className="text-sm font-medium text-haven-teal">
-            Selected Dates
-          </div>
-          <div className="text-sm text-gray-600">
-            {format(selectedCheckIn, 'MMM dd, yyyy')} - {format(selectedCheckOut, 'MMM dd, yyyy')}
-          </div>
-          <div className="text-sm text-gray-500">
-            {Math.ceil((selectedCheckOut.getTime() - selectedCheckIn.getTime()) / (1000 * 60 * 60 * 24))} nights
-          </div>
-        </div>
-      )}
+      <GuestSelector
+        guestCount={guestCount}
+        setGuestCount={setGuestCount}
+        maxGuests={maxGuests}
+      />
+      
+      <CalendarLegend />
     </div>
   );
 };
