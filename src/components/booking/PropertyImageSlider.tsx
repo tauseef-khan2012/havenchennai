@@ -56,8 +56,8 @@ export const PropertyImageSlider: React.FC<PropertyImageSliderProps> = ({ proper
   return (
     <>
       <div className="relative">
-        {/* Main Image Display */}
-        <div className="relative aspect-[16/10] rounded-xl overflow-hidden group">
+        {/* Main Image Display - Smaller aspect ratio for better layout */}
+        <div className="relative aspect-[4/3] lg:aspect-[3/2] rounded-xl overflow-hidden group">
           <img
             src={propertyImages[currentIndex].url}
             alt={propertyImages[currentIndex].label}
@@ -106,13 +106,13 @@ export const PropertyImageSlider: React.FC<PropertyImageSliderProps> = ({ proper
           </div>
         </div>
 
-        {/* Thumbnail Navigation */}
-        <div className="flex gap-2 mt-4 overflow-x-auto pb-2">
+        {/* Thumbnail Navigation - More compact */}
+        <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
           {propertyImages.map((image, index) => (
             <button
               key={index}
               onClick={() => goToImage(index)}
-              className={`flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+              className={`flex-shrink-0 w-16 h-12 lg:w-18 lg:h-14 rounded-lg overflow-hidden border-2 transition-all ${
                 currentIndex === index 
                   ? 'border-haven-teal shadow-md' 
                   : 'border-gray-200 hover:border-gray-300'

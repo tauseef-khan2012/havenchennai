@@ -3,6 +3,10 @@ import React from 'react';
 import { PropertyHeader } from '@/components/booking/PropertyHeader';
 import { BookingContent } from '@/components/booking/BookingContent';
 import { PropertyImageSlider } from '@/components/booking/PropertyImageSlider';
+import { BookingPageGrid } from '@/components/booking/BookingPageGrid';
+import { BookingContentColumn } from '@/components/booking/BookingContentColumn';
+import { BookingSummaryColumn } from '@/components/booking/BookingSummaryColumn';
+import { DesktopBookingSummary } from '@/components/booking/DesktopBookingSummary';
 import { FloatingBookingSummary } from '@/components/booking/FloatingBookingSummary';
 import { calculateNights } from '@/utils/bookingUtils';
 import { UUID } from '@/types/booking';
@@ -42,43 +46,65 @@ export const BookingPageContent: React.FC<BookingPageContentProps> = ({
   const nights = selectedCheckIn && selectedCheckOut ? calculateNights(selectedCheckIn, selectedCheckOut) : 0;
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8 pb-32 lg:pb-8 lg:pr-[420px]">
-      {/* Property Header */}
-      <PropertyHeader property={property} />
+    <>
+      <BookingPageGrid>
+        {/* Left Column - Property Content */}
+        <BookingContentColumn>
+          {/* Property Header */}
+          <PropertyHeader property={property} />
 
-      {/* Main Content Layout */}
-      <div className="space-y-8">
-        {/* Property Images */}
-        <PropertyImageSlider property={property} />
+          {/* Property Images */}
+          <PropertyImageSlider property={property} />
 
-        {/* Booking Content */}
-        <BookingContent
-          propertyId={propertyId}
+          {/* Booking Content */}
+          <BookingContent
+            propertyId={propertyId}
+            property={property}
+            selectedCheckIn={selectedCheckIn}
+            selectedCheckOut={selectedCheckOut}
+            priceBreakdown={priceBreakdown}
+            platformComparisons={platformComparisons}
+            onDateRangeSelect={onDateRangeSelect}
+            onPlatformBooking={onPlatformBooking}
+          />
+        </BookingContentColumn>
+
+        {/* Right Column - Desktop Booking Summary */}
+        <BookingSummaryColumn>
+          <DesktopBookingSummary
+            property={property}
+            propertyId={propertyId}
+            guestCount={guestCount}
+            setGuestCount={setGuestCount}
+            selectedCheckIn={selectedCheckIn}
+            selectedCheckOut={selectedCheckOut}
+            priceBreakdown={priceBreakdown}
+            appliedDiscount={appliedDiscount}
+            nights={nights}
+            isCalculatingPrice={isCalculatingPrice}
+            onDiscountApplied={onDiscountApplied}
+            onProceedToPayment={onProceedToPayment}
+          />
+        </BookingSummaryColumn>
+      </BookingPageGrid>
+
+      {/* Mobile Floating Summary - Only shows on mobile */}
+      <div className="lg:hidden">
+        <FloatingBookingSummary
           property={property}
+          propertyId={propertyId}
+          guestCount={guestCount}
+          setGuestCount={setGuestCount}
           selectedCheckIn={selectedCheckIn}
           selectedCheckOut={selectedCheckOut}
           priceBreakdown={priceBreakdown}
-          platformComparisons={platformComparisons}
-          onDateRangeSelect={onDateRangeSelect}
-          onPlatformBooking={onPlatformBooking}
+          appliedDiscount={appliedDiscount}
+          nights={nights}
+          isCalculatingPrice={isCalculatingPrice}
+          onDiscountApplied={onDiscountApplied}
+          onProceedToPayment={onProceedToPayment}
         />
       </div>
-
-      {/* Floating Booking Summary */}
-      <FloatingBookingSummary
-        property={property}
-        propertyId={propertyId}
-        guestCount={guestCount}
-        setGuestCount={setGuestCount}
-        selectedCheckIn={selectedCheckIn}
-        selectedCheckOut={selectedCheckOut}
-        priceBreakdown={priceBreakdown}
-        appliedDiscount={appliedDiscount}
-        nights={nights}
-        isCalculatingPrice={isCalculatingPrice}
-        onDiscountApplied={onDiscountApplied}
-        onProceedToPayment={onProceedToPayment}
-      />
-    </div>
+    </>
   );
 };
