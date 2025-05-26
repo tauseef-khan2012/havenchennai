@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -192,7 +193,7 @@ const BookingPage: React.FC = () => {
       <>
         <Navbar />
         <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-          <div className="container mx-auto max-w-6xl px-4 py-8">
+          <div className="container mx-auto max-w-7xl px-4 py-8">
             <div className="animate-pulse space-y-8">
               <div className="h-8 bg-gray-200 rounded w-1/2"></div>
               <div className="aspect-[16/10] bg-gray-200 rounded-xl"></div>
@@ -229,7 +230,8 @@ const BookingPage: React.FC = () => {
     <>
       <Navbar />
       <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="container mx-auto max-w-6xl px-4 py-8">
+        {/* Add bottom padding on mobile to account for floating summary */}
+        <div className="container mx-auto max-w-7xl px-4 py-8 pb-32 lg:pb-8 lg:pr-[420px]">
           {/* Property Header */}
           <PropertyHeader property={property} />
 

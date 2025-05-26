@@ -29,8 +29,8 @@ export const BookingContent: React.FC<BookingContentProps> = ({
   return (
     <div className="space-y-8">
       {/* Availability Calendar */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h2 className="text-2xl font-serif font-bold mb-6">Select Your Dates</h2>
+      <div className="bg-white rounded-2xl shadow-lg p-6 lg:p-8">
+        <h2 className="text-2xl lg:text-3xl font-serif font-bold mb-6 text-gray-900">Select Your Dates</h2>
         <AvailabilityCalendar
           propertyId={propertyId}
           onDateRangeSelect={onDateRangeSelect}
@@ -41,8 +41,8 @@ export const BookingContent: React.FC<BookingContentProps> = ({
 
       {/* Platform Comparison */}
       {selectedCheckIn && selectedCheckOut && priceBreakdown && (
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-2xl font-serif font-bold mb-6">Compare Prices</h2>
+        <div className="bg-white rounded-2xl shadow-lg p-6 lg:p-8">
+          <h2 className="text-2xl lg:text-3xl font-serif font-bold mb-6 text-gray-900">Compare Prices</h2>
           <PlatformComparison
             directPrice={priceBreakdown.totalAmountDue}
             platformComparisons={platformComparisons}
@@ -53,21 +53,21 @@ export const BookingContent: React.FC<BookingContentProps> = ({
       )}
 
       {/* Property Description */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h2 className="text-2xl font-serif font-bold mb-4">About This Place</h2>
-        <p className="text-gray-600 leading-relaxed">
+      <div className="bg-white rounded-2xl shadow-lg p-6 lg:p-8">
+        <h2 className="text-2xl lg:text-3xl font-serif font-bold mb-6 text-gray-900">About This Place</h2>
+        <p className="text-gray-600 leading-relaxed text-lg mb-6">
           {property.long_description || property.short_description || 
            "Experience the tranquility of lakeside living in our beautifully designed container home. Nestled on the shores of Muttukadu Lake in Chennai, this unique accommodation offers modern amenities with stunning natural views. Perfect for couples or small families seeking a peaceful retreat from city life."}
         </p>
         
         {property.amenities && property.amenities.length > 0 && (
-          <div className="mt-6">
-            <h3 className="font-semibold mb-3">What This Place Offers</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold mb-4 text-gray-900">What This Place Offers</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {property.amenities.map((amenity: string, index: number) => (
-                <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
-                  <div className="w-2 h-2 bg-haven-teal rounded-full"></div>
-                  {amenity}
+                <div key={index} className="flex items-center gap-3 text-gray-700 bg-gray-50 rounded-lg p-3">
+                  <div className="w-2 h-2 bg-haven-teal rounded-full flex-shrink-0"></div>
+                  <span className="text-sm font-medium">{amenity}</span>
                 </div>
               ))}
             </div>
