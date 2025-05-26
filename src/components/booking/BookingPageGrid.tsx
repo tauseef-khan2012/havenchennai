@@ -7,8 +7,8 @@ interface BookingPageGridProps {
 
 export const BookingPageGrid: React.FC<BookingPageGridProps> = ({ children }) => {
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8 pt-24">
-      <div className="lg:grid lg:grid-cols-[1fr_400px] lg:gap-8 lg:items-start">
+    <div className="container mx-auto max-w-6xl px-4 py-8 pt-24">
+      <div className="space-y-8">
         {children}
       </div>
     </div>

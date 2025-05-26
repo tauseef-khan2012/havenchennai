@@ -5,9 +5,6 @@ import { BookingContent } from '@/components/booking/BookingContent';
 import { PropertyImageSlider } from '@/components/booking/PropertyImageSlider';
 import { BookingPageGrid } from '@/components/booking/BookingPageGrid';
 import { BookingContentColumn } from '@/components/booking/BookingContentColumn';
-import { BookingSummaryColumn } from '@/components/booking/BookingSummaryColumn';
-import { DesktopBookingSummary } from '@/components/booking/DesktopBookingSummary';
-import { FloatingBookingSummary } from '@/components/booking/FloatingBookingSummary';
 import { calculateNights } from '@/utils/bookingUtils';
 import { UUID } from '@/types/booking';
 import { EnhancedPriceBreakdown } from '@/services/enhancedPriceService';
@@ -43,74 +40,33 @@ export const BookingPageContent: React.FC<BookingPageContentProps> = ({
   onProceedToPayment
 }) => {
   const [guestCount, setGuestCount] = React.useState(2);
-  const nights = selectedCheckIn && selectedCheckOut ? calculateNights(selectedCheckIn, selectedCheckOut) : 0;
 
   return (
-    <>
-      <BookingPageGrid>
-        {/* Left Column - Property Content */}
-        <BookingContentColumn>
-          {/* Property Header */}
-          <PropertyHeader property={property} />
+    <BookingPageGrid>
+      {/* Single Column Layout - Full Width Content */}
+      <BookingContentColumn>
+        {/* Property Header */}
+        <PropertyHeader property={property} />
 
-          {/* Property Images */}
-          <PropertyImageSlider property={property} />
+        {/* Property Images */}
+        <PropertyImageSlider property={property} />
 
-          {/* Booking Content with integrated summary */}
-          <BookingContent
-            propertyId={propertyId}
-            property={property}
-            selectedCheckIn={selectedCheckIn}
-            selectedCheckOut={selectedCheckOut}
-            priceBreakdown={priceBreakdown}
-            platformComparisons={platformComparisons}
-            onDateRangeSelect={onDateRangeSelect}
-            onPlatformBooking={onPlatformBooking}
-            guestCount={guestCount}
-            setGuestCount={setGuestCount}
-            isCalculatingPrice={isCalculatingPrice}
-            onProceedToPayment={onProceedToPayment}
-          />
-        </BookingContentColumn>
-
-        {/* Right Column - Desktop Booking Summary (hidden on mobile) */}
-        <BookingSummaryColumn>
-          <div className="hidden lg:block">
-            <DesktopBookingSummary
-              property={property}
-              propertyId={propertyId}
-              guestCount={guestCount}
-              setGuestCount={setGuestCount}
-              selectedCheckIn={selectedCheckIn}
-              selectedCheckOut={selectedCheckOut}
-              priceBreakdown={priceBreakdown}
-              appliedDiscount={appliedDiscount}
-              nights={nights}
-              isCalculatingPrice={isCalculatingPrice}
-              onDiscountApplied={onDiscountApplied}
-              onProceedToPayment={onProceedToPayment}
-            />
-          </div>
-        </BookingSummaryColumn>
-      </BookingPageGrid>
-
-      {/* Mobile Floating Summary - Only shows on mobile */}
-      <div className="lg:hidden">
-        <FloatingBookingSummary
-          property={property}
+        {/* Booking Content with integrated calendar and summary */}
+        <BookingContent
           propertyId={propertyId}
-          guestCount={guestCount}
-          setGuestCount={setGuestCount}
+          property={property}
           selectedCheckIn={selectedCheckIn}
           selectedCheckOut={selectedCheckOut}
           priceBreakdown={priceBreakdown}
-          appliedDiscount={appliedDiscount}
-          nights={nights}
+          platformComparisons={platformComparisons}
+          onDateRangeSelect={onDateRangeSelect}
+          onPlatformBooking={onPlatformBooking}
+          guestCount={guestCount}
+          setGuestCount={setGuestCount}
           isCalculatingPrice={isCalculatingPrice}
-          onDiscountApplied={onDiscountApplied}
           onProceedToPayment={onProceedToPayment}
         />
-      </div>
-    </>
+      </BookingContentColumn>
+    </BookingPageGrid>
   );
 };

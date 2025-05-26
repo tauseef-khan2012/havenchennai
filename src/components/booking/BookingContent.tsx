@@ -55,7 +55,7 @@ export const BookingContent: React.FC<BookingContentProps> = ({
             />
           </div>
           
-          {/* Compact Booking Summary */}
+          {/* Integrated Booking Summary */}
           <div>
             <CompactBookingSummary
               property={property}
