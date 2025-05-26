@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -6,7 +5,8 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { PropertyHeader } from '@/components/booking/PropertyHeader';
 import { BookingContent } from '@/components/booking/BookingContent';
-import { EnhancedBookingSidebar } from '@/components/booking/EnhancedBookingSidebar';
+import { PropertyImageSlider } from '@/components/booking/PropertyImageSlider';
+import { FloatingBookingSummary } from '@/components/booking/FloatingBookingSummary';
 import { Button } from '@/components/ui/button';
 import { UUID } from '@/types/booking';
 import { supabase } from '@/integrations/supabase/client';
@@ -192,13 +192,11 @@ const BookingPage: React.FC = () => {
       <>
         <Navbar />
         <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-          <div className="container mx-auto max-w-7xl px-4 py-8">
+          <div className="container mx-auto max-w-6xl px-4 py-8">
             <div className="animate-pulse space-y-8">
               <div className="h-8 bg-gray-200 rounded w-1/2"></div>
-              <div className="grid lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 h-96 bg-gray-200 rounded-xl"></div>
-                <div className="h-96 bg-gray-200 rounded-xl"></div>
-              </div>
+              <div className="aspect-[16/10] bg-gray-200 rounded-xl"></div>
+              <div className="h-96 bg-gray-200 rounded-xl"></div>
             </div>
           </div>
         </main>
@@ -231,45 +229,44 @@ const BookingPage: React.FC = () => {
     <>
       <Navbar />
       <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="container mx-auto max-w-7xl px-4 py-8">
+        <div className="container mx-auto max-w-6xl px-4 py-8">
+          {/* Property Header */}
           <PropertyHeader property={property} />
 
-          <div className="grid lg:grid-cols-12 gap-8 mt-8">
-            {/* Main Content */}
-            <div className="lg:col-span-8">
-              <BookingContent
-                propertyId={propertyId}
-                property={property}
-                selectedCheckIn={selectedCheckIn}
-                selectedCheckOut={selectedCheckOut}
-                priceBreakdown={priceBreakdown}
-                platformComparisons={platformComparisons}
-                onDateRangeSelect={handleDateRangeSelect}
-                onPlatformBooking={handlePlatformBooking}
-              />
-            </div>
+          {/* Main Content Layout */}
+          <div className="space-y-8">
+            {/* Property Images */}
+            <PropertyImageSlider property={property} />
 
-            {/* Enhanced Sidebar */}
-            <div className="lg:col-span-4">
-              <div className="sticky top-4">
-                <EnhancedBookingSidebar
-                  property={property}
-                  propertyId={propertyId}
-                  guestCount={guestCount}
-                  setGuestCount={setGuestCount}
-                  selectedCheckIn={selectedCheckIn}
-                  selectedCheckOut={selectedCheckOut}
-                  priceBreakdown={priceBreakdown}
-                  appliedDiscount={appliedDiscount}
-                  nights={nights}
-                  isCalculatingPrice={isCalculatingPrice}
-                  onDiscountApplied={handleDiscountApplied}
-                  onProceedToPayment={handleProceedToPayment}
-                />
-              </div>
-            </div>
+            {/* Booking Content */}
+            <BookingContent
+              propertyId={propertyId}
+              property={property}
+              selectedCheckIn={selectedCheckIn}
+              selectedCheckOut={selectedCheckOut}
+              priceBreakdown={priceBreakdown}
+              platformComparisons={platformComparisons}
+              onDateRangeSelect={handleDateRangeSelect}
+              onPlatformBooking={handlePlatformBooking}
+            />
           </div>
         </div>
+
+        {/* Floating Booking Summary */}
+        <FloatingBookingSummary
+          property={property}
+          propertyId={propertyId}
+          guestCount={guestCount}
+          setGuestCount={setGuestCount}
+          selectedCheckIn={selectedCheckIn}
+          selectedCheckOut={selectedCheckOut}
+          priceBreakdown={priceBreakdown}
+          appliedDiscount={appliedDiscount}
+          nights={nights}
+          isCalculatingPrice={isCalculatingPrice}
+          onDiscountApplied={handleDiscountApplied}
+          onProceedToPayment={handleProceedToPayment}
+        />
       </main>
       <Footer />
     </>
