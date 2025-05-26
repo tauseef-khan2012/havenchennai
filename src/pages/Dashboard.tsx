@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -15,10 +14,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
-import { format, parseISO } from 'date-fns';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { EnhancedBookingTable } from '@/components/dashboard/EnhancedBookingTable';
 
 const Dashboard = () => {
   const { user, profile, signOut, refreshProfile } = useAuth();
@@ -50,76 +48,78 @@ const Dashboard = () => {
   }, [profile]);
 
   // Fetch stay bookings
+  const fetchStayBookings = async () => {
+    if (!user) return;
+
+    try {
+      setLoadingStayBookings(true);
+      const { data, error } = await supabase
+        .from('bookings')
+        .select(`
+          id,
+          check_in_date,
+          check_out_date,
+          number_of_guests,
+          booking_status,
+          total_amount_due,
+          payment_status,
+          property_id,
+          properties:property_id(name)
+        `)
+        .eq('user_id', user.id)
+        .order('check_in_date', { ascending: true });
+
+      if (error) throw error;
+      
+      setStayBookings(data || []);
+    } catch (error) {
+      console.error('Error fetching stay bookings:', error);
+      setStayBookingsError(error.message);
+    } finally {
+      setLoadingStayBookings(false);
+    }
+  };
+
+  // Fetch experience bookings
+  const fetchExperienceBookings = async () => {
+    if (!user) return;
+
+    try {
+      setLoadingExperienceBookings(true);
+      const { data, error } = await supabase
+        .from('experience_bookings')
+        .select(`
+          id,
+          number_of_attendees,
+          booking_status,
+          total_amount_due,
+          payment_status,
+          experience_instance_id,
+          experience_instances:experience_instance_id(
+            date,
+            time,
+            experiences:experience_id(name)
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      
+      setExperienceBookings(data || []);
+    } catch (error) {
+      console.error('Error fetching experience bookings:', error);
+      setExperienceBookingsError(error.message);
+    } finally {
+      setLoadingExperienceBookings(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchStayBookings = async () => {
-      if (!user) return;
-
-      try {
-        setLoadingStayBookings(true);
-        const { data, error } = await supabase
-          .from('bookings')
-          .select(`
-            id,
-            check_in_date,
-            check_out_date,
-            number_of_guests,
-            booking_status,
-            total_amount_due,
-            property_id,
-            properties:property_id(name)
-          `)
-          .eq('user_id', user.id)
-          .order('check_in_date', { ascending: true });
-
-        if (error) throw error;
-        
-        setStayBookings(data || []);
-      } catch (error) {
-        console.error('Error fetching stay bookings:', error);
-        setStayBookingsError(error.message);
-      } finally {
-        setLoadingStayBookings(false);
-      }
-    };
-
     fetchStayBookings();
   }, [user]);
 
-  // Fetch experience bookings
   useEffect(() => {
-    const fetchExperienceBookings = async () => {
-      if (!user) return;
-
-      try {
-        setLoadingExperienceBookings(true);
-        const { data, error } = await supabase
-          .from('experience_bookings')
-          .select(`
-            id,
-            number_of_attendees,
-            booking_status,
-            total_amount_due,
-            experience_instance_id,
-            experience_instances:experience_instance_id(
-              date,
-              time,
-              experiences:experience_id(name)
-            )
-          `)
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-        
-        setExperienceBookings(data || []);
-      } catch (error) {
-        console.error('Error fetching experience bookings:', error);
-        setExperienceBookingsError(error.message);
-      } finally {
-        setLoadingExperienceBookings(false);
-      }
-    };
-
     fetchExperienceBookings();
   }, [user]);
 
@@ -203,52 +203,6 @@ const Dashboard = () => {
       });
     } finally {
       setIsUpdatingPassword(false);
-    }
-  };
-
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'completed':
-        return <Badge variant="secondary">Completed</Badge>;
-      case 'upcoming':
-      case 'Confirmed':
-      case 'confirmed':
-        return <Badge className="bg-haven-green">Upcoming</Badge>;
-      case 'cancelled':
-        return <Badge variant="destructive">Cancelled</Badge>;
-      case 'Pending Payment':
-      case 'pending_payment':
-        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800">Pending Payment</Badge>;
-      default:
-        return <Badge variant="outline">{status || 'Unknown'}</Badge>;
-    }
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    try {
-      // Parse the date string to a Date object
-      const date = typeof dateString === 'string' ? parseISO(dateString) : new Date(dateString);
-      // Format the date
-      return format(date, 'PPP'); // 'PPP' gives format like 'April 29, 2023'
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return dateString; // Return the original string if parsing fails
-    }
-  };
-
-  const formatTime = (timeString) => {
-    if (!timeString) return 'N/A';
-    // Time is likely stored as HH:MM:SS, we'll format it as HH:MM AM/PM
-    try {
-      const [hours, minutes] = timeString.split(':');
-      const hour = parseInt(hours, 10);
-      const isPM = hour >= 12;
-      const hour12 = hour % 12 || 12;
-      return `${hour12}:${minutes} ${isPM ? 'PM' : 'AM'}`;
-    } catch (error) {
-      console.error('Error formatting time:', error);
-      return timeString; // Return the original string if parsing fails
     }
   };
 
@@ -336,47 +290,11 @@ const Dashboard = () => {
                       </CardContent>
                     </Card>
                   ) : (
-                    <div className="overflow-x-auto">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Property</TableHead>
-                            <TableHead>Check-in</TableHead>
-                            <TableHead>Check-out</TableHead>
-                            <TableHead>Guests</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Total</TableHead>
-                            <TableHead>Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {stayBookings.map((booking) => (
-                            <TableRow key={booking.id}>
-                              <TableCell className="font-medium">{booking.properties?.name || 'N/A'}</TableCell>
-                              <TableCell>{formatDate(booking.check_in_date)}</TableCell>
-                              <TableCell>{formatDate(booking.check_out_date)}</TableCell>
-                              <TableCell>{booking.number_of_guests}</TableCell>
-                              <TableCell>{getStatusBadge(booking.booking_status)}</TableCell>
-                              <TableCell>${booking.total_amount_due}</TableCell>
-                              <TableCell>
-                                <div className="flex flex-wrap gap-2">
-                                  {(['upcoming', 'Confirmed', 'confirmed'].includes(booking.booking_status)) && (
-                                    <>
-                                      <Button variant="outline" size="sm">Manage</Button>
-                                      <Button variant="destructive" size="sm">Cancel</Button>
-                                    </>
-                                  )}
-                                  {(['completed', 'Completed'].includes(booking.booking_status)) && (
-                                    <Button variant="outline" size="sm">Review</Button>
-                                  )}
-                                  <Button variant="ghost" size="sm">Details</Button>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
+                    <EnhancedBookingTable 
+                      bookings={stayBookings} 
+                      type="stay" 
+                      onBookingsUpdate={fetchStayBookings}
+                    />
                   )}
                 </div>
 
@@ -411,49 +329,11 @@ const Dashboard = () => {
                       </CardContent>
                     </Card>
                   ) : (
-                    <div className="overflow-x-auto">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Experience</TableHead>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Time</TableHead>
-                            <TableHead>Attendees</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Total</TableHead>
-                            <TableHead>Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {experienceBookings.map((booking) => (
-                            <TableRow key={booking.id}>
-                              <TableCell className="font-medium">
-                                {booking.experience_instances?.experiences?.name || 'N/A'}
-                              </TableCell>
-                              <TableCell>{formatDate(booking.experience_instances?.date)}</TableCell>
-                              <TableCell>{formatTime(booking.experience_instances?.time)}</TableCell>
-                              <TableCell>{booking.number_of_attendees}</TableCell>
-                              <TableCell>{getStatusBadge(booking.booking_status)}</TableCell>
-                              <TableCell>${booking.total_amount_due}</TableCell>
-                              <TableCell>
-                                <div className="flex flex-wrap gap-2">
-                                  {(['upcoming', 'Confirmed', 'confirmed'].includes(booking.booking_status)) && (
-                                    <>
-                                      <Button variant="outline" size="sm">Manage</Button>
-                                      <Button variant="destructive" size="sm">Cancel</Button>
-                                    </>
-                                  )}
-                                  {(['completed', 'Completed'].includes(booking.booking_status)) && (
-                                    <Button variant="outline" size="sm">Review</Button>
-                                  )}
-                                  <Button variant="ghost" size="sm">Details</Button>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
+                    <EnhancedBookingTable 
+                      bookings={experienceBookings} 
+                      type="experience" 
+                      onBookingsUpdate={fetchExperienceBookings}
+                    />
                   )}
                 </div>
               </div>
