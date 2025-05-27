@@ -83,8 +83,8 @@ const StayOverviewSection = ({ forwardRef }: StayOverviewSectionProps) => {
             <div className="grid grid-cols-12 grid-rows-6 gap-2 h-[500px]">
               <div className="col-span-8 row-span-4 relative overflow-hidden rounded-lg shadow-lg">
                 <img 
-                  src="/lovable-uploads/a768b355-2a53-4898-91c5-3372bc1fe662.png" 
-                  alt="Container Home Exterior" 
+                  src="/lovable-uploads/fdf4ae09-782a-476b-b866-173bf4816200.png" 
+                  alt="Rooftop Deck Panoramic Views" 
                   className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                   loading="lazy"
                   decoding="async"
@@ -101,8 +101,8 @@ const StayOverviewSection = ({ forwardRef }: StayOverviewSectionProps) => {
               </div>
               <div className="col-span-4 row-span-3 relative overflow-hidden rounded-lg shadow-lg">
                 <img 
-                  src="/lovable-uploads/fdf4ae09-782a-476b-b866-173bf4816200.png" 
-                  alt="Rooftop Deck Views" 
+                  src="/lovable-uploads/54bc279a-b178-45ae-a1a2-5d06ad1c435d.png" 
+                  alt="Rooftop Deck Night Views" 
                   className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                   loading="lazy"
                   decoding="async"
@@ -110,8 +110,8 @@ const StayOverviewSection = ({ forwardRef }: StayOverviewSectionProps) => {
               </div>
               <div className="col-span-8 row-span-2 relative overflow-hidden rounded-lg shadow-lg">
                 <img 
-                  src="/lovable-uploads/deda06e0-1382-4f56-875d-f5715e78fc08.png" 
-                  alt="Container Home Bedroom" 
+                  src="/lovable-uploads/d62143b5-3f29-4040-9d6c-f00ea43f861e.png" 
+                  alt="Multi-level Deck Overview" 
                   className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                   loading="lazy"
                   decoding="async"

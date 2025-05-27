@@ -1,183 +1,130 @@
+
 import { useState } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { getNetworkAwareImageUrl } from '@/utils/formatters';
-import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
-import LazyImage from '@/components/shared/LazyImage';
-
-interface GalleryImage {
-  id: string;
-  src: string;
-  alt: string;
-  lowResSrc?: string;
-  section: 'interiors' | 'lakeside' | 'highlights';
-  width: number;
-  height: number;
-}
-
-// We're keeping the home gallery smaller for performance
-const galleryImages: GalleryImage[] = [
-  {
-    id: '1',
-    src: '/lovable-uploads/d1148760-0de0-44d6-ae11-98a16c4b61fc.png',
-    alt: 'Container interior workspace with natural light',
-    section: 'interiors',
-    width: 4,
-    height: 3
-  },
-  {
-    id: '2',
-    src: '/lovable-uploads/e4f31ab2-de64-417b-af9f-97d3d17e2f47.png',
-    alt: 'Bedroom with minimalist design and large window',
-    section: 'interiors',
-    width: 4,
-    height: 3
-  },
-  {
-    id: '3',
-    src: '/lovable-uploads/92fdb568-68f2-4ac8-9908-e0db6e29b56d.png',
-    alt: 'Panoramic view of Muttukadu Lake from deck',
-    section: 'lakeside',
-    width: 6,
-    height: 4
-  },
-  {
-    id: '4',
-    src: '/lovable-uploads/2d7b66e7-63b3-4b13-a6f3-9d253a5609aa.png',
-    alt: 'Sunset view from rooftop deck',
-    section: 'lakeside',
-    width: 6,
-    height: 4
-  },
-  {
-    id: '5',
-    src: '/lovable-uploads/a768b355-2a53-4898-91c5-3372bc1fe662.png',
-    alt: 'Container home exterior during golden hour',
-    section: 'interiors',
-    width: 4,
-    height: 3
-  },
-  {
-    id: '6',
-    src: '/lovable-uploads/ea3b40a2-e087-4627-aecc-211b123dc269.png',
-    alt: 'Deck with outdoor furniture overlooking lake',
-    section: 'lakeside',
-    width: 4,
-    height: 3
-  },
-  {
-    id: '7',
-    src: '/lovable-uploads/deda06e0-1382-4f56-875d-f5715e78fc08.png',
-    alt: 'Morning mist over Muttukadu Lake',
-    section: 'lakeside',
-    width: 4,
-    height: 3
-  },
-  {
-    id: '8',
-    src: '/lovable-uploads/8446db9f-ec1d-4876-adb8-84f568a58892.png',
-    alt: 'Shore Temple at Mahabalipuram',
-    section: 'highlights',
-    width: 4,
-    height: 3
-  },
-  {
-    id: '9',
-    src: '/lovable-uploads/3d09a878-2b77-4c76-b9dc-916c5572305e.png',
-    alt: 'Boating at Muttukadu backwaters',
-    section: 'highlights',
-    width: 4,
-    height: 3
-  },
-];
+import { motion } from 'framer-motion';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { X } from 'lucide-react';
 
 const MasonryGallery = () => {
-  const [activeSection, setActiveSection] = useState<'all' | 'interiors' | 'lakeside' | 'highlights'>('all');
-  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
-  
-  const filteredImages = activeSection === 'all' 
-    ? galleryImages 
-    : galleryImages.filter(img => img.section === activeSection);
-  
-  const sectionLabels = {
-    all: 'All Photos',
-    interiors: 'Container Interiors',
-    lakeside: 'Lakeside & Deck Life',
-    highlights: 'ECR & Chennai Highlights'
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedTitle, setSelectedTitle] = useState<string>('');
+
+  const images = [
+    {
+      src: '/lovable-uploads/fdf4ae09-782a-476b-b866-173bf4816200.png',
+      alt: 'Rooftop Deck Panoramic Views',
+      title: 'Rooftop Deck Views'
+    },
+    {
+      src: '/lovable-uploads/dca2b7eb-af54-4c6e-8739-8add4f661dba.png',
+      alt: 'Sunset from Upper Deck',
+      title: 'Golden Hour Magic'
+    },
+    {
+      src: '/lovable-uploads/54bc279a-b178-45ae-a1a2-5d06ad1c435d.png',
+      alt: 'Rooftop Deck Night Views',
+      title: 'Evening Serenity'
+    },
+    {
+      src: '/lovable-uploads/d62143b5-3f29-4040-9d6c-f00ea43f861e.png',
+      alt: 'Multi-level Deck Overview',
+      title: 'Multi-Level Living'
+    },
+    {
+      src: '/lovable-uploads/44941cd5-2bc4-4e82-8698-7916b158ebd5.png',
+      alt: 'Ground Level Deck & Entrance',
+      title: 'Ground Floor Deck'
+    },
+    {
+      src: '/lovable-uploads/a768b355-2a53-4898-91c5-3372bc1fe662.png',
+      alt: 'Container Home Exterior',
+      title: 'Haven Exterior'
+    },
+    {
+      src: '/lovable-uploads/913eeb57-1adb-4da7-a61b-ba718b4849d7.png',
+      alt: 'Ground Floor Deck with Gardens',
+      title: 'Garden Deck Views'
+    },
+    {
+      src: '/lovable-uploads/4d8ae28d-5b42-4bd6-9ed3-83acb04bb29b.png',
+      alt: 'First Floor Deck Views',
+      title: 'First Floor Deck'
+    }
+  ];
+
+  const openModal = (src: string, title: string) => {
+    setSelectedImage(src);
+    setSelectedTitle(title);
   };
-  
+
+  const closeModal = () => {
+    setSelectedImage(null);
+    setSelectedTitle('');
+  };
+
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-16 bg-gray-50">
       <div className="container-custom">
-        <h2 className="font-serif text-3xl md:text-4xl font-bold text-haven-dark text-center mb-4">
-          Gallery: Haven Moments
-        </h2>
-        <p className="text-gray-600 text-center max-w-2xl mx-auto mb-10">
-          Explore our container home's unique design, lakeside views, and nearby attractions through these captivating images.
-        </p>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <h2 className="font-serif text-3xl font-bold mb-4">Visual Journey</h2>
+          <p className="text-gray-700 max-w-2xl mx-auto">
+            Discover the beauty of our container home through these carefully curated moments. 
+            From stunning deck views to peaceful interior spaces, every corner tells a story.
+          </p>
+        </motion.div>
         
-        <div className="flex justify-center mb-8 overflow-x-auto pb-2">
-          <div className="flex space-x-2">
-            {Object.entries(sectionLabels).map(([key, label]) => (
-              <button
-                key={key}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  activeSection === key
-                    ? 'bg-haven-teal text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-                onClick={() => setActiveSection(key as any)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredImages.map((image, index) => (
-            <div 
-              key={image.id}
-              className={`overflow-hidden rounded-lg cursor-pointer hover-lift ${
-                image.width > image.height ? 'row-span-1' : 'row-span-2'
-              }`}
-              onClick={() => setSelectedImage(image)}
+        <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+          {images.map((image, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              className="break-inside-avoid cursor-pointer group"
+              onClick={() => openModal(image.src, image.title)}
             >
-              <LazyImage 
-                src={image.src}
-                alt={image.alt}
-                aspectRatio="auto"
-                priority={index < 6} // Prioritize first 6 images
-                className="w-full h-full transition-transform duration-500 hover:scale-105"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              />
-            </div>
+              <div className="relative overflow-hidden rounded-lg shadow-lg">
+                <img 
+                  src={image.src} 
+                  alt={image.alt}
+                  className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+                  <div className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <p className="text-sm font-medium">{image.title}</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           ))}
         </div>
-        
-        <div className="text-center mt-10">
-          <Link to="/gallery" className="inline-flex items-center text-haven-teal hover:underline font-medium">
-            View Full Gallery <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        </div>
       </div>
-      
-      <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-        {selectedImage && (
-          <DialogContent className="max-w-5xl p-0 overflow-hidden">
-            <div className="relative">
-              <LazyImage 
-                src={selectedImage.src}
-                alt={selectedImage.alt}
-                className="w-full max-h-[80vh] object-contain"
-                priority={true}
+
+      <Dialog open={!!selectedImage} onOpenChange={closeModal}>
+        <DialogContent className="max-w-4xl p-0 bg-black">
+          <DialogTitle className="sr-only">{selectedTitle}</DialogTitle>
+          <div className="relative">
+            <button
+              onClick={closeModal}
+              className="absolute top-4 right-4 z-10 bg-white/20 hover:bg-white/30 rounded-full p-2 transition-colors"
+            >
+              <X className="h-6 w-6 text-white" />
+            </button>
+            {selectedImage && (
+              <img 
+                src={selectedImage} 
+                alt={selectedTitle}
+                className="w-full h-auto max-h-[90vh] object-contain"
               />
-              <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-2 rounded text-sm">
-                {selectedImage.alt}
-              </div>
-            </div>
-          </DialogContent>
-        )}
+            )}
+          </div>
+        </DialogContent>
       </Dialog>
     </section>
   );
