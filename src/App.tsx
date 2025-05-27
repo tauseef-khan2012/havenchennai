@@ -19,7 +19,6 @@ import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import BookingPage from "./pages/BookingPage";
 import BookingConfirmationPage from "./components/booking/BookingConfirmationPage";
-import ContactUs from "./pages/ContactUs";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import Blog from "./pages/Blog";
@@ -27,7 +26,6 @@ import BlogPost from "./pages/BlogPost";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CurrencyProvider } from "./contexts/CurrencyContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
-import Location from "./pages/Location";
 import Gallery from "./pages/Gallery";
 import { CookieConsent } from "./components/shared/CookieConsent";
 
@@ -48,7 +46,6 @@ const App = () => (
               <Route path="/stay/amenities" element={<StayAmenities />} />
               <Route path="/stay/deck-views" element={<StayDeckViews />} />
               <Route path="/stay/location" element={<StayLocation />} />
-              <Route path="/location" element={<Location />} />
               <Route path="/gallery" element={<Gallery />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
@@ -57,7 +54,6 @@ const App = () => (
               <Route path="/experiences" element={<Experiences />} />
               <Route path="/experiences/:id" element={<ExperienceDetail />} />
               <Route path="/packages" element={<Packages />} />
-              <Route path="/contact" element={<ContactUs />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-of-service" element={<TermsOfService />} />
               <Route path="/login" element={<Login />} />

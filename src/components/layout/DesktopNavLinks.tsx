@@ -3,6 +3,7 @@ import NavLink from "./NavLink";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import UserProfileDropdown from "./UserProfileDropdown";
+import StayDropdown from "./StayDropdown";
 
 interface DesktopNavLinksProps {
   isActive: (path: string) => boolean;
@@ -16,14 +17,9 @@ const DesktopNavLinks = ({ isActive, user }: DesktopNavLinksProps) => {
   return (
     <nav className="flex items-center gap-8">
       <div className="flex items-center gap-8">
-        <NavLink to="/stay" isActive={isActive("/stay")}>
-          The Stay
-        </NavLink>
+        <StayDropdown isActive={isActive} />
         <NavLink to="/experiences" isActive={isActive("/experiences")}>
           Experiences
-        </NavLink>
-        <NavLink to="/location" isActive={isActive("/location")}>
-          Location
         </NavLink>
         <NavLink to="/gallery" isActive={isActive("/gallery")}>
           Gallery
@@ -33,9 +29,6 @@ const DesktopNavLinks = ({ isActive, user }: DesktopNavLinksProps) => {
         </NavLink>
         <NavLink to="/about" isActive={isActive("/about")}>
           About Us
-        </NavLink>
-        <NavLink to="/contact" isActive={isActive("/contact")}>
-          Contact
         </NavLink>
       </div>
       

@@ -3,6 +3,8 @@ import NavLink from "./NavLink";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import UserProfileDropdown from "./UserProfileDropdown";
+import { ChevronRight } from "lucide-react";
+import { useState } from "react";
 
 interface MobileNavLinksProps {
   isOpen: boolean;
@@ -11,34 +13,53 @@ interface MobileNavLinksProps {
 }
 
 const MobileNavLinks = ({ isOpen, isActive, user }: MobileNavLinksProps) => {
+  const [isStayMenuOpen, setIsStayMenuOpen] = useState(false);
+  
   // Use consistent property ID for Haven
   const havenPropertyId = "550e8400-e29b-41d4-a716-446655440000";
 
   if (!isOpen) return null;
+
+  const stayPages = [
+    { to: "/stay", label: "Overview" },
+    { to: "/stay/amenities", label: "Amenities" },
+    { to: "/stay/deck-views", label: "Deck Views" },
+    { to: "/stay/location", label: "Location" }
+  ];
   
   return (
     <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-md py-4 px-4">
       <nav className="flex flex-col space-y-4">
-        <NavLink
-          to="/stay"
-          isActive={isActive("/stay")}
-          className="p-2"
-        >
-          The Stay
-        </NavLink>
+        <div>
+          <button
+            onClick={() => setIsStayMenuOpen(!isStayMenuOpen)}
+            className="flex items-center justify-between w-full p-2 text-left hover:text-haven-teal transition-colors"
+          >
+            <span>The Stay</span>
+            <ChevronRight className={`h-4 w-4 transition-transform ${isStayMenuOpen ? 'rotate-90' : ''}`} />
+          </button>
+          {isStayMenuOpen && (
+            <div className="ml-4 mt-2 space-y-2">
+              {stayPages.map((page) => (
+                <NavLink
+                  key={page.to}
+                  to={page.to}
+                  isActive={isActive(page.to)}
+                  className="block p-2 text-sm"
+                >
+                  {page.label}
+                </NavLink>
+              ))}
+            </div>
+          )}
+        </div>
+        
         <NavLink
           to="/experiences"
           isActive={isActive("/experiences")}
           className="p-2"
         >
           Experiences
-        </NavLink>
-        <NavLink
-          to="/location"
-          isActive={isActive("/location")}
-          className="p-2"
-        >
-          Location
         </NavLink>
         <NavLink
           to="/gallery"
@@ -60,13 +81,6 @@ const MobileNavLinks = ({ isOpen, isActive, user }: MobileNavLinksProps) => {
           className="p-2"
         >
           About Us
-        </NavLink>
-        <NavLink
-          to="/contact"
-          isActive={isActive("/contact")}
-          className="p-2"
-        >
-          Contact
         </NavLink>
         
         <div className="flex flex-col space-y-2 pt-2 border-t border-gray-100">
