@@ -6,6 +6,7 @@ import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import StayNavigation from '@/components/stay/StayNavigation';
 import RecreationalFacilities from '@/components/location/RecreationalFacilities';
+import TestimonialsSection from '@/components/testimonials/TestimonialsSection';
 import { ArrowDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -204,120 +205,13 @@ const Stay = () => {
       {/* Recreational Facilities Section */}
       <RecreationalFacilities />
       
-      {/* Reviews Section */}
-      <section className="py-16 bg-white">
-        <div className="container-custom">
-          <motion.div 
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={fadeInUp}
-            className="text-center mb-12"
-          >
-            <h2 className="font-serif text-3xl font-bold mb-2">Why Guests Love This Place</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Don't just take our word for it. Here's what our guests have to say about their stay at Haven.
-            </p>
-          </motion.div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <motion.div 
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={fadeInUp}
-              className="bg-white p-6 rounded-lg shadow-md border border-gray-100"
-            >
-              <div className="flex items-center mb-4">
-                <div className="text-yellow-400 flex mr-2">
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                    </svg>
-                  ))}
-                </div>
-                <span className="text-gray-600 text-sm">5.0</span>
-              </div>
-              <p className="text-gray-700 mb-4">
-                "The views from the rooftop deck were absolutely breathtaking. Watching the sunset over the lake was a highlight of our trip. Such a peaceful retreat!"
-              </p>
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-haven-green rounded-full flex items-center justify-center text-white font-medium mr-3">
-                  RK
-                </div>
-                <div>
-                  <p className="font-medium">Ravi Kumar</p>
-                  <p className="text-gray-600 text-sm">April 2025</p>
-                </div>
-              </div>
-            </motion.div>
-            
-            <motion.div 
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={fadeInUp}
-              className="bg-white p-6 rounded-lg shadow-md border border-gray-100"
-              style={{ transitionDelay: "0.1s" }}
-            >
-              <div className="flex items-center mb-4">
-                <div className="text-yellow-400 flex mr-2">
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                    </svg>
-                  ))}
-                </div>
-                <span className="text-gray-600 text-sm">5.0</span>
-              </div>
-              <p className="text-gray-700 mb-4">
-                "The amenities were top-notch. From the premium coffee to the luxurious bed linens, every detail was thoughtfully curated. A perfect blend of comfort and style."
-              </p>
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-haven-blue rounded-full flex items-center justify-center text-white font-medium mr-3">
-                  AP
-                </div>
-                <div>
-                  <p className="font-medium">Anika Patel</p>
-                  <p className="text-gray-600 text-sm">March 2025</p>
-                </div>
-              </div>
-            </motion.div>
-            
-            <motion.div 
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={fadeInUp}
-              className="bg-white p-6 rounded-lg shadow-md border border-gray-100"
-              style={{ transitionDelay: "0.2s" }}
-            >
-              <div className="flex items-center mb-4">
-                <div className="text-yellow-400 flex mr-2">
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                    </svg>
-                  ))}
-                </div>
-                <span className="text-gray-600 text-sm">5.0</span>
-              </div>
-              <p className="text-gray-700 mb-4">
-                "The location is unbeatable. Close enough to attractions but secluded enough to feel like you're in your own world. The nearby trails were perfect for morning walks."
-              </p>
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-haven-brown rounded-full flex items-center justify-center text-white font-medium mr-3">
-                  MR
-                </div>
-                <div>
-                  <p className="font-medium">Michael Rodriguez</p>
-                  <p className="text-gray-600 text-sm">May 2025</p>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
+      {/* Enhanced Testimonials Section */}
+      <TestimonialsSection 
+        category="stay"
+        maxItems={6}
+        title="Why Guests Love This Place"
+        subtitle="Don't just take our word for it. Here's what our guests have to say about their stay at Haven."
+      />
       
       {/* Floating Book Now Button */}
       <div className="fixed bottom-8 right-8 z-40">

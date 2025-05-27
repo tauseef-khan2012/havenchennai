@@ -9,6 +9,7 @@ import MasonryGallery from '@/components/home/MasonryGallery';
 import StickyBookingWidget from '@/components/home/StickyBookingWidget';
 import CallToAction from '@/components/home/CallToAction';
 import NewsletterSignup from '@/components/home/NewsletterSignup';
+import FeaturedTestimonials from '@/components/testimonials/FeaturedTestimonials';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 
@@ -121,6 +122,14 @@ const Index = () => {
           </div>
         }>
           <MasonryGallery />
+        </ErrorBoundary>
+        
+        <ErrorBoundary fallback={
+          <div className="py-16 text-center">
+            <p>Unable to load testimonials section</p>
+          </div>
+        }>
+          <FeaturedTestimonials />
         </ErrorBoundary>
         
         <ErrorBoundary>
