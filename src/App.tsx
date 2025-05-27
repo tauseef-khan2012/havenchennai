@@ -22,6 +22,8 @@ import BookingConfirmationPage from "./components/booking/BookingConfirmationPag
 import ContactUs from "./pages/ContactUs";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CurrencyProvider } from "./contexts/CurrencyContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -48,6 +50,8 @@ const App = () => (
               <Route path="/stay/location" element={<StayLocation />} />
               <Route path="/location" element={<Location />} />
               <Route path="/gallery" element={<Gallery />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/booking" element={<BookingPage />} />
               <Route path="/booking/confirmation" element={<BookingConfirmationPage />} />
               <Route path="/experiences" element={<Experiences />} />

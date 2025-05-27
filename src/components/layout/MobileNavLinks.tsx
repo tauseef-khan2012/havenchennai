@@ -48,6 +48,13 @@ const MobileNavLinks = ({ isOpen, isActive, user }: MobileNavLinksProps) => {
           Gallery
         </NavLink>
         <NavLink
+          to="/blog"
+          isActive={isActive("/blog")}
+          className="p-2"
+        >
+          Journal
+        </NavLink>
+        <NavLink
           to="/about"
           isActive={isActive("/about")}
           className="p-2"
