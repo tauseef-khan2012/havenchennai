@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -5,13 +6,6 @@ import StayHero from '@/components/stay/StayHero';
 import StayNavigation from '@/components/stay/StayNavigation';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { 
-  Carousel, 
-  CarouselContent, 
-  CarouselItem, 
-  CarouselNext, 
-  CarouselPrevious 
-} from '@/components/ui/carousel';
 import { Volume2, VolumeX, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -24,59 +18,62 @@ const StayDeckViews = () => {
   const deckViews = [
     {
       name: 'Rooftop Deck',
-      description: 'Our spectacular rooftop deck offers 360-degree views of the lake and sky, perfect for stargazing and sunrise watching.',
-      image: '/lovable-uploads/2d7b66e7-63b3-4b13-a6f3-9d253a5609aa.png',
+      description: 'Our spectacular rooftop deck offers 360-degree panoramic views of Muttukadu Lake and surrounding landscapes, complete with yoga mats and ambient lighting for magical evenings.',
+      image: '/lovable-uploads/fdf4ae09-782a-476b-b866-173bf4816200.png',
       features: [
-        'Panoramic views of Muttukadu Lake',
-        'Yoga and meditation space with mats',
-        'Perfect spot for watching sunrises and sunsets',
-        'Nighttime stargazing opportunities'
+        'Panoramic views of Muttukadu Lake and distant hills',
+        'Dedicated yoga and meditation space with provided mats',
+        'Perfect spot for watching sunrises and golden hour sunsets',
+        'Nighttime stargazing with unobstructed sky views',
+        'Ambient LED lighting for evening relaxation'
       ]
     },
     {
       name: 'First Floor Deck',
-      description: 'The first floor deck provides a comfortable outdoor living space with direct views of the surrounding nature.',
-      image: '/lovable-uploads/ea3b40a2-e087-4627-aecc-211b123dc269.png',
+      description: 'The elevated first floor deck provides a comfortable outdoor living space with stunning lake views, perfect for morning coffee or evening relaxation.',
+      image: '/lovable-uploads/4d8ae28d-5b42-4bd6-9ed3-83acb04bb29b.png',
       features: [
-        'Comfortable seating for relaxation',
-        'Perfect for enjoying morning coffee',
-        'Lake and greenery views',
-        'Quiet space to read or work'
+        'Comfortable seating area with lake views',
+        'Perfect elevation for photography and bird watching',
+        'Protected from ground-level activities for privacy',
+        'Ideal spot for morning coffee or afternoon tea',
+        'Easy access from the first floor living area'
       ]
     },
     {
       name: 'Ground Floor Deck',
-      description: 'A spacious ground-level deck surrounded by greenery and plants, perfect for socializing.',
-      image: '/lovable-uploads/3f68b7dc-fc1b-4cab-ac65-013e5c1e074f.png',
+      description: 'A spacious ground-level deck surrounded by lush greenery and flowering plants, offering direct access to the surrounding gardens and outdoor spaces.',
+      image: '/lovable-uploads/913eeb57-1adb-4da7-a61b-ba718b4849d7.png',
       features: [
-        'Shaded outdoor space',
-        'Comfortable seating area',
-        'Surrounded by plants and nature',
-        'Easy access to surrounding grounds'
+        'Direct access to landscaped gardens',
+        'Surrounded by tropical plants and flowers',
+        'Multiple seating arrangements for groups',
+        'Easy access to outdoor recreational areas',
+        'Natural shade from surrounding vegetation'
       ]
     }
   ];
   
   const galleryImages = [
     {
-      src: '/lovable-uploads/2d7b66e7-63b3-4b13-a6f3-9d253a5609aa.png',
-      alt: 'Rooftop Deck View',
-      time: 'Sunrise'
+      src: '/lovable-uploads/54bc279a-b178-45ae-a1a2-5d06ad1c435d.png',
+      alt: 'Rooftop Deck Night Views',
+      time: 'Evening'
     },
     {
-      src: '/lovable-uploads/ea3b40a2-e087-4627-aecc-211b123dc269.png',
-      alt: 'First Floor Deck',
-      time: 'Morning'
-    },
-    {
-      src: '/lovable-uploads/8446db9f-ec1d-4876-adb8-84f568a58892.png',
-      alt: 'Sunset View from Deck',
+      src: '/lovable-uploads/dca2b7eb-af54-4c6e-8739-8add4f661dba.png',
+      alt: 'Sunset Views from Upper Deck',
       time: 'Sunset'
     },
     {
-      src: '/lovable-uploads/3f68b7dc-fc1b-4cab-ac65-013e5c1e074f.png',
-      alt: 'Ground Floor Deck',
+      src: '/lovable-uploads/d62143b5-3f29-4040-9d6c-f00ea43f861e.png',
+      alt: 'Multi-level Deck Overview',
       time: 'Afternoon'
+    },
+    {
+      src: '/lovable-uploads/44941cd5-2bc4-4e82-8698-7916b158ebd5.png',
+      alt: 'Ground Level Deck & Entrance',
+      time: 'Golden Hour'
     }
   ];
   
@@ -106,8 +103,8 @@ const StayDeckViews = () => {
       <main className="min-h-screen">
         <StayHero 
           title="Deck Views"
-          subtitle="Experience breathtaking panoramas from our thoughtfully designed deck spaces."
-          backgroundImage="/lovable-uploads/6f37f539-1310-49d2-965a-0c02228f5ced.png"
+          subtitle="Experience breathtaking panoramas from our thoughtfully designed multi-level deck spaces."
+          backgroundImage="/lovable-uploads/fdf4ae09-782a-476b-b866-173bf4816200.png"
         />
         <StayNavigation />
         
@@ -136,10 +133,10 @@ const StayDeckViews = () => {
               variants={fadeInUp}
               className="max-w-3xl mx-auto text-center mb-12"
             >
-              <h2 className="font-serif text-3xl font-bold mb-4">Spectacular Views from Every Deck</h2>
+              <h2 className="font-serif text-3xl font-bold mb-4">Spectacular Views from Every Level</h2>
               <p className="text-gray-700">
-                Our container home features multiple deck spaces, each offering unique perspectives of the surrounding natural beauty. 
-                From the ground floor to the rooftop, immerse yourself in the serene environment while enjoying modern comforts.
+                Our container home features multiple deck spaces across three levels, each offering unique perspectives of Muttukadu Lake and the surrounding natural beauty. 
+                From intimate ground-level gardens to panoramic rooftop vistas, every deck provides a different way to connect with nature.
               </p>
             </motion.div>
             
@@ -175,14 +172,14 @@ const StayDeckViews = () => {
                   <div className="md:w-1/2">
                     <h3 className="font-serif text-2xl font-semibold mb-3">{deck.name}</h3>
                     <p className="text-gray-700 mb-4">{deck.description}</p>
-                    <h4 className="font-medium mb-2">Highlights:</h4>
+                    <h4 className="font-medium mb-2">Key Features:</h4>
                     <ul className="space-y-2">
                       {deck.features.map((feature, i) => (
                         <li key={i} className="flex items-start">
                           <svg className="h-5 w-5 text-haven-green mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
-                          <span>{feature}</span>
+                          <span className="text-sm">{feature}</span>
                         </li>
                       ))}
                     </ul>
@@ -198,7 +195,7 @@ const StayDeckViews = () => {
               variants={fadeInUp}
               className="mt-24"
             >
-              <h3 className="font-serif text-2xl font-semibold mb-6 text-center">Experience Every Moment</h3>
+              <h3 className="font-serif text-2xl font-semibold mb-6 text-center">Capture Every Moment</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {galleryImages.map((image, index) => (
                   <div 
@@ -230,27 +227,27 @@ const StayDeckViews = () => {
               className="mt-24 bg-haven-beige bg-opacity-20 p-8 rounded-xl"
             >
               <div className="max-w-3xl mx-auto text-center">
-                <h3 className="font-serif text-2xl font-semibold mb-4">The Perfect Time to Visit</h3>
+                <h3 className="font-serif text-2xl font-semibold mb-4">The Perfect Deck for Every Moment</h3>
                 <p className="text-gray-700 mb-6">
-                  Each of our deck spaces offers unique experiences throughout the day. From misty mornings to golden sunsets, 
-                  discover the magic of Muttukadu Lake from every angle.
+                  Each deck level offers unique experiences throughout the day. From sunrise yoga on the rooftop to evening conversations on the ground floor, 
+                  discover the magic of Muttukadu Lake from every perspective.
                 </p>
                 <div className="grid grid-cols-4 gap-4 text-center">
                   <div className="p-4">
-                    <div className="text-haven-green font-medium mb-1">Morning</div>
-                    <div className="text-sm text-gray-600">Misty lake views, birdwatching</div>
+                    <div className="text-haven-green font-medium mb-1">Dawn</div>
+                    <div className="text-sm text-gray-600">Rooftop yoga, lake mist</div>
                   </div>
                   <div className="p-4">
                     <div className="text-haven-green font-medium mb-1">Midday</div>
-                    <div className="text-sm text-gray-600">Clear views, perfect for photography</div>
+                    <div className="text-sm text-gray-600">Clear panoramic views</div>
                   </div>
                   <div className="p-4">
-                    <div className="text-haven-green font-medium mb-1">Sunset</div>
-                    <div className="text-sm text-gray-600">Golden hour, spectacular colors</div>
+                    <div className="text-haven-green font-medium mb-1">Golden Hour</div>
+                    <div className="text-sm text-gray-600">Sunset photography</div>
                   </div>
                   <div className="p-4">
-                    <div className="text-haven-green font-medium mb-1">Night</div>
-                    <div className="text-sm text-gray-600">Stargazing, moonlit lake</div>
+                    <div className="text-haven-green font-medium mb-1">Evening</div>
+                    <div className="text-sm text-gray-600">Stargazing, night lights</div>
                   </div>
                 </div>
               </div>

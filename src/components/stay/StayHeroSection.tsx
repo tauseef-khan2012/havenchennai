@@ -21,7 +21,7 @@ const StayHeroSection = ({ onBookNowClick, onScrollToNext }: StayHeroSectionProp
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat animate-kenBurns"
         style={{ 
-          backgroundImage: 'url(/lovable-uploads/43aa0007-941b-4b51-b1a0-a2b67f4bc6d2.png)',
+          backgroundImage: 'url(/lovable-uploads/fdf4ae09-782a-476b-b866-173bf4816200.png)',
           filter: 'brightness(0.7)'
         }}
       />
@@ -37,7 +37,7 @@ const StayHeroSection = ({ onBookNowClick, onScrollToNext }: StayHeroSectionProp
             Your Lakeside Haven
           </h1>
           <p className="text-xl md:text-2xl mb-8">
-            Experience luxury and serenity in our custom-designed container home by Muttukadu Lake
+            Experience luxury and serenity in our custom-designed container home overlooking Muttukadu Lake
           </p>
           <Button 
             className="bg-white text-haven-green hover:bg-opacity-90 text-lg px-8 py-6"
