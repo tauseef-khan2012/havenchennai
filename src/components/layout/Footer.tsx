@@ -45,22 +45,23 @@ const Footer = () => {
             <h3 className="font-serif text-xl mb-4">Information</h3>
             <ul className="space-y-2">
               <li><Link to="/about" className="text-gray-300 hover:text-white transition-colors">About Us</Link></li>
+              <li><Link to="/contact" className="text-gray-300 hover:text-white transition-colors">Contact Us</Link></li>
+              <li><Link to="/location" className="text-gray-300 hover:text-white transition-colors">Location</Link></li>
               <li><Link to="#" className="text-gray-300 hover:text-white transition-colors">FAQs</Link></li>
-              <li><Link to="#" className="text-gray-300 hover:text-white transition-colors">Policies</Link></li>
-              <li><Link to="#" className="text-gray-300 hover:text-white transition-colors">Contact Us</Link></li>
             </ul>
           </div>
           
           <div>
             <h3 className="font-serif text-xl mb-4">Contact</h3>
             <address className="not-italic text-gray-300">
-              <p className="mb-2">123 Nature Way</p>
-              <p className="mb-2">Peaceful Valley, CA 95000</p>
+              <p className="mb-2">Muttukadu Lake Area</p>
+              <p className="mb-2">East Coast Road (ECR)</p>
+              <p className="mb-2">Tamil Nadu, India</p>
               <p className="mb-2">
                 <a href="mailto:hello@haven-stays.com" className="hover:text-white transition-colors">hello@haven-stays.com</a>
               </p>
               <p>
-                <a href="tel:+11234567890" className="hover:text-white transition-colors">(123) 456-7890</a>
+                <a href="tel:+919876543210" className="hover:text-white transition-colors">+91 98765 43210</a>
               </p>
             </address>
           </div>
@@ -71,8 +72,8 @@ const Footer = () => {
           <div className="mt-4 md:mt-0 flex items-center gap-6">
             <CurrencySelector />
             <ul className="flex space-x-6">
-              <li><Link to="#" className="text-sm text-gray-400 hover:text-white transition-colors">Privacy Policy</Link></li>
-              <li><Link to="#" className="text-sm text-gray-400 hover:text-white transition-colors">Terms of Service</Link></li>
+              <li><Link to="/privacy-policy" className="text-sm text-gray-400 hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/terms-of-service" className="text-sm text-gray-400 hover:text-white transition-colors">Terms of Service</Link></li>
             </ul>
           </div>
         </div>

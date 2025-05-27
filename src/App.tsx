@@ -19,11 +19,15 @@ import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import BookingPage from "./pages/BookingPage";
 import BookingConfirmationPage from "./components/booking/BookingConfirmationPage";
+import ContactUs from "./pages/ContactUs";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CurrencyProvider } from "./contexts/CurrencyContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import Location from "./pages/Location";
 import Gallery from "./pages/Gallery";
+import { CookieConsent } from "./components/shared/CookieConsent";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +53,9 @@ const App = () => (
               <Route path="/experiences" element={<Experiences />} />
               <Route path="/experiences/:id" element={<ExperienceDetail />} />
               <Route path="/packages" element={<Packages />} />
+              <Route path="/contact" element={<ContactUs />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-of-service" element={<TermsOfService />} />
               <Route path="/login" element={<Login />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/dashboard" element={
@@ -58,6 +65,7 @@ const App = () => (
               } />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <CookieConsent />
           </TooltipProvider>
         </CurrencyProvider>
       </AuthProvider>

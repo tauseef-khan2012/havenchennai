@@ -54,6 +54,13 @@ const MobileNavLinks = ({ isOpen, isActive, user }: MobileNavLinksProps) => {
         >
           About Us
         </NavLink>
+        <NavLink
+          to="/contact"
+          isActive={isActive("/contact")}
+          className="p-2"
+        >
+          Contact
+        </NavLink>
         
         <div className="flex flex-col space-y-2 pt-2 border-t border-gray-100">
           {user ? (

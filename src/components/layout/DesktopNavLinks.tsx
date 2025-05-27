@@ -31,6 +31,9 @@ const DesktopNavLinks = ({ isActive, user }: DesktopNavLinksProps) => {
         <NavLink to="/about" isActive={isActive("/about")}>
           About Us
         </NavLink>
+        <NavLink to="/contact" isActive={isActive("/contact")}>
+          Contact
+        </NavLink>
       </div>
       
       <div className="flex items-center gap-4 ml-4">
