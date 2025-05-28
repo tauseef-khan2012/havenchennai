@@ -53,10 +53,10 @@ const ContainerHomeSection = () => {
   return <section className="py-16 lg:py-24 bg-gradient-to-br from-haven-beige via-white to-haven-beige/30 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
-        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" className="Better relevant title for useful SEO searches">
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <pattern id="container-pattern" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
             <rect x="0" y="0" width="2" height="2" fill="currentColor" />
-            
+            <rect x="30" y="30" width="2" height="2" fill="currentColor" />
           </pattern>
           <rect x="0" y="0" width="100%" height="100%" fill="url(#container-pattern)" />
         </svg>
@@ -75,7 +75,48 @@ const ContainerHomeSection = () => {
         </div>
 
         {/* Main Content Grid */}
-        
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center mb-16">
+          {/* Hero Image */}
+          <div className="order-2 lg:order-1">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl group">
+              <img src="/lovable-uploads/a768b355-2a53-4898-91c5-3372bc1fe662.png" alt="Haven container home exterior with full multi-level deck structure at Muttukadu Lake" className="w-full h-[400px] lg:h-[500px] object-cover transition-transform duration-700 group-hover:scale-105" loading="eager" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </div>
+          </div>
+          
+          {/* Content */}
+          <div className="order-1 lg:order-2">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-lg border border-white/20">
+              <h3 className="font-serif text-2xl lg:text-3xl font-bold text-haven-dark mb-4">
+                Your Sustainable Lakeside Retreat
+              </h3>
+              <p className="text-gray-700 mb-6 leading-relaxed">
+                Wake up to breathtaking panoramas through floor-to-ceiling windows, enjoy your morning coffee on 
+                multi-level decks, and fall asleep to the gentle sounds of nature. Our container home offers a 
+                refreshing escape from city life while keeping you connected.
+              </p>
+              
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="text-center bg-haven-teal/10 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-haven-teal">5</div>
+                  <div className="text-sm text-gray-600">Max Guests</div>
+                </div>
+                <div className="text-center bg-haven-green/10 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-haven-green">3</div>
+                  <div className="text-sm text-gray-600">Deck Levels</div>
+                </div>
+              </div>
+              
+              <Link to="/booking">
+                <Button className="w-full bg-haven-teal hover:bg-haven-teal/90 text-white text-lg py-3 rounded-xl transition-all duration-300 transform hover:scale-105">
+                  <Calendar className="h-5 w-5 mr-2" />
+                  Check Availability
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
 
         {/* Features Grid */}
         <div className="mb-12">
