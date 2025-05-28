@@ -12,7 +12,7 @@ import FeaturedTestimonials from '@/components/testimonials/FeaturedTestimonials
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 
-// Hero slides data with new twilight Haven exterior as first image
+// Hero slides data with new twilight Haven exterior as first image (removed 5th slide)
 const heroSlides = [
   {
     id: '1',
@@ -60,17 +60,6 @@ const heroSlides = [
   },
   {
     id: '5',
-    image: '/lovable-uploads/141f5fa0-fb9d-4584-95f3-a7c7b5544a5b.png',
-    lowResImage: '/lovable-uploads/141f5fa0-fb9d-4584-95f3-a7c7b5544a5b.png',
-    title: 'Multi-Level Living',
-    subtitle: 'Experience unique perspectives from every deck level',
-    cta: {
-      text: 'Discover More',
-      href: '/stay'
-    }
-  },
-  {
-    id: '6',
     image: '/lovable-uploads/44941cd5-2bc4-4e82-8698-7916b158ebd5.png',
     lowResImage: '/lovable-uploads/44941cd5-2bc4-4e82-8698-7916b158ebd5.png',
     title: 'Golden Hour Magic',

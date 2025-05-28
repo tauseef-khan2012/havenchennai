@@ -81,11 +81,18 @@ const ContainerHomeSection = () => {
       </div>
       
       <div className="container-custom relative z-10">
-        {/* Header Section */}
+        {/* Updated Header Section */}
         <div className="text-center mb-8 lg:mb-12">
-          <h2 className="font-serif text-3xl lg:text-4xl xl:text-5xl font-bold text-haven-dark mb-4">
-            Minimalist Comfort by Muttukadu Lake
+          <h1 className="font-serif text-4xl lg:text-5xl xl:text-6xl font-bold text-haven-dark mb-4">
+            Guest House with Kitchen & Amenities
+          </h1>
+          <h2 className="font-serif text-2xl lg:text-3xl xl:text-4xl font-semibold text-haven-teal mb-4">
+            at Lakeside with Multi-Level Decks
           </h2>
+          <p className="text-lg lg:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+            Experience the perfect blend of comfort and nature in our fully-equipped container guest house, 
+            featuring panoramic lake views, modern amenities, and thoughtfully designed spaces for your ideal getaway.
+          </p>
         </div>
 
         {/* Main Content Grid */}
