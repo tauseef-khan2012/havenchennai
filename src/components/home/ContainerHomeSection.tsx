@@ -67,10 +67,7 @@ const ContainerHomeSection = () => {
         <div className="text-center mb-8 lg:mb-12">
           <h1 className="font-serif text-4xl lg:text-5xl xl:text-6xl font-bold text-haven-dark mb-4">Container House with Garden & Kitchen</h1>
           <h2 className="font-serif lg:text-3xl xl:text-4xl mb-4 text-haven-dark font-semibold text-xl mx-0 px-0">besides Muttukadu Lake</h2>
-          <p className="text-lg lg:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-            Experience the perfect blend of comfort and nature in our fully-equipped container guest house, 
-            featuring panoramic lake views, modern amenities, and thoughtfully designed spaces for your ideal getaway.
-          </p>
+          
         </div>
 
         {/* Main Content Grid */}
@@ -85,19 +82,15 @@ const ContainerHomeSection = () => {
           {/* Content */}
           <div className="order-1 lg:order-2">
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-lg border border-white/20">
-              <p className="text-gray-700 mb-6 leading-relaxed">
-                Wake up to breathtaking panoramas through floor-to-ceiling windows, enjoy your morning coffee on 
-                multi-level decks, and fall asleep to the gentle sounds of nature. Our container home offers a 
-                refreshing escape from city life while keeping you connected.
-              </p>
+              <p className="text-gray-700 mb-6 leading-relaxed">Experience the perfect blend of comfort and nature in our fully-equipped container guest house, featuring panoramic lake views, modern amenities, and thoughtfully designed spaces for your ideal getaway.</p>
               
               {/* Quick Stats */}
               <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="text-center bg-haven-teal/10 rounded-lg p-4">
+                <div className="text-center bg-haven-teal/10 p-4 px-[10px] py-[10px] rounded">
                   <div className="text-2xl font-bold text-haven-teal">5</div>
                   <div className="text-sm text-gray-600">Max Guests</div>
                 </div>
-                <div className="text-center bg-haven-green/10 rounded-lg p-4">
+                <div className="text-center bg-haven-green/10 p-4 px-[10px] py-[10px] rounded">
                   <div className="text-2xl font-bold text-haven-green">3</div>
                   <div className="text-sm text-gray-600">Deck Levels</div>
                 </div>
