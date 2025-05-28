@@ -68,10 +68,7 @@ const ContainerHomeSection = () => {
           <h2 className="font-serif text-3xl lg:text-4xl xl:text-5xl font-bold text-haven-dark mb-4">
             Minimalist Comfort by Muttukadu Lake
           </h2>
-          <p className="text-lg lg:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-            Experience the perfect blend of sustainable living and modern comfort in our uniquely designed container home. 
-            Surrounded by nature yet equipped with all modern amenities for the perfect lakeside escape.
-          </p>
+          
         </div>
 
         {/* Main Content Grid */}
@@ -79,17 +76,15 @@ const ContainerHomeSection = () => {
           {/* Hero Image */}
           <div className="order-2 lg:order-1">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl group">
-              <img src="/lovable-uploads/a768b355-2a53-4898-91c5-3372bc1fe662.png" alt="Haven container home exterior with full multi-level deck structure at Muttukadu Lake" className="w-full h-[400px] lg:h-[500px] object-cover transition-transform duration-700 group-hover:scale-105" loading="eager" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              
+              
             </div>
           </div>
           
           {/* Content */}
           <div className="order-1 lg:order-2">
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-lg border border-white/20">
-              <h3 className="font-serif text-2xl lg:text-3xl font-bold text-haven-dark mb-4">
-                Your Sustainable Lakeside Retreat
-              </h3>
+              
               <p className="text-gray-700 mb-6 leading-relaxed">
                 Wake up to breathtaking panoramas through floor-to-ceiling windows, enjoy your morning coffee on 
                 multi-level decks, and fall asleep to the gentle sounds of nature. Our container home offers a 
