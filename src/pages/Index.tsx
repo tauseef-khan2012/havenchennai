@@ -12,12 +12,12 @@ import FeaturedTestimonials from '@/components/testimonials/FeaturedTestimonials
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 
-// Hero slides data with Haven exterior as first image and new images
+// Hero slides data with new twilight Haven exterior as first image
 const heroSlides = [
   {
     id: '1',
-    image: '/lovable-uploads/032b0326-be0f-4d2f-bc40-e4873823e984.png',
-    lowResImage: '/lovable-uploads/032b0326-be0f-4d2f-bc40-e4873823e984.png',
+    image: '/lovable-uploads/0bf49c3a-e3e0-4828-badd-a492dc4dd957.png',
+    lowResImage: '/lovable-uploads/0bf49c3a-e3e0-4828-badd-a492dc4dd957.png',
     title: 'Welcome to Haven',
     subtitle: 'Experience sustainable luxury in our unique container home retreat',
     cta: {
