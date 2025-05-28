@@ -42,35 +42,41 @@ export const BookingContent: React.FC<BookingContentProps> = ({
     <div className="space-y-8">
       {/* Calendar and Booking Summary Side by Side */}
       <div className="bg-white rounded-2xl shadow-lg p-6 lg:p-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Calendar Section with Guest Selection */}
-          <div>
-            <h2 className="text-2xl lg:text-3xl font-serif font-bold mb-6 text-gray-900">Select Dates</h2>
-            <AvailabilityCalendar
-              propertyId={propertyId}
-              onDateRangeSelect={onDateRangeSelect}
-              selectedCheckIn={selectedCheckIn}
-              selectedCheckOut={selectedCheckOut}
-              guestCount={guestCount}
-              setGuestCount={setGuestCount}
-              maxGuests={property.max_guests}
-            />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+          {/* Left Column - Calendar Section with Guest Selection */}
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl lg:text-3xl font-serif font-bold mb-6 text-gray-900">Select Dates</h2>
+              <div className="bg-gray-50 rounded-xl p-4 border">
+                <AvailabilityCalendar
+                  propertyId={propertyId}
+                  onDateRangeSelect={onDateRangeSelect}
+                  selectedCheckIn={selectedCheckIn}
+                  selectedCheckOut={selectedCheckOut}
+                  guestCount={guestCount}
+                  setGuestCount={setGuestCount}
+                  maxGuests={property.max_guests}
+                />
+              </div>
+            </div>
           </div>
           
-          {/* Reserve Haven Summary */}
-          <div>
-            <CompactBookingSummary
-              property={property}
-              propertyId={propertyId}
-              guestCount={guestCount}
-              setGuestCount={setGuestCount}
-              selectedCheckIn={selectedCheckIn}
-              selectedCheckOut={selectedCheckOut}
-              priceBreakdown={priceBreakdown}
-              nights={nights}
-              isCalculatingPrice={isCalculatingPrice}
-              onProceedToPayment={onProceedToPayment}
-            />
+          {/* Right Column - Reserve Haven Summary */}
+          <div className="md:border-l md:border-gray-200 md:pl-8 lg:pl-12">
+            <div className="bg-haven-teal/5 rounded-xl p-6 border border-haven-teal/20">
+              <CompactBookingSummary
+                property={property}
+                propertyId={propertyId}
+                guestCount={guestCount}
+                setGuestCount={setGuestCount}
+                selectedCheckIn={selectedCheckIn}
+                selectedCheckOut={selectedCheckOut}
+                priceBreakdown={priceBreakdown}
+                nights={nights}
+                isCalculatingPrice={isCalculatingPrice}
+                onProceedToPayment={onProceedToPayment}
+              />
+            </div>
           </div>
         </div>
       </div>
