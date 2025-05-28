@@ -48,62 +48,65 @@ export const BookingSidebar: React.FC<BookingSidebarProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Left Column - Date & Guest Selection */}
       <div className="space-y-6">
-        {/* Date Selection */}
-        <div>
-          <h2 className="text-2xl lg:text-3xl font-serif font-bold mb-6 text-gray-900">Select Dates</h2>
-          <Card>
-            <CardContent className="p-4">
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <div className="text-xs text-gray-500 uppercase tracking-wide">Check-in</div>
-                  <div className="font-medium">
-                    {selectedCheckIn ? formatDate(selectedCheckIn) : 'Select date'}
-                  </div>
-                </div>
-                <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <div className="text-xs text-gray-500 uppercase tracking-wide">Check-out</div>
-                  <div className="font-medium">
-                    {selectedCheckOut ? formatDate(selectedCheckOut) : 'Select date'}
-                  </div>
+        {/* Date Selection Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl font-serif text-gray-900 flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-haven-teal" />
+              Select Dates
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <div className="text-xs text-gray-500 uppercase tracking-wide">Check-in</div>
+                <div className="font-medium">
+                  {selectedCheckIn ? formatDate(selectedCheckIn) : 'Select date'}
                 </div>
               </div>
-              
-              {nights > 0 && (
-                <div className="text-center text-sm text-gray-600">
-                  {nights} {nights === 1 ? 'night' : 'nights'}
+              <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <div className="text-xs text-gray-500 uppercase tracking-wide">Check-out</div>
+                <div className="font-medium">
+                  {selectedCheckOut ? formatDate(selectedCheckOut) : 'Select date'}
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+              </div>
+            </div>
+            
+            {nights > 0 && (
+              <div className="text-center text-sm text-gray-600">
+                {nights} {nights === 1 ? 'night' : 'nights'}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-        {/* Guest Selection */}
-        <div>
-          <h3 className="text-lg font-semibold mb-3 text-gray-900 flex items-center gap-2">
-            <Users className="h-5 w-5 text-haven-teal" />
-            Guests
-          </h3>
-          <Card>
-            <CardContent className="p-4">
-              <select
-                value={guestCount}
-                onChange={(e) => setGuestCount(parseInt(e.target.value))}
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 focus:border-haven-teal focus:ring-haven-teal"
-              >
-                {Array.from({ length: property.max_guests }, (_, i) => i + 1).map(num => (
-                  <option key={num} value={num}>
-                    {num} {num === 1 ? 'Guest' : 'Guests'}
-                  </option>
-                ))}
-              </select>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Guest Selection Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <Users className="h-5 w-5 text-haven-teal" />
+              Guests
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <select
+              value={guestCount}
+              onChange={(e) => setGuestCount(parseInt(e.target.value))}
+              className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 focus:border-haven-teal focus:ring-haven-teal"
+            >
+              {Array.from({ length: property.max_guests }, (_, i) => i + 1).map(num => (
+                <option key={num} value={num}>
+                  {num} {num === 1 ? 'Guest' : 'Guests'}
+                </option>
+              ))}
+            </select>
+          </CardContent>
+        </Card>
 
-        {/* Property Highlights */}
+        {/* Property Highlights Card */}
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-3">
@@ -124,75 +127,75 @@ export const BookingSidebar: React.FC<BookingSidebarProps> = ({
 
       {/* Right Column - Reserve Haven Summary */}
       <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl lg:text-3xl font-serif font-bold mb-6 text-gray-900">Reserve Haven</h2>
-          
-          {selectedCheckIn && selectedCheckOut && priceBreakdown ? (
-            <>
-              {/* Discount Code */}
-              <div className="mb-6">
-                <DiscountCodeInput
-                  bookingType="property"
-                  itemId={propertyId}
-                  totalAmount={priceBreakdown.subtotalAfterDiscount}
-                  onDiscountApplied={onDiscountApplied}
-                  appliedDiscount={appliedDiscount}
-                />
-              </div>
+        {selectedCheckIn && selectedCheckOut && priceBreakdown ? (
+          <>
+            {/* Discount Code */}
+            <DiscountCodeInput
+              bookingType="property"
+              itemId={propertyId}
+              totalAmount={priceBreakdown.subtotalAfterDiscount}
+              onDiscountApplied={onDiscountApplied}
+              appliedDiscount={appliedDiscount}
+            />
 
-              {/* Reserve Haven Card */}
-              <Card className="shadow-lg">
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    <div className="flex justify-between text-sm">
-                      <span>Check-in</span>
-                      <span>{selectedCheckIn.toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Check-out</span>
-                      <span>{selectedCheckOut.toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Nights</span>
-                      <span>{nights}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Guests</span>
-                      <span>{guestCount}</span>
-                    </div>
-                    
-                    <Separator />
-                    
-                    <EnhancedPriceSummary 
-                      priceBreakdown={priceBreakdown} 
-                      nights={nights}
-                      showCompetitorComparison={false}
-                    />
-                    
-                    <Button 
-                      onClick={onProceedToPayment}
-                      className="w-full bg-haven-teal hover:bg-haven-teal/90 text-white py-3 text-lg font-medium"
-                      disabled={isCalculatingPrice}
-                      size="lg"
-                    >
-                      {isCalculatingPrice ? 'Calculating...' : 'Continue to Checkout'}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </>
-          ) : (
+            {/* Reserve Haven Card */}
             <Card className="shadow-lg">
-              <CardContent className="p-8 text-center">
-                <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                <h3 className="font-medium text-gray-900 mb-2">Select your dates</h3>
-                <p className="text-gray-500 text-sm">
-                  Choose your check-in and check-out dates to see pricing and availability
-                </p>
+              <CardHeader>
+                <CardTitle className="text-xl font-serif text-gray-900">Reserve Haven</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span>Check-in</span>
+                    <span>{selectedCheckIn.toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Check-out</span>
+                    <span>{selectedCheckOut.toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Nights</span>
+                    <span>{nights}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Guests</span>
+                    <span>{guestCount}</span>
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                <EnhancedPriceSummary 
+                  priceBreakdown={priceBreakdown} 
+                  nights={nights}
+                  showCompetitorComparison={false}
+                />
+                
+                <Button 
+                  onClick={onProceedToPayment}
+                  className="w-full bg-haven-teal hover:bg-haven-teal/90 text-white py-3 text-lg font-medium"
+                  disabled={isCalculatingPrice}
+                  size="lg"
+                >
+                  {isCalculatingPrice ? 'Calculating...' : 'Continue to Checkout'}
+                </Button>
               </CardContent>
             </Card>
-          )}
-        </div>
+          </>
+        ) : (
+          <Card className="shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-xl font-serif text-gray-900">Reserve Haven</CardTitle>
+            </CardHeader>
+            <CardContent className="p-8 text-center">
+              <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+              <h3 className="font-medium text-gray-900 mb-2">Select your dates</h3>
+              <p className="text-gray-500 text-sm">
+                Choose your check-in and check-out dates to see pricing and availability
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
