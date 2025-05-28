@@ -92,8 +92,8 @@ const ContainerHomeSection = () => {
           <div className="order-2 lg:order-1">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl group">
               <img
-                src="/lovable-uploads/112be84d-40e5-49d1-adda-126ac7b3c86a.png"
-                alt="Haven container home exterior with multi-level decks at Muttukadu Lake"
+                src="/lovable-uploads/a768b355-2a53-4898-91c5-3372bc1fe662.png"
+                alt="Haven container home exterior with full multi-level deck structure at Muttukadu Lake"
                 className="w-full h-[400px] lg:h-[500px] object-cover transition-transform duration-700 group-hover:scale-105"
                 loading="eager"
               />
