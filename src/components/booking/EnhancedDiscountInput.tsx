@@ -117,9 +117,13 @@ const EnhancedDiscountInput: React.FC<EnhancedDiscountInputProps> = ({
     try {
       const result = await validateDiscountCode(
         codeToApply,
-        bookingType,
-        itemId,
-        totalAmount
+        {
+          propertyId: itemId,
+          checkInDate: new Date(),
+          checkOutDate: new Date(),
+          numberOfGuests: 1,
+          subtotal: totalAmount
+        }
       );
 
       if (result.isValid) {
@@ -131,7 +135,7 @@ const EnhancedDiscountInput: React.FC<EnhancedDiscountInputProps> = ({
       } else {
         toast({
           title: 'Invalid discount code',
-          description: result.errorMessage || 'This discount code is not valid.',
+          description: result.reason || 'This discount code is not valid.',
           variant: 'destructive'
         });
       }
@@ -171,7 +175,7 @@ const EnhancedDiscountInput: React.FC<EnhancedDiscountInputProps> = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Badge variant="secondary" className="bg-green-100 text-green-800">
-                {appliedDiscount.discountCode?.code}
+                {appliedDiscount.discountCode || 'DISCOUNT'}
               </Badge>
               <span className="text-sm text-gray-600">
                 ₹{appliedDiscount.discountAmount} off

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Users, Calendar, MapPin, Wifi } from 'lucide-react';
 import { EnhancedPriceSummary } from './EnhancedPriceSummary';
-import DiscountCodeInput from './DiscountCodeInput';
+import { DiscountCodeInput } from './DiscountCodeInput';
 import { EnhancedPriceBreakdown } from '@/services/enhancedPriceService';
 import { DiscountApplication } from '@/services/discountService';
 import { UUID } from '@/types/booking';
