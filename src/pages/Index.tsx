@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -13,7 +12,7 @@ import FeaturedTestimonials from '@/components/testimonials/FeaturedTestimonials
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 
-// Hero slides data with best scenic deck shots
+// Hero slides data with Haven exterior as first image and new images
 const heroSlides = [
   {
     id: '1',
@@ -39,8 +38,8 @@ const heroSlides = [
   },
   {
     id: '3',
-    image: '/lovable-uploads/54bc279a-b178-45ae-a1a2-5d06ad1c435d.png',
-    lowResImage: '/lovable-uploads/54bc279a-b178-45ae-a1a2-5d06ad1c435d.png',
+    image: '/lovable-uploads/80ae807c-39e1-4519-b19a-ed92c4b221cd.png',
+    lowResImage: '/lovable-uploads/80ae807c-39e1-4519-b19a-ed92c4b221cd.png',
     title: 'Rooftop Serenity',
     subtitle: 'Find peace and tranquility on our panoramic rooftop deck',
     cta: {
@@ -50,8 +49,19 @@ const heroSlides = [
   },
   {
     id: '4',
-    image: '/lovable-uploads/d62143b5-3f29-4040-9d6c-f00ea43f861e.png',
-    lowResImage: '/lovable-uploads/d62143b5-3f29-4040-9d6c-f00ea43f861e.png',
+    image: '/lovable-uploads/032b0326-be0f-4d2f-bc40-e4873823e984.png',
+    lowResImage: '/lovable-uploads/032b0326-be0f-4d2f-bc40-e4873823e984.png',
+    title: 'Work & Entertainment Hub',
+    subtitle: 'Stay connected with high-speed WiFi, Netflix, and a productive workspace',
+    cta: {
+      text: 'Discover Amenities',
+      href: '/stay/amenities'
+    }
+  },
+  {
+    id: '5',
+    image: '/lovable-uploads/141f5fa0-fb9d-4584-95f3-a7c7b5544a5b.png',
+    lowResImage: '/lovable-uploads/141f5fa0-fb9d-4584-95f3-a7c7b5544a5b.png',
     title: 'Multi-Level Living',
     subtitle: 'Experience unique perspectives from every deck level',
     cta: {
@@ -60,7 +70,7 @@ const heroSlides = [
     }
   },
   {
-    id: '5',
+    id: '6',
     image: '/lovable-uploads/44941cd5-2bc4-4e82-8698-7916b158ebd5.png',
     lowResImage: '/lovable-uploads/44941cd5-2bc4-4e82-8698-7916b158ebd5.png',
     title: 'Golden Hour Magic',
