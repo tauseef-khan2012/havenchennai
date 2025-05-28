@@ -75,7 +75,7 @@ const ContainerHomeSection = () => {
           {/* Hero Image */}
           <div className="order-2 lg:order-1">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl group">
-              <img src="/lovable-uploads/fdf4ae09-782a-476b-b866-173bf4816200.png" alt="Haven Container Home Exterior - Multi-level decks overlooking Muttukadu Lake" className="w-full h-[400px] lg:h-[500px] object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" />
+              
             </div>
           </div>
           
