@@ -16,8 +16,8 @@ import { useErrorHandler } from '@/hooks/useErrorHandler';
 const heroSlides = [
   {
     id: '1',
-    image: '/lovable-uploads/fdf4ae09-782a-476b-b866-173bf4816200.png',
-    lowResImage: '/lovable-uploads/fdf4ae09-782a-476b-b866-173bf4816200.png',
+    image: '/lovable-uploads/032b0326-be0f-4d2f-bc40-e4873823e984.png',
+    lowResImage: '/lovable-uploads/032b0326-be0f-4d2f-bc40-e4873823e984.png',
     title: 'Welcome to Haven',
     subtitle: 'Experience sustainable luxury in our unique container home retreat',
     cta: {
