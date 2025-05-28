@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, Users, MapPin, Clock, CreditCard } from 'lucide-react';
 import { EnhancedPriceSummary } from './EnhancedPriceSummary';
 import { EnhancedPriceBreakdown } from '@/services/enhancedPriceService';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import { UUID } from '@/types/booking';
 
 interface EnhancedBookingSummaryProps {
@@ -34,6 +35,8 @@ export const EnhancedBookingSummary: React.FC<EnhancedBookingSummaryProps> = ({
   onProceedToPayment,
   showPropertyDetails = true
 }) => {
+  const { formatPrice } = useCurrency();
+
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-US', {
       weekday: 'short',
@@ -120,7 +123,7 @@ export const EnhancedBookingSummary: React.FC<EnhancedBookingSummaryProps> = ({
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium text-green-800">Direct Booking Savings</span>
                       <Badge variant="secondary" className="bg-green-100 text-green-800">
-                        Save ₹{priceBreakdown.savingsFromCompetitors}
+                        Save {formatPrice(priceBreakdown.savingsFromCompetitors, priceBreakdown.currency)}
                       </Badge>
                     </div>
                   </div>

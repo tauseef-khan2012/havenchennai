@@ -16,6 +16,7 @@ import { EnhancedPriceSummary } from './EnhancedPriceSummary';
 import { useRazorpayPayment } from '@/hooks/useRazorpayPayment';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import { initiatePayment, verifyPayment } from '@/services/payment';
 import { EnhancedPriceBreakdown } from '@/services/enhancedPriceService';
 import { UUID } from '@/types/booking';
@@ -53,6 +54,7 @@ export const EnhancedPaymentStep: React.FC<EnhancedPaymentStepProps> = ({
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { formatPrice } = useCurrency();
   const [isInitiating, setIsInitiating] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'idle' | 'initiating' | 'processing' | 'success' | 'failed'>('idle');
 
@@ -272,7 +274,7 @@ export const EnhancedPaymentStep: React.FC<EnhancedPaymentStepProps> = ({
               ) : (
                 <>
                   <CreditCard className="h-5 w-5 mr-2" />
-                  Pay ₹{priceBreakdown.totalAmountDue.toLocaleString()}
+                  Pay {formatPrice(priceBreakdown.totalAmountDue, priceBreakdown.currency)}
                 </>
               )}
             </Button>
@@ -304,7 +306,7 @@ export const EnhancedPaymentStep: React.FC<EnhancedPaymentStepProps> = ({
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-green-800">You saved by booking direct</span>
                     <Badge variant="secondary" className="bg-green-100 text-green-800">
-                      ₹{priceBreakdown.savingsFromCompetitors}
+                      {formatPrice(priceBreakdown.savingsFromCompetitors, priceBreakdown.currency)}
                     </Badge>
                   </div>
                 </div>

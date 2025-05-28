@@ -24,27 +24,27 @@ export const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
     <div className="space-y-4 bg-gray-50 rounded-lg p-4">
       <div className="space-y-3">
         <div className="flex justify-between text-sm">
-          <span>₹4,000 × {nights} nights</span>
-          <span>₹{formatPrice(4000 * nights, 'INR')}</span>
+          <span>{formatPrice(4000, 'INR')} × {nights} nights</span>
+          <span>{formatPrice(4000 * nights, 'INR')}</span>
         </div>
         
         {additionalGuestCharges > 0 && (
           <div className="flex justify-between text-sm">
-            <span>Additional guests ({guestCount - 2} × ₹500)</span>
-            <span>₹{formatPrice(additionalGuestCharges, 'INR')}</span>
+            <span>Additional guests ({guestCount - 2} × {formatPrice(500, 'INR')})</span>
+            <span>{formatPrice(additionalGuestCharges, 'INR')}</span>
           </div>
         )}
         
         {priceBreakdown.discountAmount > 0 && (
           <div className="flex justify-between text-sm text-green-600">
             <span>Discount</span>
-            <span>-₹{formatPrice(priceBreakdown.discountAmount, 'INR')}</span>
+            <span>-{formatPrice(priceBreakdown.discountAmount, 'INR')}</span>
           </div>
         )}
         
         <div className="flex justify-between text-sm">
           <span>GST (18%)</span>
-          <span>₹{formatPrice(priceBreakdown.taxAmount, 'INR')}</span>
+          <span>{formatPrice(priceBreakdown.taxAmount, 'INR')}</span>
         </div>
       </div>
       
@@ -52,7 +52,7 @@ export const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
       
       <div className="flex justify-between font-bold text-lg">
         <span>Total</span>
-        <span>₹{formatPrice(priceBreakdown.totalAmountDue + additionalGuestCharges, 'INR')}</span>
+        <span>{formatPrice(priceBreakdown.totalAmountDue + additionalGuestCharges, 'INR')}</span>
       </div>
     </div>
   );
