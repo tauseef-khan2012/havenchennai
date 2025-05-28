@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -118,11 +119,11 @@ const Index = () => {
   return (
     <ErrorBoundary>
       <Navbar />
-      <main>
+      <main className="space-y-0">
         <EnhancedHeroSlider slides={heroSlides} />
         
         <ErrorBoundary fallback={
-          <div className="py-16 text-center">
+          <div className="py-8 text-center">
             <p>Unable to load container home section</p>
           </div>
         }>
@@ -130,7 +131,7 @@ const Index = () => {
         </ErrorBoundary>
         
         <ErrorBoundary fallback={
-          <div className="py-16 text-center">
+          <div className="py-8 text-center">
             <p>Unable to load experiences section</p>
           </div>
         }>
@@ -138,7 +139,7 @@ const Index = () => {
         </ErrorBoundary>
         
         <ErrorBoundary fallback={
-          <div className="py-16 text-center">
+          <div className="py-8 text-center">
             <p>Unable to load gallery section</p>
           </div>
         }>
@@ -146,7 +147,7 @@ const Index = () => {
         </ErrorBoundary>
         
         <ErrorBoundary fallback={
-          <div className="py-16 text-center">
+          <div className="py-8 text-center">
             <p>Unable to load testimonials section</p>
           </div>
         }>

@@ -11,9 +11,9 @@ const ExperiencesSection = () => {
   const categories = ['All', 'Wellness', 'Cultural', 'Adventure', 'Couples'];
 
   return (
-    <section className="py-20">
+    <section className="py-12 lg:py-16 bg-white">
       <div className="container-custom">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-haven-dark mb-2">
               Curated Experiences
@@ -22,7 +22,10 @@ const ExperiencesSection = () => {
               Discover the best of Chennai's East Coast Road with our handpicked experiences, from cultural landmarks to natural wonders.
             </p>
           </div>
-          <Link to="/experiences" className="mt-4 md:mt-0 text-haven-teal hover:underline font-medium flex items-center">
+          <Link 
+            to="/experiences" 
+            className="mt-4 md:mt-0 text-haven-teal hover:text-haven-teal/80 font-medium flex items-center transition-colors duration-200"
+          >
             All Experiences <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </div>
