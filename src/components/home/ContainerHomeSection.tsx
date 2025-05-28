@@ -1,6 +1,8 @@
+
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Calendar, Home, BookOpen, Waves, Bed, ChefHat } from 'lucide-react';
+
 interface FeatureCardProps {
   icon: React.ReactNode;
   title: string;
@@ -8,6 +10,7 @@ interface FeatureCardProps {
   image: string;
   alt: string;
 }
+
 const FeatureCard = ({
   icon,
   title,
@@ -24,6 +27,7 @@ const FeatureCard = ({
       <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
     </div>
   </div>;
+
 const ContainerHomeSection = () => {
   const features = [{
     icon: <Bed className="h-6 w-6" />,
@@ -50,7 +54,8 @@ const ContainerHomeSection = () => {
     image: "/lovable-uploads/ea3b40a2-e087-4627-aecc-211b123dc269.png",
     alt: "Three panoramic decks at Haven Chennai"
   }];
-  return <section className="py-12 lg:py-16 bg-gradient-to-br from-haven-beige via-white to-haven-beige/30 relative overflow-hidden">
+
+  return <section className="py-8 lg:py-12 bg-gradient-to-br from-haven-beige via-white to-haven-beige/30 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -64,14 +69,13 @@ const ContainerHomeSection = () => {
       
       <div className="container-custom relative z-10">
         {/* Updated Header Section */}
-        <div className="text-center mb-8 lg:mb-12">
-          <h1 className="font-serif text-4xl lg:text-5xl xl:text-6xl font-bold text-haven-dark mb-4">Container House with Garden & Kitchen</h1>
-          <h2 className="font-serif lg:text-3xl xl:text-4xl mb-4 text-haven-dark font-semibold text-xl mx-0 px-0">besides Muttukadu Lake</h2>
-          
+        <div className="text-center mb-6 lg:mb-8">
+          <h1 className="font-serif text-4xl lg:text-5xl xl:text-6xl font-bold text-haven-dark mb-3">Container House with Garden & Kitchen</h1>
+          <h2 className="font-serif lg:text-3xl xl:text-4xl mb-3 text-haven-dark font-semibold text-xl mx-0 px-0">besides Muttukadu Lake</h2>
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center mb-12">
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-8 items-center mb-8">
           {/* Hero Image */}
           <div className="order-2 lg:order-1">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl group">
@@ -82,15 +86,15 @@ const ContainerHomeSection = () => {
           {/* Content */}
           <div className="order-1 lg:order-2">
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-lg border border-white/20">
-              <p className="text-gray-700 mb-6 leading-relaxed">Experience the perfect blend of comfort and nature in our fully-equipped container guest house, featuring panoramic lake views, modern amenities, and thoughtfully designed spaces for your ideal getaway.</p>
+              <p className="text-gray-700 mb-4 leading-relaxed">Experience the perfect blend of comfort and nature in our fully-equipped container guest house, featuring panoramic lake views, modern amenities, and thoughtfully designed spaces for your ideal getaway.</p>
               
               {/* Quick Stats */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="text-center bg-haven-teal/10 p-4 px-[10px] py-[10px] rounded">
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="text-center bg-haven-teal/10 p-3 rounded">
                   <div className="text-2xl font-bold text-haven-teal">5</div>
                   <div className="text-sm text-gray-600">Max Guests</div>
                 </div>
-                <div className="text-center bg-haven-green/10 p-4 px-[10px] py-[10px] rounded">
+                <div className="text-center bg-haven-green/10 p-3 rounded">
                   <div className="text-2xl font-bold text-haven-green">3</div>
                   <div className="text-sm text-gray-600">Deck Levels</div>
                 </div>
@@ -107,8 +111,8 @@ const ContainerHomeSection = () => {
         </div>
 
         {/* Features Grid */}
-        <div className="mb-8">
-          <h3 className="font-serif text-2xl lg:text-3xl font-bold text-center text-haven-dark mb-6">
+        <div className="mb-6">
+          <h3 className="font-serif text-2xl lg:text-3xl font-bold text-center text-haven-dark mb-4">
             Premium Amenities & Features
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
@@ -140,4 +144,5 @@ const ContainerHomeSection = () => {
       </div>
     </section>;
 };
+
 export default ContainerHomeSection;
