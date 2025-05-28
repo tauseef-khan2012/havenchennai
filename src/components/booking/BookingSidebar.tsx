@@ -131,9 +131,11 @@ export const BookingSidebar: React.FC<BookingSidebarProps> = ({
           <>
             {/* Discount Code */}
             <DiscountCodeInput
-              bookingType="property"
-              itemId={propertyId}
-              totalAmount={priceBreakdown.subtotalAfterDiscount}
+              propertyId={propertyId}
+              checkInDate={selectedCheckIn}
+              checkOutDate={selectedCheckOut}
+              guestCount={guestCount}
+              subtotal={priceBreakdown.subtotalAfterDiscount}
               onDiscountApplied={onDiscountApplied}
               appliedDiscount={appliedDiscount}
             />
