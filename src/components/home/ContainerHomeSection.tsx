@@ -66,7 +66,7 @@ const ContainerHomeSection = () => {
         {/* Updated Header Section */}
         <div className="text-center mb-8 lg:mb-12">
           <h1 className="font-serif text-4xl lg:text-5xl xl:text-6xl font-bold text-haven-dark mb-4">Container House with Garden & Kitchen</h1>
-          <h2 className="font-serif lg:text-3xl xl:text-4xl mb-4 text-[haven-light-blue] text-haven-dark font-normal">besides Muttukadu Lake</h2>
+          <h2 className="font-serif lg:text-3xl xl:text-4xl mb-4 text-haven-dark font-semibold text-xl mx-0 px-0">besides Muttukadu Lake</h2>
           <p className="text-lg lg:text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
             Experience the perfect blend of comfort and nature in our fully-equipped container guest house, 
             featuring panoramic lake views, modern amenities, and thoughtfully designed spaces for your ideal getaway.
