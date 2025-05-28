@@ -134,16 +134,28 @@ export const recordDiscountUsage = async (
   bookingId: UUID
 ): Promise<boolean> => {
   try {
-    // Increment the used_count for the discount code
-    const { error } = await supabase
+    // First, get the current used_count
+    const { data: discountCode, error: fetchError } = await supabase
+      .from('discount_codes')
+      .select('used_count')
+      .eq('code', code.toUpperCase())
+      .single();
+
+    if (fetchError || !discountCode) {
+      console.error('Error fetching discount code:', fetchError);
+      return false;
+    }
+
+    // Increment the used_count
+    const { error: updateError } = await supabase
       .from('discount_codes')
       .update({ 
-        used_count: supabase.rpc('increment_used_count', { discount_code: code })
+        used_count: (discountCode.used_count || 0) + 1
       })
       .eq('code', code.toUpperCase());
 
-    if (error) {
-      console.error('Error recording discount usage:', error);
+    if (updateError) {
+      console.error('Error recording discount usage:', updateError);
       return false;
     }
 

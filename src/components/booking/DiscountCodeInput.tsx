@@ -20,7 +20,7 @@ interface DiscountCodeInputProps {
   onDiscountApplied: (discount: DiscountApplication) => void;
 }
 
-export const DiscountCodeInput: React.FC<DiscountCodeInputProps> = ({
+const DiscountCodeInput: React.FC<DiscountCodeInputProps> = ({
   propertyId,
   checkInDate,
   checkOutDate,
@@ -159,3 +159,5 @@ export const DiscountCodeInput: React.FC<DiscountCodeInputProps> = ({
     </Card>
   );
 };
+
+export { DiscountCodeInput };

@@ -43,7 +43,9 @@ export const useBookingNavigation = () => {
       checkIn: selectedCheckIn.toISOString(),
       checkOut: selectedCheckOut.toISOString(),
       guests: guestCount.toString(),
-      ...(appliedDiscount?.isValid && { discountCode: appliedDiscount.discountCode?.code || '' })
+      ...(appliedDiscount?.isValid && appliedDiscount.discountCode && { 
+        discountCode: appliedDiscount.discountCode 
+      })
     });
 
     navigate(`/booking/payment?${bookingParams.toString()}`);
