@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { 
@@ -6,8 +7,8 @@ import {
   PriceBreakdown,
   GuestInfo
 } from '@/types/booking';
-import { PropertyBookingStep1_DatesGuests } from './steps/PropertyBookingStep1_DatesGuests';
-import { PropertyBookingStep2_Addons } from './steps/PropertyBookingStep2_Addons';
+import { PropertyBookingStep1_DatesGuests } from './PropertyBookingStep1_DatesGuests';
+import { PropertyBookingStep2_Addons } from './PropertyBookingStep2_Addons';
 import PaymentStep from './steps/PaymentStep';
 import BookingConfirmationStep from './steps/BookingConfirmationStep';
 import { useBookingCreation } from '@/hooks/useBookingCreation';
@@ -35,6 +36,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
   const [bookingReference, setBookingReference] = useState<string | null>(null);
   const { makeBooking, isLoading: isCreatingBooking } = useBookingCreation();
   const [isCalculatingPrice, setIsCalculatingPrice] = useState(false);
+  const [guests, setGuests] = useState<GuestInfo[]>([]);
 
   const [contactInfo, setContactInfo] = useState({
     fullName: '',
@@ -119,14 +121,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
       case 4:
         return (
           <BookingConfirmationStep
-            bookingId={bookingId!}
             bookingReference={bookingReference!}
-            bookingType={bookingType}
-            property={property}
-            checkInDate={selectedCheckIn!}
-            checkOutDate={selectedCheckOut!}
-            guestCount={guestCount}
-            priceBreakdown={priceBreakdown!}
+            onViewBookings={() => {
+              // Navigate to bookings page
+              window.location.href = '/dashboard';
+            }}
           />
         );
 

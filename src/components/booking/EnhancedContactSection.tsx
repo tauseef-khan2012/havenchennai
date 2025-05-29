@@ -28,7 +28,7 @@ export const EnhancedContactSection: React.FC<EnhancedContactSectionProps> = ({
   errors,
   onFieldChange
 }) => {
-  const { user, signUp, login } = useAuth();
+  const { user, signUp, signIn } = useAuth();
   const { toast } = useToast();
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [showSignupForm, setShowSignupForm] = useState(false);
@@ -48,7 +48,7 @@ export const EnhancedContactSection: React.FC<EnhancedContactSectionProps> = ({
 
     setIsLoading(true);
     try {
-      await login(loginData.email, loginData.password);
+      await signIn({ email: loginData.email, password: loginData.password });
       setShowLoginForm(false);
       toast({
         title: "Welcome back!",
@@ -77,8 +77,12 @@ export const EnhancedContactSection: React.FC<EnhancedContactSectionProps> = ({
 
     setIsLoading(true);
     try {
-      await signUp(signupData.email, signupData.password, {
-        full_name: signupData.fullName
+      await signUp({
+        email: signupData.email,
+        password: signupData.password,
+        metadata: {
+          full_name: signupData.fullName
+        }
       });
       setShowSignupForm(false);
       toast({
