@@ -63,6 +63,63 @@ export type Database = {
           },
         ]
       }
+      booking_analytics: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          event_data: Json | null
+          event_type: string
+          experience_booking_id: string | null
+          experience_id: string | null
+          id: string
+          ip_address: unknown | null
+          property_id: string | null
+          referrer: string | null
+          session_id: string | null
+          user_agent: string | null
+          user_id: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          event_data?: Json | null
+          event_type: string
+          experience_booking_id?: string | null
+          experience_id?: string | null
+          id?: string
+          ip_address?: unknown | null
+          property_id?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          event_data?: Json | null
+          event_type?: string
+          experience_booking_id?: string | null
+          experience_id?: string | null
+          id?: string
+          ip_address?: unknown | null
+          property_id?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: []
+      }
       booking_guests: {
         Row: {
           booking_id: string
@@ -97,6 +154,7 @@ export type Database = {
       }
       bookings: {
         Row: {
+          abandonment_reason: string | null
           amount_paid: number | null
           base_price_total: number
           booked_at: string
@@ -107,15 +165,19 @@ export type Database = {
           check_out_date: string
           checked_in_at: string | null
           checked_out_at: string | null
+          checkout_started_at: string | null
           cleaning_fee_total: number | null
           confirmed_at: string | null
+          conversion_source: string | null
           created_at: string
           currency: string
           customer_notes: string | null
           discounts_total: number | null
           id: string
           internal_notes: string | null
+          last_payment_attempt_at: string | null
           number_of_guests: number
+          payment_attempt_count: number | null
           payment_id: string | null
           payment_status: string | null
           property_id: string
@@ -126,8 +188,12 @@ export type Database = {
           total_amount_due: number
           updated_at: string
           user_id: string
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
         }
         Insert: {
+          abandonment_reason?: string | null
           amount_paid?: number | null
           base_price_total: number
           booked_at?: string
@@ -138,15 +204,19 @@ export type Database = {
           check_out_date: string
           checked_in_at?: string | null
           checked_out_at?: string | null
+          checkout_started_at?: string | null
           cleaning_fee_total?: number | null
           confirmed_at?: string | null
+          conversion_source?: string | null
           created_at?: string
           currency?: string
           customer_notes?: string | null
           discounts_total?: number | null
           id?: string
           internal_notes?: string | null
+          last_payment_attempt_at?: string | null
           number_of_guests: number
+          payment_attempt_count?: number | null
           payment_id?: string | null
           payment_status?: string | null
           property_id: string
@@ -157,8 +227,12 @@ export type Database = {
           total_amount_due: number
           updated_at?: string
           user_id: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
         }
         Update: {
+          abandonment_reason?: string | null
           amount_paid?: number | null
           base_price_total?: number
           booked_at?: string
@@ -169,15 +243,19 @@ export type Database = {
           check_out_date?: string
           checked_in_at?: string | null
           checked_out_at?: string | null
+          checkout_started_at?: string | null
           cleaning_fee_total?: number | null
           confirmed_at?: string | null
+          conversion_source?: string | null
           created_at?: string
           currency?: string
           customer_notes?: string | null
           discounts_total?: number | null
           id?: string
           internal_notes?: string | null
+          last_payment_attempt_at?: string | null
           number_of_guests?: number
+          payment_attempt_count?: number | null
           payment_id?: string | null
           payment_status?: string | null
           property_id?: string
@@ -188,6 +266,9 @@ export type Database = {
           total_amount_due?: number
           updated_at?: string
           user_id?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
         }
         Relationships: [
           {
@@ -275,17 +356,22 @@ export type Database = {
       }
       experience_bookings: {
         Row: {
+          abandonment_reason: string | null
           amount_paid: number | null
           booked_at: string
           booking_reference: string
           booking_status: string | null
           cancelled_at: string | null
+          checkout_started_at: string | null
           confirmed_at: string | null
+          conversion_source: string | null
           created_at: string
           currency: string
           experience_instance_id: string
           id: string
+          last_payment_attempt_at: string | null
           number_of_attendees: number
+          payment_attempt_count: number | null
           payment_id: string | null
           payment_status: string | null
           source_booking_id: string | null
@@ -294,19 +380,27 @@ export type Database = {
           total_amount_due: number
           updated_at: string
           user_id: string
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
         }
         Insert: {
+          abandonment_reason?: string | null
           amount_paid?: number | null
           booked_at?: string
           booking_reference: string
           booking_status?: string | null
           cancelled_at?: string | null
+          checkout_started_at?: string | null
           confirmed_at?: string | null
+          conversion_source?: string | null
           created_at?: string
           currency?: string
           experience_instance_id: string
           id?: string
+          last_payment_attempt_at?: string | null
           number_of_attendees: number
+          payment_attempt_count?: number | null
           payment_id?: string | null
           payment_status?: string | null
           source_booking_id?: string | null
@@ -315,19 +409,27 @@ export type Database = {
           total_amount_due: number
           updated_at?: string
           user_id: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
         }
         Update: {
+          abandonment_reason?: string | null
           amount_paid?: number | null
           booked_at?: string
           booking_reference?: string
           booking_status?: string | null
           cancelled_at?: string | null
+          checkout_started_at?: string | null
           confirmed_at?: string | null
+          conversion_source?: string | null
           created_at?: string
           currency?: string
           experience_instance_id?: string
           id?: string
+          last_payment_attempt_at?: string | null
           number_of_attendees?: number
+          payment_attempt_count?: number | null
           payment_id?: string | null
           payment_status?: string | null
           source_booking_id?: string | null
@@ -336,6 +438,9 @@ export type Database = {
           total_amount_due?: number
           updated_at?: string
           user_id?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
         }
         Relationships: [
           {
@@ -661,45 +766,129 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_attempts: {
+        Row: {
+          abandoned_at: string | null
+          amount: number
+          attempt_number: number
+          booking_id: string | null
+          completed_at: string | null
+          created_at: string
+          currency: string
+          experience_booking_id: string | null
+          failure_code: string | null
+          failure_description: string | null
+          id: string
+          ip_address: unknown | null
+          payment_method: string | null
+          razorpay_order_id: string | null
+          status: string
+          user_agent: string | null
+        }
+        Insert: {
+          abandoned_at?: string | null
+          amount: number
+          attempt_number?: number
+          booking_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          experience_booking_id?: string | null
+          failure_code?: string | null
+          failure_description?: string | null
+          id?: string
+          ip_address?: unknown | null
+          payment_method?: string | null
+          razorpay_order_id?: string | null
+          status: string
+          user_agent?: string | null
+        }
+        Update: {
+          abandoned_at?: string | null
+          amount?: number
+          attempt_number?: number
+          booking_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          experience_booking_id?: string | null
+          failure_code?: string | null
+          failure_description?: string | null
+          id?: string
+          ip_address?: unknown | null
+          payment_method?: string | null
+          razorpay_order_id?: string | null
+          status?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
           booking_id: string | null
           created_at: string
           currency: string
+          device_info: Json | null
           experience_booking_id: string | null
+          failure_reason: string | null
           id: string
+          ip_address: unknown | null
           payment_gateway: string | null
+          payment_link: string | null
           payment_method: string | null
           payment_status: string | null
           processed_at: string | null
+          razorpay_order_id: string | null
+          razorpay_payment_id: string | null
+          razorpay_signature: string | null
+          retry_count: number | null
           transaction_id: string
+          user_agent: string | null
         }
         Insert: {
           amount: number
           booking_id?: string | null
           created_at?: string
           currency?: string
+          device_info?: Json | null
           experience_booking_id?: string | null
+          failure_reason?: string | null
           id?: string
+          ip_address?: unknown | null
           payment_gateway?: string | null
+          payment_link?: string | null
           payment_method?: string | null
           payment_status?: string | null
           processed_at?: string | null
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
+          retry_count?: number | null
           transaction_id: string
+          user_agent?: string | null
         }
         Update: {
           amount?: number
           booking_id?: string | null
           created_at?: string
           currency?: string
+          device_info?: Json | null
           experience_booking_id?: string | null
+          failure_reason?: string | null
           id?: string
+          ip_address?: unknown | null
           payment_gateway?: string | null
+          payment_link?: string | null
           payment_method?: string | null
           payment_status?: string | null
           processed_at?: string | null
+          razorpay_order_id?: string | null
+          razorpay_payment_id?: string | null
+          razorpay_signature?: string | null
+          retry_count?: number | null
           transaction_id?: string
+          user_agent?: string | null
         }
         Relationships: [
           {

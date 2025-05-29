@@ -20,7 +20,7 @@ import { useCurrency } from '@/contexts/CurrencyContext';
 import { EnhancedPriceBreakdown } from '@/services/enhancedPriceService';
 import { UUID } from '@/types/booking';
 
-interface EnhancedPaymentStepProps {
+interface RazorpayPaymentStepProps {
   bookingId: UUID;
   bookingReference: string;
   property: any;
@@ -38,7 +38,7 @@ interface EnhancedPaymentStepProps {
   onPaymentFailure: (error: string) => void;
 }
 
-export const EnhancedPaymentStep: React.FC<EnhancedPaymentStepProps> = ({
+export const RazorpayPaymentStep: React.FC<RazorpayPaymentStepProps> = ({
   bookingId,
   bookingReference,
   property,

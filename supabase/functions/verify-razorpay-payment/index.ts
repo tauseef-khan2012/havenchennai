@@ -1,158 +1,179 @@
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
-import { createHmac } from "https://deno.land/std@0.167.0/node/crypto.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createHmac } from "https://deno.land/std@0.190.0/node/crypto.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+}
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
-  
+
   try {
-    // Get request data
-    const { razorpayPaymentId, razorpayOrderId, razorpaySignature, bookingId, bookingType } = await req.json();
-    
-    // Validate request data
-    if (!razorpayPaymentId || !razorpayOrderId || !razorpaySignature || !bookingId || !bookingType) {
-      return new Response(
-        JSON.stringify({ error: 'Missing required fields' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
+    const { 
+      razorpayPaymentId, 
+      razorpayOrderId, 
+      razorpaySignature, 
+      bookingId, 
+      bookingType 
+    } = await req.json()
+
+    console.log('Verifying payment:', { razorpayPaymentId, razorpayOrderId, bookingId, bookingType })
+
+    // Get Razorpay secret
+    const razorpayKeySecret = Deno.env.get('RAZORPAY_KEY_SECRET')
+    if (!razorpayKeySecret) {
+      throw new Error('Razorpay secret key not configured')
     }
-    
-    // Create Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    
+
     // Verify signature
-    const razorpayKeySecret = Deno.env.get('RAZORPAY_KEY_SECRET')!;
-    const generatedSignature = createHmac('sha256', razorpayKeySecret)
-      .update(`${razorpayOrderId}|${razorpayPaymentId}`)
-      .digest('hex');
-    
-    if (generatedSignature !== razorpaySignature) {
-      console.error('Invalid Razorpay signature');
-      return new Response(
-        JSON.stringify({ error: 'Invalid payment signature', success: false }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    const body = razorpayOrderId + "|" + razorpayPaymentId
+    const expectedSignature = createHmac('sha256', razorpayKeySecret)
+      .update(body)
+      .digest('hex')
+
+    console.log('Signature verification:', { 
+      expected: expectedSignature, 
+      received: razorpaySignature 
+    })
+
+    if (expectedSignature !== razorpaySignature) {
+      console.error('Signature verification failed')
+      
+      // Record failed payment attempt
+      await supabase
+        .from('payment_attempts')
+        .update({
+          status: 'failed',
+          failure_code: 'SIGNATURE_VERIFICATION_FAILED',
+          failure_description: 'Payment signature verification failed',
+          completed_at: new Date().toISOString()
+        })
+        .eq('razorpay_order_id', razorpayOrderId)
+
+      throw new Error('Payment signature verification failed')
     }
-    
-    // Fetch payment details from Razorpay
-    const razorpayKeyId = Deno.env.get('RAZORPAY_KEY_ID')!;
-    const razorpayAuth = btoa(`${razorpayKeyId}:${razorpayKeySecret}`);
-    
+
+    // Get payment details from Razorpay
+    const razorpayKeyId = 'rzp_test_Cr76JJQnGN8YSj'
     const paymentResponse = await fetch(`https://api.razorpay.com/v1/payments/${razorpayPaymentId}`, {
-      method: 'GET',
       headers: {
-        'Authorization': `Basic ${razorpayAuth}`,
-        'Content-Type': 'application/json'
+        'Authorization': `Basic ${btoa(`${razorpayKeyId}:${razorpayKeySecret}`)}`,
       }
-    });
-    
-    const paymentData = await paymentResponse.json();
-    
+    })
+
     if (!paymentResponse.ok) {
-      console.error('Failed to fetch payment details:', paymentData);
-      return new Response(
-        JSON.stringify({ error: 'Failed to verify payment details', success: false }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      throw new Error('Failed to fetch payment details from Razorpay')
     }
-    
-    // Verify payment status
-    if (paymentData.status !== 'captured') {
-      console.error('Payment not captured:', paymentData);
-      return new Response(
-        JSON.stringify({ error: 'Payment not captured', success: false }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-    
-    // Record payment in database
-    const table = bookingType === 'property' ? 'bookings' : 'experience_bookings';
-    
-    // Get booking information
-    const { data: booking, error: bookingError } = await supabase
-      .from(table)
-      .select('*')
-      .eq('id', bookingId)
-      .single();
-    
-    if (bookingError || !booking) {
-      console.error('Booking not found:', bookingError);
-      return new Response(
-        JSON.stringify({ error: 'Booking not found', success: false }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-    
-    // Insert payment record
-    const { data: payment, error: paymentError } = await supabase
-      .from('payments')
-      .insert({
-        [bookingType === 'property' ? 'booking_id' : 'experience_booking_id']: bookingId,
-        amount: paymentData.amount / 100, // Convert from paise to INR
-        currency: paymentData.currency,
-        transaction_id: paymentData.id,
-        payment_method: paymentData.method,
-        payment_gateway: 'Razorpay',
-        payment_status: 'Successful',
-        processed_at: new Date().toISOString()
-      })
-      .select('id')
-      .single();
-    
-    if (paymentError) {
-      console.error('Error recording payment:', paymentError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to record payment', success: false }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-    
+
+    const paymentDetails = await paymentResponse.json()
+    console.log('Payment details from Razorpay:', paymentDetails)
+
+    // Determine table based on booking type
+    const table = bookingType === 'property' ? 'bookings' : 'experience_bookings'
+
     // Update booking status
-    const { error: updateError } = await supabase
+    const { error: bookingError } = await supabase
       .from(table)
       .update({
-        payment_id: payment.id,
-        payment_status: 'Paid',
         booking_status: 'Confirmed',
-        amount_paid: paymentData.amount / 100, // Convert from paise to INR
+        payment_status: 'Paid',
         confirmed_at: new Date().toISOString()
       })
-      .eq('id', bookingId);
-    
-    if (updateError) {
-      console.error('Error updating booking status:', updateError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to update booking status', success: false }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      .eq('id', bookingId)
+
+    if (bookingError) {
+      console.error('Error updating booking:', bookingError)
+      throw new Error('Failed to update booking status')
     }
-    
+
+    // Record payment in payments table
+    const { error: paymentError } = await supabase
+      .from('payments')
+      .insert({
+        booking_id: bookingType === 'property' ? bookingId : null,
+        experience_booking_id: bookingType === 'experience' ? bookingId : null,
+        amount: paymentDetails.amount / 100, // Convert from paise
+        currency: paymentDetails.currency,
+        transaction_id: razorpayPaymentId,
+        payment_method: paymentDetails.method,
+        payment_status: 'Successful',
+        payment_gateway: 'Razorpay',
+        razorpay_order_id: razorpayOrderId,
+        razorpay_payment_id: razorpayPaymentId,
+        razorpay_signature: razorpaySignature,
+        processed_at: new Date().toISOString()
+      })
+
+    if (paymentError) {
+      console.error('Error recording payment:', paymentError)
+    }
+
+    // Update payment attempt as successful
+    const { error: attemptError } = await supabase
+      .from('payment_attempts')
+      .update({
+        status: 'success',
+        payment_method: paymentDetails.method,
+        completed_at: new Date().toISOString()
+      })
+      .eq('razorpay_order_id', razorpayOrderId)
+
+    if (attemptError) {
+      console.error('Error updating payment attempt:', attemptError)
+    }
+
+    // Record successful booking analytics
+    const { error: analyticsError } = await supabase
+      .from('booking_analytics')
+      .insert({
+        booking_id: bookingType === 'property' ? bookingId : null,
+        experience_booking_id: bookingType === 'experience' ? bookingId : null,
+        event_type: 'booking_complete',
+        event_data: {
+          razorpay_payment_id: razorpayPaymentId,
+          razorpay_order_id: razorpayOrderId,
+          payment_method: paymentDetails.method,
+          amount: paymentDetails.amount / 100
+        },
+        created_at: new Date().toISOString()
+      })
+
+    if (analyticsError) {
+      console.error('Error recording analytics:', analyticsError)
+    }
+
+    console.log('Payment verification successful')
+
+    return new Response(
+      JSON.stringify({ success: true }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      }
+    )
+
+  } catch (error) {
+    console.error('Error in verify-razorpay-payment:', error)
     return new Response(
       JSON.stringify({ 
-        success: true, 
-        paymentId: payment.id,
-        bookingStatus: 'Confirmed'
+        success: false,
+        error: error.message || 'Payment verification failed' 
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-    
-  } catch (error) {
-    console.error('Error verifying Razorpay payment:', error);
-    
-    return new Response(
-      JSON.stringify({ error: 'Internal server error', success: false }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      }
+    )
   }
-});
+})

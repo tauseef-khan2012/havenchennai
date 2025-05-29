@@ -1,90 +1,116 @@
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+}
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
-  
+
   try {
-    // Get request data
-    const { razorpayOrderId, errorCode, errorDescription, bookingId, bookingType } = await req.json();
-    
-    // Validate request data
-    if (!razorpayOrderId || !bookingId || !bookingType) {
-      return new Response(
-        JSON.stringify({ error: 'Missing required fields' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
+    const { 
+      razorpayOrderId, 
+      errorCode, 
+      errorDescription, 
+      bookingId, 
+      bookingType 
+    } = await req.json()
+
+    console.log('Handling payment failure:', { 
+      razorpayOrderId, 
+      errorCode, 
+      errorDescription, 
+      bookingId, 
+      bookingType 
+    })
+
+    // Update payment attempt as failed
+    const { error: attemptError } = await supabase
+      .from('payment_attempts')
+      .update({
+        status: 'failed',
+        failure_code: errorCode,
+        failure_description: errorDescription,
+        completed_at: new Date().toISOString()
+      })
+      .eq('razorpay_order_id', razorpayOrderId)
+
+    if (attemptError) {
+      console.error('Error updating payment attempt:', attemptError)
     }
-    
-    // Create Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    
-    // Record failed payment attempt
-    const { data: payment, error: paymentError } = await supabase
+
+    // Record payment failure in payments table
+    const { error: paymentError } = await supabase
       .from('payments')
       .insert({
-        [bookingType === 'property' ? 'booking_id' : 'experience_booking_id']: bookingId,
-        amount: 0, // Failed payment, no amount captured
-        currency: 'INR', // Default currency
-        transaction_id: razorpayOrderId,
-        payment_method: 'Unknown',
-        payment_gateway: 'Razorpay',
+        booking_id: bookingType === 'property' ? bookingId : null,
+        experience_booking_id: bookingType === 'experience' ? bookingId : null,
+        amount: 0,
+        currency: 'INR',
+        transaction_id: `failed_${razorpayOrderId}`,
+        payment_method: 'unknown',
         payment_status: 'Failed',
+        payment_gateway: 'Razorpay',
+        razorpay_order_id: razorpayOrderId,
+        failure_reason: `${errorCode}: ${errorDescription}`,
         processed_at: new Date().toISOString()
       })
-      .select('id')
-      .single();
-    
+
     if (paymentError) {
-      console.error('Error recording failed payment:', paymentError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to record payment failure' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      console.error('Error recording failed payment:', paymentError)
     }
-    
-    // Update booking with payment failure information
-    const table = bookingType === 'property' ? 'bookings' : 'experience_bookings';
-    
-    const { error: updateError } = await supabase
-      .from(table)
-      .update({
-        payment_id: payment.id,
-        payment_status: 'Failed',
-        internal_notes: `Payment failed: ${errorCode || 'Unknown error'} - ${errorDescription || 'No description'}`
+
+    // Record analytics for failed payment
+    const { error: analyticsError } = await supabase
+      .from('booking_analytics')
+      .insert({
+        booking_id: bookingType === 'property' ? bookingId : null,
+        experience_booking_id: bookingType === 'experience' ? bookingId : null,
+        event_type: 'payment_failed',
+        event_data: {
+          razorpay_order_id: razorpayOrderId,
+          error_code: errorCode,
+          error_description: errorDescription
+        },
+        created_at: new Date().toISOString()
       })
-      .eq('id', bookingId);
-    
-    if (updateError) {
-      console.error('Error updating booking with payment failure:', updateError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to update booking with payment failure information' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+
+    if (analyticsError) {
+      console.error('Error recording failure analytics:', analyticsError)
     }
-    
+
+    console.log('Payment failure handled successfully')
+
     return new Response(
       JSON.stringify({ success: true }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-    
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      }
+    )
+
   } catch (error) {
-    console.error('Error handling Razorpay payment failure:', error);
-    
+    console.error('Error in handle-razorpay-failure:', error)
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+      JSON.stringify({ 
+        success: false,
+        error: error.message || 'Failed to handle payment failure' 
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      }
+    )
   }
-});
+})
