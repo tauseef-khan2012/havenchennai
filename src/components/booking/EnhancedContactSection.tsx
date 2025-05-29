@@ -80,9 +80,8 @@ export const EnhancedContactSection: React.FC<EnhancedContactSectionProps> = ({
       await signUp({
         email: signupData.email,
         password: signupData.password,
-        metadata: {
-          full_name: signupData.fullName
-        }
+        fullName: signupData.fullName,
+        acceptTerms: true
       });
       setShowSignupForm(false);
       toast({

@@ -7,8 +7,8 @@ import {
   PriceBreakdown,
   GuestInfo
 } from '@/types/booking';
-import { PropertyBookingStep1_DatesGuests } from './PropertyBookingStep1_DatesGuests';
-import { PropertyBookingStep2_Addons } from './PropertyBookingStep2_Addons';
+import PropertyBookingStep1_DatesGuests from './PropertyBookingStep1_DatesGuests';
+import PropertyBookingStep2_Addons from './PropertyBookingStep2_Addons';
 import PaymentStep from './steps/PaymentStep';
 import BookingConfirmationStep from './steps/BookingConfirmationStep';
 import { useBookingCreation } from '@/hooks/useBookingCreation';

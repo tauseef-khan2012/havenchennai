@@ -105,9 +105,8 @@ export const EnhancedDiscountSection: React.FC<EnhancedDiscountSectionProps> = (
       await signUp({
         email: signupData.email,
         password: signupData.password,
-        metadata: {
-          full_name: signupData.fullName
-        }
+        fullName: signupData.fullName,
+        acceptTerms: true
       });
 
       // Apply the signup discount
