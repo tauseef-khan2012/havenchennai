@@ -6,8 +6,10 @@ export interface DiscountApplication {
   isValid: boolean;
   discountAmount: number;
   discountCode?: string;
+  code?: string;
   discountType?: 'percentage' | 'fixed';
   discountValue?: number;
+  discountPercentage?: number;
   reason?: string;
 }
 
@@ -18,6 +20,39 @@ interface BookingDetails {
   numberOfGuests: number;
   subtotal: number;
 }
+
+/**
+ * Applies a discount code to a booking
+ */
+export const applyDiscountCode = async (
+  code: string,
+  propertyId: UUID,
+  checkInDate: Date,
+  checkOutDate: Date,
+  numberOfGuests: number,
+  subtotal: number
+): Promise<DiscountApplication> => {
+  const bookingDetails: BookingDetails = {
+    propertyId,
+    checkInDate,
+    checkOutDate,
+    numberOfGuests,
+    subtotal
+  };
+  
+  const result = await validateDiscountCode(code, bookingDetails);
+  
+  // Add additional properties for UI display
+  if (result.isValid) {
+    result.code = code;
+    result.discountCode = code;
+    if (result.discountType === 'percentage' && result.discountValue) {
+      result.discountPercentage = result.discountValue;
+    }
+  }
+  
+  return result;
+};
 
 /**
  * Validates a discount code against booking details
@@ -112,8 +147,10 @@ export const validateDiscountCode = async (
       isValid: true,
       discountAmount,
       discountCode: code,
+      code: code,
       discountType: discountCodes.discount_type as 'percentage' | 'fixed',
-      discountValue: discountCodes.discount_value
+      discountValue: discountCodes.discount_value,
+      discountPercentage: discountCodes.discount_type === 'percentage' ? discountCodes.discount_value : undefined
     };
 
   } catch (error) {

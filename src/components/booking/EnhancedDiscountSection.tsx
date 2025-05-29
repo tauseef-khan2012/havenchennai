@@ -7,8 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Gift, Percent, UserPlus, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { DiscountApplication } from '@/services/discountService';
-import { applyDiscountCode } from '@/services/discountService';
+import { DiscountApplication, applyDiscountCode } from '@/services/discountService';
 import { UUID } from '@/types/booking';
 
 interface EnhancedDiscountSectionProps {
@@ -65,13 +64,21 @@ export const EnhancedDiscountSection: React.FC<EnhancedDiscountSectionProps> = (
         subtotal
       );
       
-      onDiscountApplied(discount);
-      setDiscountCode('');
-      
-      toast({
-        title: "Discount applied!",
-        description: `You saved ${discount.discountAmount} with code ${discount.code}`,
-      });
+      if (discount.isValid) {
+        onDiscountApplied(discount);
+        setDiscountCode('');
+        
+        toast({
+          title: "Discount applied!",
+          description: `You saved ₹${discount.discountAmount.toFixed(2)} with code ${discount.code}`,
+        });
+      } else {
+        toast({
+          title: "Invalid discount code",
+          description: discount.reason || "Please check your code and try again.",
+          variant: "destructive"
+        });
+      }
     } catch (error) {
       toast({
         title: "Invalid discount code",
@@ -109,14 +116,21 @@ export const EnhancedDiscountSection: React.FC<EnhancedDiscountSectionProps> = (
         subtotal
       );
       
-      onDiscountApplied(discount);
-      onSignupDiscountClaimed?.();
-      setShowSignupForm(false);
-      
-      toast({
-        title: "Welcome to Haven!",
-        description: "Your account has been created and 5% discount applied!",
-      });
+      if (discount.isValid) {
+        onDiscountApplied(discount);
+        onSignupDiscountClaimed?.();
+        setShowSignupForm(false);
+        
+        toast({
+          title: "Welcome to Haven!",
+          description: "Your account has been created and 5% discount applied!",
+        });
+      } else {
+        toast({
+          title: "Account created!",
+          description: "Welcome to Haven! The discount could not be applied at this time.",
+        });
+      }
     } catch (error) {
       toast({
         title: "Signup failed",
@@ -219,7 +233,7 @@ export const EnhancedDiscountSection: React.FC<EnhancedDiscountSectionProps> = (
         <div className="space-y-3">
           <h4 className="font-medium">Have a discount code?</h4>
           
-          {appliedDiscount ? (
+          {appliedDiscount && appliedDiscount.isValid ? (
             <div className="bg-green-50 p-3 rounded-lg border border-green-200">
               <div className="flex items-center justify-between">
                 <div>
@@ -229,7 +243,7 @@ export const EnhancedDiscountSection: React.FC<EnhancedDiscountSectionProps> = (
                   </p>
                 </div>
                 <Badge variant="secondary" className="bg-green-100 text-green-800">
-                  {appliedDiscount.discountPercentage}% off
+                  {appliedDiscount.discountPercentage || appliedDiscount.discountValue}% off
                 </Badge>
               </div>
             </div>
