@@ -44,16 +44,21 @@ const BookingForm: React.FC<BookingFormProps> = ({
     phone: ''
   });
 
-  const handleDateChange = (checkIn: Date, checkOut: Date) => {
-    setSelectedCheckIn(checkIn);
-    setSelectedCheckOut(checkOut);
-  };
-
-  const handleStep1Next = () => {
+  const handleStep1Next = (data: { 
+    checkInDate: Date; 
+    checkOutDate: Date; 
+    numberOfGuests: number;
+    specialRequests?: string;
+  }) => {
+    setSelectedCheckIn(data.checkInDate);
+    setSelectedCheckOut(data.checkOutDate);
+    setGuestCount(data.numberOfGuests);
+    setSpecialRequests(data.specialRequests || '');
     setCurrentStep(2);
   };
 
-  const handleStep2Next = () => {
+  const handleStep2Next = (addons: {instanceId: UUID, attendees: number}[]) => {
+    setSelectedAddonExperiences(addons);
     setCurrentStep(3);
   };
 
@@ -73,26 +78,27 @@ const BookingForm: React.FC<BookingFormProps> = ({
         return (
           <PropertyBookingStep1_DatesGuests
             propertyId={propertyId}
-            selectedCheckIn={selectedCheckIn}
-            selectedCheckOut={selectedCheckOut}
-            guestCount={guestCount}
-            onDateChange={handleDateChange}
-            onGuestCountChange={setGuestCount}
             onNext={handleStep1Next}
-            isLoading={isCalculatingPrice}
+            initialValues={{
+              checkInDate: selectedCheckIn || undefined,
+              checkOutDate: selectedCheckOut || undefined,
+              numberOfGuests: guestCount,
+              specialRequests: specialRequests
+            }}
+            maxGuests={property?.max_guests || 10}
+            minNights={property?.min_nights || 1}
           />
         );
 
       case 2:
         return (
           <PropertyBookingStep2_Addons
-            selectedCheckIn={selectedCheckIn!}
-            selectedCheckOut={selectedCheckOut!}
-            guestCount={guestCount}
-            onAddonExperiencesChange={setSelectedAddonExperiences}
+            checkInDate={selectedCheckIn!}
+            checkOutDate={selectedCheckOut!}
+            numberOfGuests={guestCount}
             onNext={handleStep2Next}
             onBack={() => setCurrentStep(1)}
-            isLoading={false}
+            initialSelectedAddons={selectedAddonExperiences}
           />
         );
 
