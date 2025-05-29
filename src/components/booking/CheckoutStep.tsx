@@ -2,14 +2,14 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
-import { AlertCircle, User, Mail, Phone, Users } from 'lucide-react';
+import { AlertCircle, Users } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { EnhancedPriceSummary } from './EnhancedPriceSummary';
-import { DiscountCodeInput } from './DiscountCodeInput';
+import { EnhancedDiscountSection } from './EnhancedDiscountSection';
+import { EnhancedContactSection } from './EnhancedContactSection';
 import { GuestDetailsForm } from './GuestDetailsForm';
 import { EnhancedPriceBreakdown } from '@/services/enhancedPriceService';
 import { DiscountApplication } from '@/services/discountService';
@@ -107,7 +107,19 @@ export const CheckoutStep: React.FC<CheckoutStepProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleContactInfoChange = (field: keyof ContactInfo, value: string) => {
+  const handleContactInfoChange = (info: ContactInfo) => {
+    setContactInfo(info);
+    // Clear relevant errors
+    setErrors(prev => {
+      const updated = { ...prev };
+      delete updated.fullName;
+      delete updated.email;
+      delete updated.phone;
+      return updated;
+    });
+  };
+
+  const handleFieldChange = (field: keyof ContactInfo, value: string) => {
     setContactInfo(prev => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
@@ -170,7 +182,7 @@ export const CheckoutStep: React.FC<CheckoutStepProps> = ({
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5 text-haven-teal" />
+                <Users className="h-5 w-5 text-haven-teal" />
                 Booking Details
               </CardTitle>
             </CardHeader>
@@ -199,60 +211,13 @@ export const CheckoutStep: React.FC<CheckoutStepProps> = ({
             </CardContent>
           </Card>
 
-          {/* Contact Information */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Mail className="h-5 w-5 text-haven-teal" />
-                Contact Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name *</Label>
-                <Input
-                  id="fullName"
-                  value={contactInfo.fullName}
-                  onChange={(e) => handleContactInfoChange('fullName', e.target.value)}
-                  placeholder="Enter your full name"
-                  className={errors.fullName ? 'border-red-500' : ''}
-                />
-                {errors.fullName && (
-                  <p className="text-sm text-red-600">{errors.fullName}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={contactInfo.email}
-                  onChange={(e) => handleContactInfoChange('email', e.target.value)}
-                  placeholder="Enter your email address"
-                  className={errors.email ? 'border-red-500' : ''}
-                />
-                {errors.email && (
-                  <p className="text-sm text-red-600">{errors.email}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number *</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={contactInfo.phone}
-                  onChange={(e) => handleContactInfoChange('phone', e.target.value)}
-                  placeholder="Enter your phone number"
-                  className={errors.phone ? 'border-red-500' : ''}
-                />
-                {errors.phone && (
-                  <p className="text-sm text-red-600">{errors.phone}</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          {/* Enhanced Contact Information */}
+          <EnhancedContactSection
+            contactInfo={contactInfo}
+            onContactInfoChange={handleContactInfoChange}
+            errors={errors}
+            onFieldChange={handleFieldChange}
+          />
 
           {/* Guest Details */}
           <Card>
@@ -263,48 +228,11 @@ export const CheckoutStep: React.FC<CheckoutStepProps> = ({
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {guestDetails.map((guest, index) => (
-                <div key={index} className="space-y-4">
-                  <h4 className="font-medium text-gray-900">
-                    {index === 0 ? 'Primary Guest' : `Guest ${index + 1}`}
-                  </h4>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor={`guest-${index}-name`}>Full Name *</Label>
-                      <Input
-                        id={`guest-${index}-name`}
-                        value={guest.name}
-                        onChange={(e) => handleGuestDetailsChange(index, 'name', e.target.value)}
-                        placeholder="Enter guest name"
-                        className={errors[`guest_${index}_name`] ? 'border-red-500' : ''}
-                      />
-                      {errors[`guest_${index}_name`] && (
-                        <p className="text-sm text-red-600">{errors[`guest_${index}_name`]}</p>
-                      )}
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor={`guest-${index}-age`}>Age (optional)</Label>
-                      <Input
-                        id={`guest-${index}-age`}
-                        type="number"
-                        min="0"
-                        max="120"
-                        value={guest.age || ''}
-                        onChange={(e) => handleGuestDetailsChange(index, 'age', parseInt(e.target.value) || undefined)}
-                        placeholder="Age"
-                        className={errors[`guest_${index}_age`] ? 'border-red-500' : ''}
-                      />
-                      {errors[`guest_${index}_age`] && (
-                        <p className="text-sm text-red-600">{errors[`guest_${index}_age`]}</p>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {index < guestDetails.length - 1 && <Separator />}
-                </div>
-              ))}
+              <GuestDetailsForm
+                guestDetails={guestDetails}
+                onGuestDetailsChange={handleGuestDetailsChange}
+                errors={errors}
+              />
 
               {guestCount > 2 && (
                 <Alert>
@@ -339,8 +267,8 @@ export const CheckoutStep: React.FC<CheckoutStepProps> = ({
 
         {/* Right Column - Pricing Summary */}
         <div className="space-y-6">
-          {/* Discount Code */}
-          <DiscountCodeInput
+          {/* Enhanced Discount Code */}
+          <EnhancedDiscountSection
             propertyId={propertyId}
             checkInDate={selectedCheckIn}
             checkOutDate={selectedCheckOut}

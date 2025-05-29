@@ -173,6 +173,9 @@ export type Database = {
           currency: string
           customer_notes: string | null
           discounts_total: number | null
+          guest_email: string | null
+          guest_name: string | null
+          guest_phone: string | null
           id: string
           internal_notes: string | null
           last_payment_attempt_at: string | null
@@ -187,7 +190,7 @@ export type Database = {
           taxes_total: number | null
           total_amount_due: number
           updated_at: string
-          user_id: string
+          user_id: string | null
           utm_campaign: string | null
           utm_medium: string | null
           utm_source: string | null
@@ -212,6 +215,9 @@ export type Database = {
           currency?: string
           customer_notes?: string | null
           discounts_total?: number | null
+          guest_email?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
           id?: string
           internal_notes?: string | null
           last_payment_attempt_at?: string | null
@@ -226,7 +232,7 @@ export type Database = {
           taxes_total?: number | null
           total_amount_due: number
           updated_at?: string
-          user_id: string
+          user_id?: string | null
           utm_campaign?: string | null
           utm_medium?: string | null
           utm_source?: string | null
@@ -251,6 +257,9 @@ export type Database = {
           currency?: string
           customer_notes?: string | null
           discounts_total?: number | null
+          guest_email?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
           id?: string
           internal_notes?: string | null
           last_payment_attempt_at?: string | null
@@ -265,7 +274,7 @@ export type Database = {
           taxes_total?: number | null
           total_amount_due?: number
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
           utm_campaign?: string | null
           utm_medium?: string | null
           utm_source?: string | null
@@ -368,6 +377,9 @@ export type Database = {
           created_at: string
           currency: string
           experience_instance_id: string
+          guest_email: string | null
+          guest_name: string | null
+          guest_phone: string | null
           id: string
           last_payment_attempt_at: string | null
           number_of_attendees: number
@@ -379,7 +391,7 @@ export type Database = {
           special_requests: string | null
           total_amount_due: number
           updated_at: string
-          user_id: string
+          user_id: string | null
           utm_campaign: string | null
           utm_medium: string | null
           utm_source: string | null
@@ -397,6 +409,9 @@ export type Database = {
           created_at?: string
           currency?: string
           experience_instance_id: string
+          guest_email?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
           id?: string
           last_payment_attempt_at?: string | null
           number_of_attendees: number
@@ -408,7 +423,7 @@ export type Database = {
           special_requests?: string | null
           total_amount_due: number
           updated_at?: string
-          user_id: string
+          user_id?: string | null
           utm_campaign?: string | null
           utm_medium?: string | null
           utm_source?: string | null
@@ -426,6 +441,9 @@ export type Database = {
           created_at?: string
           currency?: string
           experience_instance_id?: string
+          guest_email?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
           id?: string
           last_payment_attempt_at?: string | null
           number_of_attendees?: number
@@ -437,7 +455,7 @@ export type Database = {
           special_requests?: string | null
           total_amount_due?: number
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
           utm_campaign?: string | null
           utm_medium?: string | null
           utm_source?: string | null

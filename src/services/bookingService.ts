@@ -23,7 +23,7 @@ export const createBooking = async (
         throw new Error('Missing property booking details');
       }
 
-      // Create property booking
+      // Create property booking (user must be authenticated for this function)
       const result = await createPropertyBooking({
         propertyId: bookingData.property.propertyId,
         userId: bookingData.userId,
@@ -48,7 +48,7 @@ export const createBooking = async (
         throw new Error('Missing experience booking details');
       }
       
-      // Create experience booking
+      // Create experience booking (user must be authenticated for this function)
       const booking = await createExperienceBooking(
         bookingData.userId,
         bookingData.experience.instanceId,
@@ -178,3 +178,6 @@ export const updateBookingPaymentStatus = async (
 // Re-export functions from other services for backward compatibility
 export { checkPropertyAvailability, checkExperienceInstanceAvailability } from './availabilityService';
 export { calculateBookingPrice, calculatePropertyBookingPrice, calculateExperienceBookingPrice } from './priceService';
+
+// Export guest booking functions
+export { createGuestBooking, getGuestBookingsByEmail, linkGuestBookingsToUser } from './guestBookingService';

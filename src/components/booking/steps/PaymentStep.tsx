@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { PaymentReceipt } from '@/components/payment/PaymentReceipt';
 import { PriceSummary } from '@/components/booking/PriceSummary';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { 
   UUID, 
@@ -13,10 +13,10 @@ import {
   PriceBreakdown, 
   PropertyBookingDetails,
   ExperienceBookingDetails,
-  GuestInfo,
-  PaymentStatus
+  GuestInfo
 } from '@/types/booking';
 import { createBooking } from '@/services/bookingService';
+import { createGuestBooking } from '@/services/guestBookingService';
 import { CreditCard, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -27,6 +27,11 @@ export interface PaymentStepProps {
   experienceDetails?: ExperienceBookingDetails;
   guests?: GuestInfo[];
   selectedAddonExperiences?: {instanceId: UUID, attendees: number}[];
+  contactInfo: {
+    fullName: string;
+    email: string;
+    phone: string;
+  };
   onBack: () => void;
   onSuccess: (bookingId: UUID, bookingReference: string) => void;
   isLoading?: boolean;
@@ -39,6 +44,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
   experienceDetails,
   guests = [],
   selectedAddonExperiences = [],
+  contactInfo,
   onBack,
   onSuccess,
   isLoading = false
@@ -53,31 +59,44 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
   const [bookingReference, setBookingReference] = useState<string | null>(null);
 
   const handlePayment = async () => {
-    if (!user) {
-      toast({
-        title: 'Authentication required',
-        description: 'Please sign in to complete your booking.',
-        variant: 'destructive',
-      });
-      navigate('/login');
-      return;
-    }
-
     setIsSubmitting(true);
     setPaymentError(null);
     
     try {
-      const bookingData = {
-        type: bookingType,
-        userId: user.id,
-        priceBreakdown: priceBreakdown,
-        guests: guests,
-        selectedAddonExperiences: selectedAddonExperiences,
-        property: propertyDetails,
-        experience: experienceDetails
-      };
+      let result;
       
-      const result = await createBooking(bookingData);
+      if (user) {
+        // User is logged in - create regular booking
+        const bookingData = {
+          type: bookingType,
+          userId: user.id,
+          priceBreakdown: priceBreakdown,
+          guests: guests,
+          selectedAddonExperiences: selectedAddonExperiences,
+          property: propertyDetails,
+          experience: experienceDetails
+        };
+        
+        result = await createBooking(bookingData);
+      } else {
+        // Guest booking - no authentication required
+        const guestBookingData = {
+          type: bookingType,
+          guestName: contactInfo.fullName,
+          guestEmail: contactInfo.email,
+          guestPhone: contactInfo.phone,
+          priceBreakdown: priceBreakdown,
+          propertyId: propertyDetails?.propertyId,
+          checkInDate: propertyDetails?.checkInDate,
+          checkOutDate: propertyDetails?.checkOutDate,
+          numberOfGuests: propertyDetails?.numberOfGuests,
+          specialRequests: propertyDetails?.specialRequests,
+          instanceId: experienceDetails?.instanceId,
+          numberOfAttendees: experienceDetails?.numberOfAttendees
+        };
+        
+        result = await createGuestBooking(guestBookingData);
+      }
       
       setBookingCreated(true);
       setBookingId(result.bookingId);
@@ -113,6 +132,21 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
           <div>
             <h3 className="text-lg font-medium mb-3">Booking Summary</h3>
             <PriceSummary priceBreakdown={priceBreakdown} />
+            
+            {/* Contact Information Summary */}
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <h4 className="font-medium mb-2">Contact Details</h4>
+              <div className="space-y-1 text-sm">
+                <p><span className="font-medium">Name:</span> {contactInfo.fullName}</p>
+                <p><span className="font-medium">Email:</span> {contactInfo.email}</p>
+                <p><span className="font-medium">Phone:</span> {contactInfo.phone}</p>
+              </div>
+              {!user && (
+                <p className="text-xs text-gray-600 mt-2">
+                  Booking as guest • You can create an account later to manage your bookings
+                </p>
+              )}
+            </div>
           </div>
           
           <div>

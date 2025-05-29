@@ -7,12 +7,13 @@ import {
   BookingType,
   GuestInfo
 } from '@/types/booking';
-import { createBooking } from '@/services/bookingService';
+import { createBooking, createGuestBooking } from '@/services/bookingService';
 import { checkPropertyAvailability } from '@/services/availabilityService';
 import { calculateEnhancedPropertyBookingPrice } from '@/services/enhancedPriceService';
 
 /**
  * Enhanced hook for creating bookings with comprehensive validation
+ * Now supports both authenticated users and guest bookings
  */
 export const useBookingCreation = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -21,6 +22,7 @@ export const useBookingCreation = () => {
 
   /**
    * Create a booking with comprehensive validation and error handling
+   * Works for both authenticated users and guests
    */
   const makeBooking = useCallback(async (
     type: BookingType,
@@ -35,17 +37,12 @@ export const useBookingCreation = () => {
       numberOfAttendees?: number;
       guests?: GuestInfo[];
       selectedAddonExperiences?: {instanceId: UUID, attendees: number}[];
+      // Guest information (required when user is not authenticated)
+      guestName?: string;
+      guestEmail?: string;
+      guestPhone?: string;
     }
   ): Promise<{ bookingId: UUID, bookingReference: string } | null> => {
-    if (!user) {
-      toast({
-        title: 'Authentication required',
-        description: 'Please sign in to make a booking.',
-        variant: 'destructive'
-      });
-      return null;
-    }
-    
     setIsLoading(true);
     
     try {
@@ -54,6 +51,11 @@ export const useBookingCreation = () => {
         throw new Error('Missing required property booking details');
       } else if (type === 'experience' && (!details.instanceId || !details.numberOfAttendees)) {
         throw new Error('Missing required experience booking details');
+      }
+
+      // For guest bookings, validate contact information
+      if (!user && (!details.guestName || !details.guestEmail || !details.guestPhone)) {
+        throw new Error('Contact information is required for guest bookings');
       }
 
       // Check availability for property bookings
@@ -100,34 +102,55 @@ export const useBookingCreation = () => {
         throw new Error('Failed to calculate price');
       }
       
-      // Prepare booking data
-      const bookingData: Parameters<typeof createBooking>[0] = {
-        type,
-        userId: user.id,
-        priceBreakdown,
-        guests: details.guests,
-        selectedAddonExperiences: details.selectedAddonExperiences
-      };
+      let bookingResult;
       
-      if (type === 'property' && details.propertyId && details.checkInDate && details.checkOutDate && details.numberOfGuests) {
-        bookingData.property = {
+      if (user) {
+        // User is authenticated - create regular booking
+        const bookingData: Parameters<typeof createBooking>[0] = {
+          type,
+          userId: user.id,
+          priceBreakdown,
+          guests: details.guests,
+          selectedAddonExperiences: details.selectedAddonExperiences
+        };
+        
+        if (type === 'property' && details.propertyId && details.checkInDate && details.checkOutDate && details.numberOfGuests) {
+          bookingData.property = {
+            propertyId: details.propertyId,
+            checkInDate: details.checkInDate,
+            checkOutDate: details.checkOutDate,
+            numberOfGuests: details.numberOfGuests,
+            specialRequests: details.specialRequests,
+            customerNotes: details.customerNotes
+          };
+        } else if (type === 'experience' && details.instanceId && details.numberOfAttendees) {
+          bookingData.experience = {
+            instanceId: details.instanceId,
+            numberOfAttendees: details.numberOfAttendees,
+            specialRequests: details.specialRequests
+          };
+        }
+        
+        bookingResult = await createBooking(bookingData);
+      } else {
+        // Guest booking - no authentication required
+        const guestBookingData = {
+          type,
+          guestName: details.guestName!,
+          guestEmail: details.guestEmail!,
+          guestPhone: details.guestPhone!,
+          priceBreakdown,
           propertyId: details.propertyId,
           checkInDate: details.checkInDate,
           checkOutDate: details.checkOutDate,
           numberOfGuests: details.numberOfGuests,
           specialRequests: details.specialRequests,
-          customerNotes: details.customerNotes
-        };
-      } else if (type === 'experience' && details.instanceId && details.numberOfAttendees) {
-        bookingData.experience = {
           instanceId: details.instanceId,
-          numberOfAttendees: details.numberOfAttendees,
-          specialRequests: details.specialRequests
+          numberOfAttendees: details.numberOfAttendees
         };
+        
+        bookingResult = await createGuestBooking(guestBookingData);
       }
-      
-      // Create booking
-      const bookingResult = await createBooking(bookingData);
       
       toast({
         title: 'Booking created successfully',
