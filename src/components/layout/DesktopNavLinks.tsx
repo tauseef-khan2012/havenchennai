@@ -24,9 +24,6 @@ const DesktopNavLinks = ({ isActive, user }: DesktopNavLinksProps) => {
         <NavLink to="/gallery" isActive={isActive("/gallery")}>
           Gallery
         </NavLink>
-        <NavLink to="/blog" isActive={isActive("/blog")}>
-          Journal
-        </NavLink>
         <NavLink to="/about" isActive={isActive("/about")}>
           About Us
         </NavLink>
