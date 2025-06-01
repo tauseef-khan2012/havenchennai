@@ -16,7 +16,7 @@ import {
 } from '@/types/booking';
 import { createBooking } from '@/services/bookingService';
 import { createGuestBooking } from '@/services/guestBookingService';
-import { CreditCard, AlertCircle } from 'lucide-react';
+import { CreditCard, AlertCircle, CheckCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export interface PaymentStepProps {
@@ -56,12 +56,30 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
   const [bookingId, setBookingId] = useState<UUID | null>(null);
   const [bookingReference, setBookingReference] = useState<string | null>(null);
 
+  // Validate contact information before proceeding
+  const validateContactInfo = () => {
+    if (!contactInfo.fullName.trim()) {
+      return { isValid: false, message: 'Full name is required' };
+    }
+    if (!contactInfo.email.trim()) {
+      return { isValid: false, message: 'Email address is required' };
+    }
+    if (!contactInfo.phone.trim()) {
+      return { isValid: false, message: 'Phone number is required' };
+    }
+    return { isValid: true, message: '' };
+  };
+
   const handlePayment = async () => {
-    // Validate contact information for guest bookings
-    if (!user && (!contactInfo.fullName || !contactInfo.email || !contactInfo.phone)) {
+    console.log('Payment initiated with contact info:', contactInfo);
+    console.log('User status:', user ? 'Logged in' : 'Guest');
+    
+    // Validate contact information
+    const validation = validateContactInfo();
+    if (!validation.isValid) {
       toast({
         title: 'Missing contact information',
-        description: 'Please provide your contact details to proceed.',
+        description: validation.message,
         variant: 'destructive'
       });
       return;
@@ -75,6 +93,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
       
       if (user) {
         // User is logged in - create regular booking
+        console.log('Creating authenticated user booking');
         const bookingData = {
           type: bookingType,
           userId: user.id,
@@ -88,6 +107,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
         result = await createBooking(bookingData);
       } else {
         // Guest booking - no authentication required
+        console.log('Creating guest booking');
         const guestBookingData = {
           type: bookingType,
           guestName: contactInfo.fullName,
@@ -155,6 +175,21 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
                 <p className="text-xs text-gray-600 mt-2">
                   Booking as guest • You can create an account later to manage your bookings
                 </p>
+              )}
+            </div>
+            
+            {/* Booking Status */}
+            <div className="mt-4">
+              {user ? (
+                <div className="flex items-center gap-2 text-sm text-green-600">
+                  <CheckCircle className="h-4 w-4" />
+                  <span>Signed in • Faster checkout</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-sm text-blue-600">
+                  <CheckCircle className="h-4 w-4" />
+                  <span>Guest booking • No account required</span>
+                </div>
               )}
             </div>
           </div>

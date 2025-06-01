@@ -28,7 +28,7 @@ export const EnhancedContactSection: React.FC<EnhancedContactSectionProps> = ({
   errors,
   onFieldChange
 }) => {
-  const { user, signUp, signIn } = useAuth();
+  const { user, signUp, signIn, profile } = useAuth();
   const { toast } = useToast();
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [showSignupForm, setShowSignupForm] = useState(false);
@@ -101,15 +101,24 @@ export const EnhancedContactSection: React.FC<EnhancedContactSectionProps> = ({
 
   // If user is logged in, auto-fill their information
   React.useEffect(() => {
-    if (user && user.user_metadata) {
+    if (user) {
+      console.log('User object:', user);
+      console.log('Profile object:', profile);
+      
+      // Try multiple possible locations for user data
+      const userData = user.user_metadata || {};
+      const profileData = profile || {};
+      
       const newContactInfo = {
-        fullName: user.user_metadata.full_name || contactInfo.fullName,
+        fullName: userData.full_name || profileData.full_name || userData.fullName || contactInfo.fullName,
         email: user.email || contactInfo.email,
-        phone: user.user_metadata.phone_number || contactInfo.phone
+        phone: userData.phone_number || userData.phone || profileData.phone_number || profileData.phone || contactInfo.phone
       };
+      
+      console.log('Setting contact info:', newContactInfo);
       onContactInfoChange(newContactInfo);
     }
-  }, [user]);
+  }, [user, profile, onContactInfoChange]);
 
   return (
     <Card>
