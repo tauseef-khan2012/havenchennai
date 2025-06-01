@@ -7,7 +7,8 @@ interface AuthenticationNoticeProps {
 }
 
 const AuthenticationNotice: React.FC<AuthenticationNoticeProps> = ({ user }) => {
-  // Component no longer needed - guest bookings are now supported
+  // Component is disabled - guest bookings are now fully supported
+  // No authentication notice should be shown
   return null;
 };
 

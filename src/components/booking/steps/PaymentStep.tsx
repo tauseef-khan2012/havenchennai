@@ -6,7 +6,6 @@ import { PaymentReceipt } from '@/components/payment/PaymentReceipt';
 import { PriceSummary } from '@/components/booking/PriceSummary';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
 import { 
   UUID, 
   BookingType, 
@@ -51,7 +50,6 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [bookingCreated, setBookingCreated] = useState(false);
@@ -59,6 +57,16 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
   const [bookingReference, setBookingReference] = useState<string | null>(null);
 
   const handlePayment = async () => {
+    // Validate contact information for guest bookings
+    if (!user && (!contactInfo.fullName || !contactInfo.email || !contactInfo.phone)) {
+      toast({
+        title: 'Missing contact information',
+        description: 'Please provide your contact details to proceed.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     setPaymentError(null);
     
@@ -104,7 +112,9 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
       
       toast({
         title: 'Booking created!',
-        description: 'Redirecting to payment...',
+        description: user 
+          ? 'Redirecting to payment...' 
+          : 'Your booking has been created. Proceeding to payment...',
       });
 
       onSuccess(result.bookingId, result.bookingReference);

@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { 
   UUID,
   BookingType,
@@ -54,6 +53,24 @@ const BookingForm: React.FC<BookingFormProps> = ({
     setSelectedCheckOut(data.checkOutDate);
     setGuestCount(data.numberOfGuests);
     setSpecialRequests(data.specialRequests || '');
+    
+    // Calculate a basic price breakdown for now
+    const basePrice = data.numberOfGuests * 2000; // ₹2000 per guest per night
+    const nights = Math.ceil((data.checkOutDate.getTime() - data.checkInDate.getTime()) / (1000 * 60 * 60 * 24));
+    const subtotal = basePrice * nights;
+    const taxAmount = subtotal * 0.18; // 18% GST
+    const totalAmountDue = subtotal + taxAmount;
+    
+    setPriceBreakdown({
+      basePrice: subtotal,
+      discountAmount: 0,
+      subtotalAfterDiscount: subtotal,
+      taxPercentage: 18,
+      taxAmount: taxAmount,
+      totalAmountDue: totalAmountDue,
+      currency: 'INR'
+    });
+    
     setCurrentStep(2);
   };
 
