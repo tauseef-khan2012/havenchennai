@@ -105,9 +105,9 @@ export const EnhancedContactSection: React.FC<EnhancedContactSectionProps> = ({
       console.log('User object:', user);
       console.log('Profile object:', profile);
       
-      // Try multiple possible locations for user data
-      const userData = user.user_metadata || {};
-      const profileData = profile || {};
+      // Extract user metadata with proper typing
+      const userData = user.user_metadata as Record<string, any> || {};
+      const profileData = profile as Record<string, any> || {};
       
       const newContactInfo = {
         fullName: userData.full_name || profileData.full_name || userData.fullName || contactInfo.fullName,
