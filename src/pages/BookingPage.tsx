@@ -4,12 +4,14 @@ import { usePropertyBooking } from '@/hooks/usePropertyBooking';
 import { useBookingPricing } from '@/hooks/useBookingPricing';
 import { useBookingDates } from '@/hooks/useBookingDates';
 import { useBookingNavigation } from '@/hooks/useBookingNavigation';
+import { useSearchParams } from 'react-router-dom';
 import { BookingPageLayout } from '@/components/booking/BookingPageLayout';
 import { BookingPageLoadingState } from '@/components/booking/BookingPageLoadingState';
 import { BookingPageNotFound } from '@/components/booking/BookingPageNotFound';
 import { BookingPageContent } from '@/components/booking/BookingPageContent';
 
 const BookingPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
   const { property, propertyId, isLoading, user } = usePropertyBooking();
   const { selectedCheckIn, selectedCheckOut, handleDateRangeSelect } = useBookingDates();
   const {
@@ -23,6 +25,23 @@ const BookingPage: React.FC = () => {
   } = useBookingPricing();
   const { handleProceedToPayment, handlePlatformBooking } = useBookingNavigation();
 
+  // Parse URL parameters and set initial dates/guests
+  useEffect(() => {
+    const checkInParam = searchParams.get('checkIn');
+    const checkOutParam = searchParams.get('checkOut');
+    const guestsParam = searchParams.get('guests');
+
+    if (checkInParam && checkOutParam) {
+      const checkInDate = new Date(checkInParam);
+      const checkOutDate = new Date(checkOutParam);
+      
+      // Validate dates
+      if (!isNaN(checkInDate.getTime()) && !isNaN(checkOutDate.getTime()) && checkOutDate > checkInDate) {
+        handleDateRangeSelect(checkInDate, checkOutDate);
+      }
+    }
+  }, [searchParams, handleDateRangeSelect]);
+
   const handleDateSelection = async (checkIn: Date, checkOut: Date) => {
     handleDateRangeSelect(checkIn, checkOut);
     
@@ -33,12 +52,15 @@ const BookingPage: React.FC = () => {
   };
 
   const handlePaymentProceed = () => {
+    const guestsParam = searchParams.get('guests');
+    const guestCount = guestsParam ? parseInt(guestsParam) : 2;
+    
     handleProceedToPayment(
       user,
       propertyId,
       selectedCheckIn,
       selectedCheckOut,
-      2, // Default guest count
+      guestCount,
       priceBreakdown,
       appliedDiscount
     );

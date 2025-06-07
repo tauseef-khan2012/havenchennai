@@ -18,8 +18,8 @@ const Hero = () => {
       <div className="absolute inset-0 bg-black bg-opacity-40" />
       <div className="relative h-full container-custom flex flex-col justify-center">
         <div className="max-w-2xl animate-fade-up">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">Escape to Lakeside Intimacy at Haven</h1>
-          <p className="text-xl text-white mb-8">Experience our unique stacked container home retreat beside Muttukadu Lake, where minimal living meets expansive views and meaningful connections.</p>
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">Welcome to Haven</h1>
+          <p className="text-xl text-white mb-8">Experience sustainable luxury in our unique container home retreat</p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link to={`/booking?propertyId=${havenPropertyId}`}>
               <Button className="btn-primary text-lg">Book Your Stay</Button>

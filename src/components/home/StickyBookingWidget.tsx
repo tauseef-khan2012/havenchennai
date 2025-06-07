@@ -1,17 +1,21 @@
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { format, addDays } from 'date-fns';
 import { Calendar, ChevronRight, X } from 'lucide-react';
 
 const StickyBookingWidget = () => {
+  const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [checkIn, setCheckIn] = useState<Date | undefined>(addDays(new Date(), 1));
   const [checkOut, setCheckOut] = useState<Date | undefined>(addDays(new Date(), 3));
   const [guests, setGuests] = useState(2);
+  
+  // Use consistent property ID for Haven
+  const havenPropertyId = "550e8400-e29b-41d4-a716-446655440000";
   
   useEffect(() => {
     const handleScroll = () => {
@@ -42,6 +46,17 @@ const StickyBookingWidget = () => {
   
   const disableCheckoutDates = (date: Date) => {
     return checkIn ? date <= checkIn : false;
+  };
+
+  const handleContinue = () => {
+    const params = new URLSearchParams({
+      propertyId: havenPropertyId,
+      ...(checkIn && { checkIn: format(checkIn, 'yyyy-MM-dd') }),
+      ...(checkOut && { checkOut: format(checkOut, 'yyyy-MM-dd') }),
+      guests: guests.toString()
+    });
+    
+    navigate(`/booking?${params.toString()}`);
   };
   
   return (
@@ -106,7 +121,7 @@ const StickyBookingWidget = () => {
                 onChange={(e) => setGuests(parseInt(e.target.value))}
                 className="w-full rounded-md border border-input bg-background px-3 py-2"
               >
-                {[1, 2, 3, 4].map(num => (
+                {[1, 2, 3, 4, 5].map(num => (
                   <option key={num} value={num}>
                     {num} {num === 1 ? 'Guest' : 'Guests'}
                   </option>
@@ -122,14 +137,14 @@ const StickyBookingWidget = () => {
                 </div>
               </div>
               
-              <Link 
-                to={`/booking?checkin=${checkIn ? format(checkIn, 'yyyy-MM-dd') : ''}&checkout=${checkOut ? format(checkOut, 'yyyy-MM-dd') : ''}&guests=${guests}`}
+              <Button 
+                onClick={handleContinue}
+                className="bg-haven-teal text-white hover:bg-opacity-90"
+                disabled={!checkIn || !checkOut}
               >
-                <Button className="bg-haven-teal text-white hover:bg-opacity-90">
-                  Continue
-                  <ChevronRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
+                Continue
+                <ChevronRight className="ml-2 h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
