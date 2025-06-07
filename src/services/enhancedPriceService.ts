@@ -2,22 +2,13 @@
 import { supabase } from '@/integrations/supabase/client';
 import { 
   UUID, 
-  BookingType, 
   PriceBreakdown
 } from '@/types/booking';
-import { 
-  calculateNights, 
-  getPropertyBasePricing, 
-  getExperienceInstancePricing
-} from './pricing/basePriceService';
-import { calculateAddonExperiencesTotal } from './pricing/addonCalculationService';
-import { getExternalRates } from './pricing/externalRatesService';
-import { getPricingRules } from './pricing/pricingRulesService';
+import { calculateNights } from './pricing/basePriceService';
 import { calculateGST } from './pricing/gstCalculationService';
-import { applyPricingRules } from './pricing/discountApplicationService';
 
 /**
- * Enhanced pricing service with GST compliance and dynamic pricing
+ * Simplified pricing service with hardcoded base price and no external dependencies
  */
 
 export interface EnhancedPriceBreakdown extends PriceBreakdown {
@@ -26,53 +17,33 @@ export interface EnhancedPriceBreakdown extends PriceBreakdown {
     sgst: number;
     igst?: number;
   };
-  competitorRates?: any[];
-  appliedDiscounts?: {
-    name: string;
-    percentage: number;
-    amount: number;
-  }[];
-  savingsFromCompetitors?: number;
 }
 
 /**
- * Enhanced property booking price calculation
+ * Simplified property booking price calculation
+ * Base price: ₹4000 per night
+ * Additional guests: ₹500 per guest after 2nd guest
+ * GST: 18%
  */
 export const calculateEnhancedPropertyBookingPrice = async (
   propertyId: UUID,
   checkInDate: Date,
   checkOutDate: Date,
-  selectedAddonExperiences?: {instanceId: UUID, attendees: number}[]
+  guestCount: number = 2
 ): Promise<EnhancedPriceBreakdown> => {
   try {
-    // Calculate number of nights using the new utility
+    // Calculate number of nights
     const nights = calculateNights(checkInDate, checkOutDate);
     
-    // Set base price to ₹4000 per night (hardcoded as requested)
+    // Hardcoded base price: ₹4000 per night
     const basePricePerNight = 4000;
-    const originalBasePrice = basePricePerNight * nights;
+    const basePrice = basePricePerNight * nights;
     
-    // Get external rates and pricing rules
-    const [externalRates, pricingRules] = await Promise.all([
-      getExternalRates(propertyId, checkInDate, checkOutDate),
-      getPricingRules(propertyId)
-    ]);
+    // Additional guest charges: ₹500 per guest after 2nd
+    const additionalGuestCharges = Math.max(0, guestCount - 2) * 500;
     
-    // Apply pricing rules for discounts
-    const { discountedPrice, appliedDiscounts, savingsFromCompetitors } = applyPricingRules(
-      originalBasePrice,
-      pricingRules,
-      externalRates
-    );
-    
-    // Remove cleaning fee (set to 0 as requested)
-    const cleaningFee = 0;
-    
-    // Calculate addon experiences cost using the correct modular service
-    const addonExperiencesTotal = await calculateAddonExperiencesTotal(selectedAddonExperiences);
-    
-    // Calculate subtotal before GST
-    const subtotalBeforeGST = discountedPrice + cleaningFee + addonExperiencesTotal;
+    // Subtotal before GST (no discounts applied here - handled in UI)
+    const subtotalBeforeGST = basePrice + additionalGuestCharges;
     
     // Calculate GST (18%)
     const gstBreakdown = calculateGST(subtotalBeforeGST);
@@ -80,84 +51,86 @@ export const calculateEnhancedPropertyBookingPrice = async (
     // Calculate total
     const totalAmountDue = subtotalBeforeGST + gstBreakdown.total;
 
-    // Calculate total discount amount
-    const totalDiscountAmount = appliedDiscounts.reduce((sum, discount) => sum + discount.amount, 0);
-
     return {
-      basePrice: originalBasePrice,
-      discountAmount: totalDiscountAmount,
-      subtotalAfterDiscount: discountedPrice,
+      basePrice: basePrice,
+      discountAmount: 0, // Discounts handled in UI layer
+      subtotalAfterDiscount: subtotalBeforeGST,
       taxPercentage: 18,
       taxAmount: gstBreakdown.total,
-      cleaningFee: cleaningFee > 0 ? cleaningFee : undefined, // Only include if > 0
-      addonExperiencesTotal: addonExperiencesTotal > 0 ? addonExperiencesTotal : undefined,
       totalAmountDue,
       currency: 'INR',
       gstBreakdown: {
         cgst: gstBreakdown.cgst,
         sgst: gstBreakdown.sgst,
         igst: gstBreakdown.igst
-      },
-      competitorRates: externalRates,
-      appliedDiscounts,
-      savingsFromCompetitors
+      }
     };
   } catch (error) {
     console.error('Error in calculateEnhancedPropertyBookingPrice:', error);
-    throw error;
+    
+    // Simple fallback calculation
+    const nights = calculateNights(checkInDate, checkOutDate);
+    const basePrice = 4000 * nights;
+    const additionalGuestCharges = Math.max(0, guestCount - 2) * 500;
+    const subtotal = basePrice + additionalGuestCharges;
+    const gstAmount = subtotal * 0.18;
+    
+    return {
+      basePrice,
+      discountAmount: 0,
+      subtotalAfterDiscount: subtotal,
+      taxPercentage: 18,
+      taxAmount: gstAmount,
+      totalAmountDue: subtotal + gstAmount,
+      currency: 'INR',
+      gstBreakdown: {
+        cgst: gstAmount / 2,
+        sgst: gstAmount / 2
+      }
+    };
   }
 };
 
 /**
- * Enhanced experience booking price calculation
+ * Simple experience booking price calculation (keeping for compatibility)
  */
 export const calculateEnhancedExperienceBookingPrice = async (
   instanceId: UUID,
   numberOfAttendees: number
 ): Promise<EnhancedPriceBreakdown> => {
   try {
-    // Get experience instance details using the new modular service
-    const instance = await getExperienceInstancePricing(instanceId);
+    const { data: instance, error } = await supabase
+      .from('experience_instances')
+      .select(`
+        *,
+        experience:experiences(*)
+      `)
+      .eq('id', instanceId)
+      .single();
 
-    // Get pricing rules for experience
-    const pricingRules = await getPricingRules(undefined, instance.experience?.id);
-    
-    // Determine pricing model and base price
-    const useFlatFee = instance.flat_fee_price_override !== null || 
-                        (instance.experience?.flat_fee_price !== null && instance.price_per_person_override === null);
-    
-    let basePrice = 0;
-    if (useFlatFee) {
-      basePrice = instance.flat_fee_price_override ?? instance.experience?.flat_fee_price ?? 0;
-    } else {
-      const pricePerPerson = instance.price_per_person_override ?? instance.experience?.price_per_person ?? 0;
-      basePrice = pricePerPerson * numberOfAttendees;
+    if (error || !instance) {
+      throw new Error('Experience instance not found');
     }
-    
-    // Apply pricing rules
-    const { discountedPrice, appliedDiscounts } = applyPricingRules(basePrice, pricingRules, []);
-    
-    // Calculate GST (18%)
-    const gstBreakdown = calculateGST(discountedPrice);
-    
-    // Calculate total
-    const totalAmountDue = discountedPrice + gstBreakdown.total;
-    const totalDiscountAmount = appliedDiscounts.reduce((sum, discount) => sum + discount.amount, 0);
 
+    // Simple pricing logic
+    const basePrice = instance.price_per_person_override || instance.experience?.price_per_person || 1000;
+    const totalPrice = basePrice * numberOfAttendees;
+    
+    // Calculate GST
+    const gstBreakdown = calculateGST(totalPrice);
+    
     return {
-      basePrice,
-      discountAmount: totalDiscountAmount,
-      subtotalAfterDiscount: discountedPrice,
+      basePrice: totalPrice,
+      discountAmount: 0,
+      subtotalAfterDiscount: totalPrice,
       taxPercentage: 18,
       taxAmount: gstBreakdown.total,
-      totalAmountDue,
-      currency: instance.experience?.currency || 'INR',
+      totalAmountDue: totalPrice + gstBreakdown.total,
+      currency: 'INR',
       gstBreakdown: {
         cgst: gstBreakdown.cgst,
-        sgst: gstBreakdown.sgst,
-        igst: gstBreakdown.igst
-      },
-      appliedDiscounts
+        sgst: gstBreakdown.sgst
+      }
     };
   } catch (error) {
     console.error('Error in calculateEnhancedExperienceBookingPrice:', error);

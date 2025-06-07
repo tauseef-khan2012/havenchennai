@@ -17,15 +17,16 @@ export const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
 }) => {
   const { formatPrice } = useCurrency();
   
-  // Calculate additional guest charges (₹500 per guest after 2nd)
+  // Calculate base nightly rate and additional guest charges
+  const baseNightlyRate = 4000;
   const additionalGuestCharges = Math.max(0, guestCount - 2) * 500;
 
   return (
     <div className="space-y-4 bg-gray-50 rounded-lg p-4">
       <div className="space-y-3">
         <div className="flex justify-between text-sm">
-          <span>{formatPrice(4000, 'INR')} × {nights} nights</span>
-          <span>{formatPrice(4000 * nights, 'INR')}</span>
+          <span>{formatPrice(baseNightlyRate, 'INR')} × {nights} {nights === 1 ? 'night' : 'nights'}</span>
+          <span>{formatPrice(baseNightlyRate * nights, 'INR')}</span>
         </div>
         
         {additionalGuestCharges > 0 && (
@@ -52,7 +53,7 @@ export const PriceBreakdown: React.FC<PriceBreakdownProps> = ({
       
       <div className="flex justify-between font-bold text-lg">
         <span>Total</span>
-        <span>{formatPrice(priceBreakdown.totalAmountDue + additionalGuestCharges, 'INR')}</span>
+        <span>{formatPrice(priceBreakdown.totalAmountDue, 'INR')}</span>
       </div>
     </div>
   );

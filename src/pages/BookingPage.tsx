@@ -16,11 +16,9 @@ const BookingPage: React.FC = () => {
   const { selectedCheckIn, selectedCheckOut, handleDateRangeSelect } = useBookingDates();
   const {
     priceBreakdown,
-    platformComparisons,
     appliedDiscount,
     isCalculatingPrice,
     calculatePricing,
-    fetchPlatformComparisons,
     handleDiscountApplied
   } = useBookingPricing();
   const { handleProceedToPayment, handlePlatformBooking } = useBookingNavigation();
@@ -52,8 +50,9 @@ const BookingPage: React.FC = () => {
     handleDateRangeSelect(checkIn, checkOut);
     
     if (propertyId) {
-      await calculatePricing(propertyId, checkIn, checkOut);
-      await fetchPlatformComparisons(propertyId, checkIn, checkOut);
+      const guestsParam = searchParams.get('guests');
+      const guestCount = guestsParam ? parseInt(guestsParam) : 2;
+      await calculatePricing(propertyId, checkIn, checkOut, guestCount);
     }
   };
 
@@ -81,14 +80,6 @@ const BookingPage: React.FC = () => {
     );
   };
 
-  // Re-calculate pricing when discount is applied
-  useEffect(() => {
-    if (selectedCheckIn && selectedCheckOut && propertyId) {
-      console.log('BookingPage - Recalculating pricing due to discount change');
-      calculatePricing(propertyId, selectedCheckIn, selectedCheckOut);
-    }
-  }, [appliedDiscount, selectedCheckIn, selectedCheckOut, propertyId, calculatePricing]);
-
   if (isLoading) {
     return <BookingPageLoadingState />;
   }
@@ -105,7 +96,7 @@ const BookingPage: React.FC = () => {
         selectedCheckIn={selectedCheckIn}
         selectedCheckOut={selectedCheckOut}
         priceBreakdown={priceBreakdown}
-        platformComparisons={platformComparisons}
+        platformComparisons={[]} // Empty for simplified version
         appliedDiscount={appliedDiscount}
         isCalculatingPrice={isCalculatingPrice}
         onDateRangeSelect={handleDateSelection}
