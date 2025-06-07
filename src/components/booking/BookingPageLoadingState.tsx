@@ -1,17 +1,14 @@
 
 import React from 'react';
-import { BookingPageLayout } from './BookingPageLayout';
 
 export const BookingPageLoadingState: React.FC = () => {
   return (
-    <BookingPageLayout>
-      <div className="container mx-auto max-w-7xl px-4 py-8">
-        <div className="animate-pulse space-y-8">
-          <div className="h-8 bg-gray-200 rounded w-1/2"></div>
-          <div className="aspect-[16/10] bg-gray-200 rounded-xl"></div>
-          <div className="h-96 bg-gray-200 rounded-xl"></div>
-        </div>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center space-y-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-haven-teal mx-auto"></div>
+        <h2 className="text-xl font-semibold text-gray-700">Loading booking details...</h2>
+        <p className="text-gray-500">Please wait while we prepare your booking experience</p>
       </div>
-    </BookingPageLayout>
+    </div>
   );
 };

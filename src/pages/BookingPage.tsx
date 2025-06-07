@@ -12,7 +12,7 @@ import { BookingPageContent } from '@/components/booking/BookingPageContent';
 
 const BookingPage: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const { property, propertyId, isLoading, user } = usePropertyBooking();
+  const { property, propertyId, isLoading, error, user, retryFetch } = usePropertyBooking();
   const { selectedCheckIn, selectedCheckOut, handleDateRangeSelect } = useBookingDates();
   const {
     priceBreakdown,
@@ -31,18 +31,24 @@ const BookingPage: React.FC = () => {
     const checkOutParam = searchParams.get('checkOut');
     const guestsParam = searchParams.get('guests');
 
+    console.log('BookingPage - URL params:', { checkInParam, checkOutParam, guestsParam });
+
     if (checkInParam && checkOutParam) {
       const checkInDate = new Date(checkInParam);
       const checkOutDate = new Date(checkOutParam);
       
+      console.log('BookingPage - Parsed dates:', { checkInDate, checkOutDate });
+      
       // Validate dates
       if (!isNaN(checkInDate.getTime()) && !isNaN(checkOutDate.getTime()) && checkOutDate > checkInDate) {
+        console.log('BookingPage - Setting initial dates from URL');
         handleDateRangeSelect(checkInDate, checkOutDate);
       }
     }
   }, [searchParams, handleDateRangeSelect]);
 
   const handleDateSelection = async (checkIn: Date, checkOut: Date) => {
+    console.log('BookingPage - Date selection:', { checkIn, checkOut, propertyId });
     handleDateRangeSelect(checkIn, checkOut);
     
     if (propertyId) {
@@ -54,6 +60,15 @@ const BookingPage: React.FC = () => {
   const handlePaymentProceed = () => {
     const guestsParam = searchParams.get('guests');
     const guestCount = guestsParam ? parseInt(guestsParam) : 2;
+    
+    console.log('BookingPage - Proceeding to payment with:', {
+      user: user?.id,
+      propertyId,
+      selectedCheckIn,
+      selectedCheckOut,
+      guestCount,
+      priceBreakdown: !!priceBreakdown
+    });
     
     handleProceedToPayment(
       user,
@@ -69,16 +84,17 @@ const BookingPage: React.FC = () => {
   // Re-calculate pricing when discount is applied
   useEffect(() => {
     if (selectedCheckIn && selectedCheckOut && propertyId) {
+      console.log('BookingPage - Recalculating pricing due to discount change');
       calculatePricing(propertyId, selectedCheckIn, selectedCheckOut);
     }
-  }, [appliedDiscount]);
+  }, [appliedDiscount, selectedCheckIn, selectedCheckOut, propertyId, calculatePricing]);
 
   if (isLoading) {
     return <BookingPageLoadingState />;
   }
 
-  if (!property) {
-    return <BookingPageNotFound />;
+  if (error || !property) {
+    return <BookingPageNotFound error={error} onRetry={retryFetch} />;
   }
 
   return (
