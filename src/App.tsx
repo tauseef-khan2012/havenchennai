@@ -19,6 +19,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import BookingPage from "./pages/BookingPage";
+import BookingPaymentPage from "./pages/BookingPaymentPage";
 import BookingConfirmationPage from "./components/booking/BookingConfirmationPage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
@@ -63,6 +64,7 @@ const App = () => (
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/booking" element={<BookingPage />} />
+              <Route path="/booking/payment" element={<BookingPaymentPage />} />
               <Route path="/booking/confirmation" element={<BookingConfirmationPage />} />
               <Route path="/experiences" element={<Experiences />} />
               <Route path="/experiences/:id" element={<ExperienceDetail />} />

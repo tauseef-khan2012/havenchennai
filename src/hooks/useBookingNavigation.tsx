@@ -18,16 +18,6 @@ export const useBookingNavigation = () => {
     priceBreakdown: EnhancedPriceBreakdown | null,
     appliedDiscount: DiscountApplication | undefined
   ) => {
-    if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to complete your booking.",
-        variant: "destructive"
-      });
-      navigate('/login');
-      return;
-    }
-
     if (!selectedCheckIn || !selectedCheckOut || !priceBreakdown) {
       toast({
         title: "Missing information",
@@ -37,7 +27,7 @@ export const useBookingNavigation = () => {
       return;
     }
 
-    // Navigate to payment with booking details
+    // Navigate to payment with booking details - no authentication required for guests
     const bookingParams = new URLSearchParams({
       propertyId,
       checkIn: selectedCheckIn.toISOString(),
