@@ -99,9 +99,9 @@ export const EnhancedContactSection: React.FC<EnhancedContactSectionProps> = ({
     }
   };
 
-  // If user is logged in, auto-fill their information
+  // If user is logged in, auto-fill their information but allow editing
   React.useEffect(() => {
-    if (user) {
+    if (user && !contactInfo.fullName && !contactInfo.email && !contactInfo.phone) {
       console.log('User object:', user);
       console.log('Profile object:', profile);
       
@@ -110,15 +110,15 @@ export const EnhancedContactSection: React.FC<EnhancedContactSectionProps> = ({
       const profileData = profile as Record<string, any> || {};
       
       const newContactInfo = {
-        fullName: userData.full_name || profileData.full_name || userData.fullName || contactInfo.fullName,
-        email: user.email || contactInfo.email,
-        phone: userData.phone_number || userData.phone || profileData.phone_number || profileData.phone || contactInfo.phone
+        fullName: userData.full_name || profileData.full_name || userData.fullName || '',
+        email: user.email || '',
+        phone: userData.phone_number || userData.phone || profileData.phone_number || profileData.phone || ''
       };
       
-      console.log('Setting contact info:', newContactInfo);
+      console.log('Setting contact info from user profile:', newContactInfo);
       onContactInfoChange(newContactInfo);
     }
-  }, [user, profile, onContactInfoChange]);
+  }, [user, profile]);
 
   return (
     <Card>
@@ -130,14 +130,14 @@ export const EnhancedContactSection: React.FC<EnhancedContactSectionProps> = ({
       </CardHeader>
       <CardContent className="space-y-4">
         {user ? (
-          // User is logged in - show their info
+          // User is logged in - show their info but allow editing
           <div className="bg-green-50 p-4 rounded-lg border border-green-200">
             <div className="flex items-center gap-2 mb-2">
               <User className="h-4 w-4 text-green-600" />
               <span className="font-medium text-green-800">Signed in as {user.email}</span>
             </div>
             <p className="text-sm text-green-600">
-              Your contact information will be automatically used for this booking.
+              Your information has been pre-filled but you can edit it below if needed.
             </p>
           </div>
         ) : (
@@ -256,7 +256,7 @@ export const EnhancedContactSection: React.FC<EnhancedContactSectionProps> = ({
           </div>
         )}
 
-        {/* Contact Information Form */}
+        {/* Contact Information Form - Always editable */}
         <div className="space-y-4">
           <div className="grid grid-cols-1 gap-4">
             <div>
@@ -267,7 +267,6 @@ export const EnhancedContactSection: React.FC<EnhancedContactSectionProps> = ({
                 onChange={(e) => onFieldChange('fullName', e.target.value)}
                 placeholder="Enter your full name"
                 className={errors.fullName ? 'border-red-500' : ''}
-                disabled={!!user}
               />
               {errors.fullName && (
                 <p className="text-sm text-red-500 mt-1">{errors.fullName}</p>
@@ -283,7 +282,6 @@ export const EnhancedContactSection: React.FC<EnhancedContactSectionProps> = ({
                 onChange={(e) => onFieldChange('email', e.target.value)}
                 placeholder="Enter your email address"
                 className={errors.email ? 'border-red-500' : ''}
-                disabled={!!user}
               />
               {errors.email && (
                 <p className="text-sm text-red-500 mt-1">{errors.email}</p>
@@ -299,7 +297,6 @@ export const EnhancedContactSection: React.FC<EnhancedContactSectionProps> = ({
                 onChange={(e) => onFieldChange('phone', e.target.value)}
                 placeholder="Enter your phone number"
                 className={errors.phone ? 'border-red-500' : ''}
-                disabled={!!user}
               />
               {errors.phone && (
                 <p className="text-sm text-red-500 mt-1">{errors.phone}</p>
