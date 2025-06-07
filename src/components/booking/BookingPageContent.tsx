@@ -6,7 +6,7 @@ import { EnhancedPaymentStep } from './EnhancedPaymentStep';
 import { BookingConfirmationStep } from './BookingConfirmationStep';
 import { EnhancedPriceBreakdown } from '@/services/enhancedPriceService';
 import { DiscountApplication } from '@/services/discountService';
-import { createBooking } from '@/services/bookingService';
+import { createBooking, createGuestBooking } from '@/services/bookingService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { UUID } from '@/types/booking';
@@ -75,15 +75,6 @@ export const BookingPageContent: React.FC<BookingPageContentProps> = ({
   };
 
   const handleProceedToPayment = async (contact: ContactInfo, requests: string, guests: GuestInfo[]) => {
-    if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to continue with your booking.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     if (!selectedCheckIn || !selectedCheckOut || !priceBreakdown) {
       toast({
         title: "Missing booking details",
@@ -103,29 +94,52 @@ export const BookingPageContent: React.FC<BookingPageContentProps> = ({
       const additionalGuestCharges = Math.max(0, guestCount - 2) * 500;
       const finalTotal = priceBreakdown.totalAmountDue + additionalGuestCharges;
 
-      // Create the booking using the real booking service
-      const bookingData = {
-        type: 'property' as const,
-        userId: user.id,
-        priceBreakdown: {
-          ...priceBreakdown,
-          totalAmountDue: finalTotal
-        },
-        guests: guests.map(guest => ({
-          name: guest.name,
-          age: guest.age
-        })),
-        property: {
+      let result;
+
+      if (user) {
+        // Authenticated user booking
+        const bookingData = {
+          type: 'property' as const,
+          userId: user.id,
+          priceBreakdown: {
+            ...priceBreakdown,
+            totalAmountDue: finalTotal
+          },
+          guests: guests.map(guest => ({
+            name: guest.name,
+            age: guest.age
+          })),
+          property: {
+            propertyId,
+            checkInDate: selectedCheckIn,
+            checkOutDate: selectedCheckOut,
+            numberOfGuests: guestCount,
+            specialRequests: requests,
+            customerNotes: `Contact: ${contact.fullName} (${contact.email}, ${contact.phone})`
+          }
+        };
+        
+        result = await createBooking(bookingData);
+      } else {
+        // Guest booking - no authentication required
+        const guestBookingData = {
+          type: 'property' as const,
+          guestName: contact.fullName,
+          guestEmail: contact.email,
+          guestPhone: contact.phone,
+          priceBreakdown: {
+            ...priceBreakdown,
+            totalAmountDue: finalTotal
+          },
           propertyId,
           checkInDate: selectedCheckIn,
           checkOutDate: selectedCheckOut,
           numberOfGuests: guestCount,
-          specialRequests: requests,
-          customerNotes: `Contact: ${contact.fullName} (${contact.email}, ${contact.phone})`
-        }
-      };
-      
-      const result = await createBooking(bookingData);
+          specialRequests: requests
+        };
+        
+        result = await createGuestBooking(guestBookingData);
+      }
       
       setBookingId(result.bookingId);
       setBookingReference(result.bookingReference);
