@@ -7,7 +7,7 @@ import ExperienceBookingStep1_Attendees from './ExperienceBookingStep1_Attendees
 import ExperienceBookingStep2_Requests from './ExperienceBookingStep2_Requests';
 import BookingStep_GuestInfo from './BookingStep_GuestInfo';
 import BookingStep_Summary from './BookingStep_Summary';
-import BookingStep_Payment from './BookingStep_Payment';
+import PaymentStep from './steps/PaymentStep';
 import BookingStep_Confirmation from './BookingStep_Confirmation';
 import { useNavigate } from 'react-router-dom';
 import { calculateNights } from '@/utils/bookingUtils';
@@ -32,6 +32,11 @@ interface BookingStepRendererProps {
     bookingReference: string; 
     priceBreakdown: PriceBreakdown;
   } | null;
+  contactInfo?: {
+    fullName: string;
+    email: string;
+    phone: string;
+  };
   onPropertyStep1Complete: (checkIn: string, checkOut: string, guests: number) => void;
   onAttendeeChange: (count: number) => void;
   onSpecialRequestsChange: (requests: string) => void;
@@ -59,6 +64,7 @@ const BookingStepRenderer: React.FC<BookingStepRendererProps> = ({
   isLoading,
   priceBreakdown,
   bookingInfo,
+  contactInfo = { fullName: '', email: '', phone: '' },
   onPropertyStep1Complete,
   onAttendeeChange,
   onSpecialRequestsChange,
@@ -137,7 +143,7 @@ const BookingStepRenderer: React.FC<BookingStepRendererProps> = ({
       
     case 3:
       return bookingInfo ? (
-        <BookingStep_Payment
+        <PaymentStep
           bookingType={type}
           priceBreakdown={bookingInfo.priceBreakdown}
           propertyDetails={type === 'property' ? {
@@ -155,6 +161,7 @@ const BookingStepRenderer: React.FC<BookingStepRendererProps> = ({
           } : undefined}
           guests={guests}
           selectedAddonExperiences={[]}
+          contactInfo={contactInfo}
           onBack={() => onBack(2)}
           onSuccess={() => onPayment()}
           isLoading={isLoading}
