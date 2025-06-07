@@ -1,6 +1,7 @@
+
 import { useState } from 'react';
 import { UUID, BookingType, PriceBreakdown, GuestInfo } from '@/types/booking';
-import { calculatePrice } from '@/services/priceService';
+import { calculateBookingPrice } from '@/services/priceService';
 
 interface BookingState {
   formStep: number;
@@ -71,19 +72,21 @@ export const useBooking = (
   const handleCalculatePrice = async () => {
     setIsLoading(true);
     try {
-      const priceData =
-        type === 'property'
-          ? {
-              propertyId: propertyId as UUID,
-              checkInDate: bookingState.checkInDate,
-              checkOutDate: bookingState.checkOutDate,
-              numberOfGuests: bookingState.guestCount,
-            }
-          : {
-              instanceId: instanceId as UUID,
-              numberOfAttendees: bookingState.attendeeCount,
-            };
-      const breakdown = await calculatePrice(type, priceData);
+      const bookingDetails = type === 'property'
+        ? {
+            type,
+            propertyId: propertyId as UUID,
+            checkInDate: new Date(bookingState.checkInDate),
+            checkOutDate: new Date(bookingState.checkOutDate),
+            numberOfAttendees: bookingState.guestCount,
+          }
+        : {
+            type,
+            instanceId: instanceId as UUID,
+            numberOfAttendees: bookingState.attendeeCount,
+          };
+      
+      const breakdown = await calculateBookingPrice(bookingDetails);
       setBookingState(prevState => ({ ...prevState, priceBreakdown: breakdown }));
     } catch (error) {
       console.error('Failed to calculate price:', error);
@@ -93,7 +96,7 @@ export const useBooking = (
   };
 
   const handleContinue = () => {
-    setFormStep(prevState => prevState.formStep + 1);
+    setBookingState(prevState => ({ ...prevState, formStep: prevState.formStep + 1 }));
   };
 
   const handleBack = (step: number) => {
