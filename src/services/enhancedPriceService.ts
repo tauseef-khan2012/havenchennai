@@ -17,6 +17,12 @@ export interface EnhancedPriceBreakdown extends PriceBreakdown {
     sgst: number;
     igst?: number;
   };
+  appliedDiscounts?: Array<{
+    name: string;
+    amount: number;
+    percentage: number;
+  }>;
+  savingsFromCompetitors?: number;
 }
 
 /**
@@ -63,7 +69,9 @@ export const calculateEnhancedPropertyBookingPrice = async (
         cgst: gstBreakdown.cgst,
         sgst: gstBreakdown.sgst,
         igst: gstBreakdown.igst
-      }
+      },
+      appliedDiscounts: [],
+      savingsFromCompetitors: 0
     };
   } catch (error) {
     console.error('Error in calculateEnhancedPropertyBookingPrice:', error);
@@ -86,7 +94,9 @@ export const calculateEnhancedPropertyBookingPrice = async (
       gstBreakdown: {
         cgst: gstAmount / 2,
         sgst: gstAmount / 2
-      }
+      },
+      appliedDiscounts: [],
+      savingsFromCompetitors: 0
     };
   }
 };
@@ -130,7 +140,9 @@ export const calculateEnhancedExperienceBookingPrice = async (
       gstBreakdown: {
         cgst: gstBreakdown.cgst,
         sgst: gstBreakdown.sgst
-      }
+      },
+      appliedDiscounts: [],
+      savingsFromCompetitors: 0
     };
   } catch (error) {
     console.error('Error in calculateEnhancedExperienceBookingPrice:', error);

@@ -83,7 +83,7 @@ export const useBookingCreation = () => {
           details.propertyId,
           details.checkInDate,
           details.checkOutDate,
-          details.selectedAddonExperiences
+          details.numberOfGuests || 2
         );
       } else {
         // For now, use a simplified price structure for experiences

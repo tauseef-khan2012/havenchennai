@@ -13,13 +13,13 @@ export const calculatePropertyBookingPrice = async (
   propertyId: UUID,
   checkInDate: Date,
   checkOutDate: Date,
-  selectedAddonExperiences?: {instanceId: UUID, attendees: number}[]
+  guestCount: number = 2
 ): Promise<PriceBreakdown> => {
   // Use enhanced pricing service which includes GST and dynamic discounts
   return await calculateEnhancedPropertyBookingPrice(
     propertyId, 
     checkInDate, 
     checkOutDate, 
-    selectedAddonExperiences
+    guestCount
   );
 };
