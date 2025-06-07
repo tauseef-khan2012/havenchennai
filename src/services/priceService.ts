@@ -24,6 +24,7 @@ export const calculateBookingPrice = async (
     checkInDate?: Date;
     checkOutDate?: Date;
     numberOfAttendees?: number;
+    numberOfGuests?: number;
     selectedAddonExperiences?: {instanceId: UUID, attendees: number}[];
   }
 ): Promise<PriceBreakdown> => {
@@ -37,7 +38,7 @@ export const calculateBookingPrice = async (
         bookingDetails.propertyId,
         bookingDetails.checkInDate,
         bookingDetails.checkOutDate,
-        bookingDetails.selectedAddonExperiences
+        bookingDetails.numberOfGuests || 2
       );
     } else if (bookingDetails.type === 'experience') {
       if (!bookingDetails.instanceId || !bookingDetails.numberOfAttendees) {
