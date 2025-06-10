@@ -19,6 +19,7 @@ export const CalendarDatePicker: React.FC<CalendarDatePickerProps> = ({
   propertyId
 }) => {
   const [tempCheckIn, setTempCheckIn] = useState<Date | undefined>(selectedCheckIn);
+  const [tempCheckOut, setTempCheckOut] = useState<Date | undefined>(selectedCheckOut);
   const [isSelectingCheckOut, setIsSelectingCheckOut] = useState(false);
   const [availabilityData, setAvailabilityData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,13 +48,14 @@ export const CalendarDatePicker: React.FC<CalendarDatePickerProps> = ({
 
   // Reset temp state when external dates change
   useEffect(() => {
-    if (selectedCheckIn && !tempCheckIn) {
-      setTempCheckIn(selectedCheckIn);
-      if (selectedCheckOut) {
-        setIsSelectingCheckOut(false);
-      }
+    setTempCheckIn(selectedCheckIn);
+    setTempCheckOut(selectedCheckOut);
+    if (selectedCheckIn && !selectedCheckOut) {
+      setIsSelectingCheckOut(true);
+    } else {
+      setIsSelectingCheckOut(false);
     }
-  }, [selectedCheckIn, selectedCheckOut, tempCheckIn]);
+  }, [selectedCheckIn, selectedCheckOut]);
 
   const isDateDisabled = (date: Date): boolean => {
     const dateStr = date.toISOString().split('T')[0];
@@ -81,17 +83,20 @@ export const CalendarDatePicker: React.FC<CalendarDatePickerProps> = ({
       // First selection - set as check-in
       console.log('CalendarDatePicker - Setting check-in date:', date);
       setTempCheckIn(date);
+      setTempCheckOut(undefined);
       setIsSelectingCheckOut(true);
     } else {
       // Second selection - set as check-out
       if (date > tempCheckIn) {
         console.log('CalendarDatePicker - Valid date range selected:', { checkIn: tempCheckIn, checkOut: date });
-        onDateRangeSelect(tempCheckIn, date);
+        setTempCheckOut(date);
         setIsSelectingCheckOut(false);
+        onDateRangeSelect(tempCheckIn, date);
       } else {
         // If selected date is before check-in, reset and set as new check-in
         console.log('CalendarDatePicker - Selected date before check-in, resetting:', date);
         setTempCheckIn(date);
+        setTempCheckOut(undefined);
         setIsSelectingCheckOut(true);
       }
     }
@@ -99,6 +104,7 @@ export const CalendarDatePicker: React.FC<CalendarDatePickerProps> = ({
 
   const clearSelection = () => {
     setTempCheckIn(undefined);
+    setTempCheckOut(undefined);
     setIsSelectingCheckOut(false);
   };
 
@@ -116,7 +122,7 @@ export const CalendarDatePicker: React.FC<CalendarDatePickerProps> = ({
       <div className="text-sm text-haven-beige/80">
         {!tempCheckIn && "Select your check-in date"}
         {tempCheckIn && isSelectingCheckOut && "Now select your check-out date"}
-        {selectedCheckIn && selectedCheckOut && `${selectedCheckIn.toLocaleDateString()} - ${selectedCheckOut.toLocaleDateString()}`}
+        {tempCheckIn && tempCheckOut && `${tempCheckIn.toLocaleDateString()} - ${tempCheckOut.toLocaleDateString()}`}
       </div>
       
       {(tempCheckIn && isSelectingCheckOut) && (
@@ -133,20 +139,32 @@ export const CalendarDatePicker: React.FC<CalendarDatePickerProps> = ({
       
       <Calendar
         mode="single"
-        selected={tempCheckIn}
+        selected={tempCheckOut || tempCheckIn}
         onSelect={handleDateSelect}
         disabled={isDateDisabled}
-        className="rounded-xl border border-haven-yellow/20 bg-haven-navy-light/50 text-haven-beige [&_.rdp-head_cell]:text-haven-beige/70 [&_.rdp-button]:text-haven-beige hover:[&_.rdp-button:not([disabled])]:bg-haven-yellow/20 [&_.rdp-day_selected]:bg-haven-yellow [&_.rdp-day_selected]:text-haven-navy-dark pointer-events-auto"
-        modifiersStyles={{
-          disabled: { 
-            backgroundColor: '#fee2e2', 
-            color: '#dc2626',
-            textDecoration: 'line-through'
-          },
-          selected: { 
-            backgroundColor: '#eab308', 
-            color: '#1e293b' 
-          }
+        className="rounded-xl border border-haven-yellow/20 bg-haven-navy-light/50 text-haven-beige pointer-events-auto"
+        classNames={{
+          months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+          month: "space-y-4",
+          caption: "flex justify-center pt-1 relative items-center text-haven-beige",
+          caption_label: "text-sm font-medium text-haven-beige",
+          nav: "space-x-1 flex items-center",
+          nav_button: "h-7 w-7 bg-transparent p-0 opacity-70 hover:opacity-100 text-haven-beige border border-haven-yellow/30 hover:bg-haven-yellow/20",
+          nav_button_previous: "absolute left-1",
+          nav_button_next: "absolute right-1",
+          table: "w-full border-collapse space-y-1",
+          head_row: "flex",
+          head_cell: "text-haven-beige/70 rounded-md w-9 font-normal text-[0.8rem]",
+          row: "flex w-full mt-2",
+          cell: "h-9 w-9 text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
+          day: "h-9 w-9 p-0 font-normal text-haven-beige hover:bg-haven-yellow/20 hover:text-haven-yellow rounded-md transition-colors",
+          day_range_end: "bg-haven-yellow text-haven-navy-dark font-medium",
+          day_selected: "bg-haven-yellow text-haven-navy-dark hover:bg-haven-yellow hover:text-haven-navy-dark focus:bg-haven-yellow focus:text-haven-navy-dark font-medium",
+          day_today: "bg-haven-yellow/30 text-haven-beige font-medium",
+          day_outside: "text-haven-beige/30 opacity-50",
+          day_disabled: "text-haven-beige/30 opacity-30 line-through",
+          day_range_middle: "bg-haven-yellow/20 text-haven-beige",
+          day_hidden: "invisible",
         }}
       />
       

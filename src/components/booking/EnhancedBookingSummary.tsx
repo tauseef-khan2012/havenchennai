@@ -48,10 +48,10 @@ export const EnhancedBookingSummary: React.FC<EnhancedBookingSummaryProps> = ({
   const canProceed = selectedCheckIn && selectedCheckOut && priceBreakdown && !isCalculatingPrice;
 
   return (
-    <Card className="shadow-lg border-haven-teal/20">
-      <CardHeader className="bg-haven-teal/5">
-        <CardTitle className="text-xl font-serif text-gray-900 flex items-center gap-2">
-          <CreditCard className="h-5 w-5 text-haven-teal" />
+    <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy">
+      <CardHeader className="bg-haven-navy-light/30">
+        <CardTitle className="text-xl font-serif text-haven-beige flex items-center gap-2">
+          <CreditCard className="h-5 w-5 text-haven-yellow" />
           Reserve Haven
         </CardTitle>
       </CardHeader>
@@ -61,10 +61,10 @@ export const EnhancedBookingSummary: React.FC<EnhancedBookingSummaryProps> = ({
         {showPropertyDetails && (
           <div className="space-y-3">
             <div className="flex items-start gap-3">
-              <MapPin className="h-4 w-4 text-haven-teal mt-1 flex-shrink-0" />
+              <MapPin className="h-4 w-4 text-haven-yellow mt-1 flex-shrink-0" />
               <div>
-                <h3 className="font-medium text-gray-900">{property.name}</h3>
-                <p className="text-sm text-gray-600">{property.location_details || 'Lakeside Location'}</p>
+                <h3 className="font-medium text-haven-beige">{property.name}</h3>
+                <p className="text-sm text-haven-beige/60">{property.location_details || 'Lakeside Location'}</p>
               </div>
             </div>
           </div>
@@ -76,38 +76,38 @@ export const EnhancedBookingSummary: React.FC<EnhancedBookingSummaryProps> = ({
             <div className="grid grid-cols-1 gap-3">
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-haven-teal" />
-                  <span>Check-in</span>
+                  <Calendar className="h-4 w-4 text-haven-yellow" />
+                  <span className="text-haven-beige">Check-in</span>
                 </div>
-                <span className="font-medium">{formatDate(selectedCheckIn)}</span>
+                <span className="font-medium text-haven-beige">{formatDate(selectedCheckIn)}</span>
               </div>
               
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-haven-teal" />
-                  <span>Check-out</span>
+                  <Calendar className="h-4 w-4 text-haven-yellow" />
+                  <span className="text-haven-beige">Check-out</span>
                 </div>
-                <span className="font-medium">{formatDate(selectedCheckOut)}</span>
+                <span className="font-medium text-haven-beige">{formatDate(selectedCheckOut)}</span>
               </div>
               
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-haven-teal" />
-                  <span>Duration</span>
+                  <Clock className="h-4 w-4 text-haven-yellow" />
+                  <span className="text-haven-beige">Duration</span>
                 </div>
-                <span className="font-medium">{nights} {nights === 1 ? 'night' : 'nights'}</span>
+                <span className="font-medium text-haven-beige">{nights} {nights === 1 ? 'night' : 'nights'}</span>
               </div>
               
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-haven-teal" />
-                  <span>Guests</span>
+                  <Users className="h-4 w-4 text-haven-yellow" />
+                  <span className="text-haven-beige">Guests</span>
                 </div>
-                <span className="font-medium">{guestCount} {guestCount === 1 ? 'guest' : 'guests'}</span>
+                <span className="font-medium text-haven-beige">{guestCount} {guestCount === 1 ? 'guest' : 'guests'}</span>
               </div>
             </div>
             
-            <Separator />
+            <Separator className="bg-haven-yellow/20" />
             
             {/* Pricing */}
             {priceBreakdown ? (
@@ -119,10 +119,10 @@ export const EnhancedBookingSummary: React.FC<EnhancedBookingSummaryProps> = ({
                 />
                 
                 {priceBreakdown.savingsFromCompetitors && priceBreakdown.savingsFromCompetitors > 0 && (
-                  <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                  <div className="bg-green-900/20 p-3 rounded-lg border border-green-400/20">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-green-800">Direct Booking Savings</span>
-                      <Badge variant="secondary" className="bg-green-100 text-green-800">
+                      <span className="text-sm font-medium text-green-400">Direct Booking Savings</span>
+                      <Badge variant="secondary" className="bg-green-900/30 text-green-400 border-green-400/20">
                         Save {formatPrice(priceBreakdown.savingsFromCompetitors, priceBreakdown.currency)}
                       </Badge>
                     </div>
@@ -131,7 +131,7 @@ export const EnhancedBookingSummary: React.FC<EnhancedBookingSummaryProps> = ({
                 
                 <Button 
                   onClick={onProceedToPayment}
-                  className="w-full bg-haven-teal hover:bg-haven-teal/90 text-white py-3 text-lg font-medium"
+                  className="w-full bg-haven-yellow hover:bg-haven-yellow/90 text-haven-navy-dark py-3 text-lg font-medium"
                   disabled={!canProceed}
                   size="lg"
                 >
@@ -140,7 +140,7 @@ export const EnhancedBookingSummary: React.FC<EnhancedBookingSummaryProps> = ({
               </div>
             ) : (
               <div className="text-center py-4">
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-haven-beige/60">
                   {isCalculatingPrice ? 'Calculating pricing...' : 'Select dates to see pricing'}
                 </div>
               </div>
@@ -148,9 +148,9 @@ export const EnhancedBookingSummary: React.FC<EnhancedBookingSummaryProps> = ({
           </div>
         ) : (
           <div className="text-center py-8">
-            <Calendar className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="font-medium text-gray-900 mb-2">Select your dates</h3>
-            <p className="text-gray-500 text-sm">
+            <Calendar className="h-12 w-12 text-haven-beige/30 mx-auto mb-4" />
+            <h3 className="font-medium text-haven-beige mb-2">Select your dates</h3>
+            <p className="text-haven-beige/60 text-sm">
               Choose your check-in and check-out dates to see pricing and availability
             </p>
           </div>

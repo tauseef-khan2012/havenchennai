@@ -7,28 +7,30 @@ interface GuestSelectorProps {
   guestCount: number;
   setGuestCount: (count: number) => void;
   maxGuests: number;
+  disabled?: boolean;
 }
 
 export const GuestSelector: React.FC<GuestSelectorProps> = ({
   guestCount,
   setGuestCount,
-  maxGuests
+  maxGuests,
+  disabled = false
 }) => {
   const handleIncrement = useCallback(() => {
-    if (guestCount < maxGuests) {
+    if (!disabled && guestCount < maxGuests) {
       const newCount = guestCount + 1;
       console.log('GuestSelector - Incrementing guest count from', guestCount, 'to', newCount);
       setGuestCount(newCount);
     }
-  }, [guestCount, maxGuests, setGuestCount]);
+  }, [guestCount, maxGuests, setGuestCount, disabled]);
 
   const handleDecrement = useCallback(() => {
-    if (guestCount > 1) {
+    if (!disabled && guestCount > 1) {
       const newCount = guestCount - 1;
       console.log('GuestSelector - Decrementing guest count from', guestCount, 'to', newCount);
       setGuestCount(newCount);
     }
-  }, [guestCount, setGuestCount]);
+  }, [guestCount, setGuestCount, disabled]);
 
   return (
     <div className="space-y-3">
@@ -44,8 +46,8 @@ export const GuestSelector: React.FC<GuestSelectorProps> = ({
             variant="outline"
             size="sm"
             onClick={handleDecrement}
-            disabled={guestCount <= 1}
-            className="h-8 w-8 p-0 rounded-full border-haven-yellow/30 bg-transparent text-haven-beige hover:bg-haven-yellow/20 hover:text-haven-yellow disabled:opacity-50"
+            disabled={disabled || guestCount <= 1}
+            className="h-8 w-8 p-0 rounded-full border-haven-yellow/30 bg-transparent text-haven-beige hover:bg-haven-yellow/20 hover:text-haven-yellow disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Minus className="h-4 w-4" />
           </Button>
@@ -62,8 +64,8 @@ export const GuestSelector: React.FC<GuestSelectorProps> = ({
             variant="outline"
             size="sm"
             onClick={handleIncrement}
-            disabled={guestCount >= maxGuests}
-            className="h-8 w-8 p-0 rounded-full border-haven-yellow/30 bg-transparent text-haven-beige hover:bg-haven-yellow/20 hover:text-haven-yellow disabled:opacity-50"
+            disabled={disabled || guestCount >= maxGuests}
+            className="h-8 w-8 p-0 rounded-full border-haven-yellow/30 bg-transparent text-haven-beige hover:bg-haven-yellow/20 hover:text-haven-yellow disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus className="h-4 w-4" />
           </Button>
