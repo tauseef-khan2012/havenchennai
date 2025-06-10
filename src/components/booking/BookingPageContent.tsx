@@ -169,16 +169,7 @@ export const BookingPageContent: React.FC<BookingPageContentProps> = ({
     );
   }
 
-  // Default booking step with updated property description
-  const updatedProperty = {
-    ...property,
-    long_description: `Experience sustainable luxury in our uniquely designed container home beside serene Muttukadu Lake. Two thoughtfully stacked shipping containers create an innovative retreat for up to 4 guests, featuring three distinct deck levels offering panoramic lake views. 
-
-Located on Chennai's OMR in peaceful Padur, Haven combines modern amenities with eco-conscious design. Wake up to stunning sunrise views over the lake, enjoy your morning coffee on the rooftop deck, and unwind as you watch the rich birdlife including pelicans and flamingos in their natural habitat.
-
-Perfect for couples seeking a romantic getaway, friends planning a unique escape, or anyone looking to disconnect from city life while staying conveniently connected to Chennai.`
-  };
-
+  // Default booking step - use property as-is without overriding description
   return (
     <div className="min-h-screen bg-navy-gradient py-8">
       <div className="absolute inset-0 bg-organic-texture opacity-20"></div>
@@ -187,7 +178,7 @@ Perfect for couples seeking a romantic getaway, friends planning a unique escape
       <div className="container mx-auto px-4 relative z-10">
         <BookingContent
           propertyId={propertyId}
-          property={updatedProperty}
+          property={property}
           selectedCheckIn={selectedCheckIn}
           selectedCheckOut={selectedCheckOut}
           priceBreakdown={priceBreakdown}

@@ -45,15 +45,28 @@ const BookingPage: React.FC = () => {
     }
   }, [searchParams, handleDateRangeSelect]);
 
+  // Auto-calculate pricing when dates change and propertyId is available
+  useEffect(() => {
+    if (selectedCheckIn && selectedCheckOut && propertyId) {
+      const guestsParam = searchParams.get('guests');
+      const guestCount = guestsParam ? parseInt(guestsParam) : 2;
+      
+      console.log('BookingPage - Auto-calculating pricing for date change:', {
+        selectedCheckIn,
+        selectedCheckOut,
+        propertyId,
+        guestCount
+      });
+      
+      calculatePricing(propertyId, selectedCheckIn, selectedCheckOut, guestCount);
+    }
+  }, [selectedCheckIn, selectedCheckOut, propertyId, calculatePricing, searchParams]);
+
   const handleDateSelection = async (checkIn: Date, checkOut: Date) => {
     console.log('BookingPage - Date selection:', { checkIn, checkOut, propertyId });
     handleDateRangeSelect(checkIn, checkOut);
     
-    if (propertyId) {
-      const guestsParam = searchParams.get('guests');
-      const guestCount = guestsParam ? parseInt(guestsParam) : 2;
-      await calculatePricing(propertyId, checkIn, checkOut, guestCount);
-    }
+    // Pricing will be calculated automatically by the useEffect above
   };
 
   const handlePaymentProceed = () => {
