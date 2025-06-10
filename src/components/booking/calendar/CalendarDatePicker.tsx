@@ -18,8 +18,8 @@ export const CalendarDatePicker: React.FC<CalendarDatePickerProps> = ({
   onDateRangeSelect,
   propertyId
 }) => {
-  const [tempCheckIn, setTempCheckIn] = useState<Date | undefined>(selectedCheckIn);
-  const [selectingCheckOut, setSelectingCheckOut] = useState(false);
+  const [pendingCheckIn, setPendingCheckIn] = useState<Date | undefined>(selectedCheckIn);
+  const [isSelectingCheckOut, setIsSelectingCheckOut] = useState(false);
   const [availabilityData, setAvailabilityData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -31,7 +31,7 @@ export const CalendarDatePicker: React.FC<CalendarDatePickerProps> = ({
       setIsLoading(true);
       try {
         const startDate = new Date();
-        const endDate = addDays(startDate, 90); // Load 3 months ahead
+        const endDate = addDays(startDate, 90);
         const availability = await checkPropertyAvailabilityDetailed(propertyId, startDate, endDate);
         setAvailabilityData(availability || []);
       } catch (error) {
@@ -71,51 +71,38 @@ export const CalendarDatePicker: React.FC<CalendarDatePickerProps> = ({
   const handleDateSelect = (date: Date | undefined) => {
     if (!date) return;
 
-    if (!tempCheckIn || selectingCheckOut) {
-      // Setting check-in date
-      setTempCheckIn(date);
-      setSelectingCheckOut(true);
+    console.log('Calendar - Date selected:', date, { pendingCheckIn, isSelectingCheckOut });
+
+    if (!pendingCheckIn || !isSelectingCheckOut) {
+      // First selection - set as check-in
+      console.log('Calendar - Setting check-in date:', date);
+      setPendingCheckIn(date);
+      setIsSelectingCheckOut(true);
     } else {
-      // Setting check-out date
-      if (date > tempCheckIn) {
-        onDateRangeSelect(tempCheckIn, date);
-        setSelectingCheckOut(false);
+      // Second selection - set as check-out
+      if (date > pendingCheckIn) {
+        console.log('Calendar - Setting check-out date and calling onDateRangeSelect:', { checkIn: pendingCheckIn, checkOut: date });
+        onDateRangeSelect(pendingCheckIn, date);
+        setIsSelectingCheckOut(false);
       } else {
         // If selected date is before check-in, reset and set as new check-in
-        setTempCheckIn(date);
-        setSelectingCheckOut(true);
+        console.log('Calendar - Selected date before check-in, resetting:', date);
+        setPendingCheckIn(date);
+        setIsSelectingCheckOut(true);
       }
     }
   };
 
-  const getDateModifiers = () => {
-    const modifiers: any = {};
-    
-    // Unavailable dates
-    modifiers.unavailable = (date: Date) => {
-      if (!availabilityData || availabilityData.length === 0) return false;
-      
-      const dateStr = date.toISOString().split('T')[0];
-      const availabilityInfo = availabilityData.find(info => info.date === dateStr);
-      return availabilityInfo && !availabilityInfo.isAvailable;
-    };
-
-    // Selected range
-    if (selectedCheckIn && selectedCheckOut) {
-      modifiers.selected = (date: Date) => {
-        return date >= selectedCheckIn && date <= selectedCheckOut;
-      };
-    } else if (tempCheckIn && selectingCheckOut) {
-      modifiers.selected = tempCheckIn;
-    }
-
-    return modifiers;
+  const clearSelection = () => {
+    setPendingCheckIn(undefined);
+    setIsSelectingCheckOut(false);
   };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-haven-beige/60">Loading availability...</div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-haven-yellow"></div>
+        <span className="ml-2 text-haven-beige/60">Loading availability...</span>
       </div>
     );
   }
@@ -123,19 +110,31 @@ export const CalendarDatePicker: React.FC<CalendarDatePickerProps> = ({
   return (
     <div className="space-y-4">
       <div className="text-sm text-haven-beige/80">
-        {!tempCheckIn && "Select your check-in date"}
-        {tempCheckIn && selectingCheckOut && "Now select your check-out date"}
-        {selectedCheckIn && selectedCheckOut && "Dates selected successfully"}
+        {!pendingCheckIn && "Select your check-in date"}
+        {pendingCheckIn && isSelectingCheckOut && "Now select your check-out date"}
+        {selectedCheckIn && selectedCheckOut && `${selectedCheckIn.toLocaleDateString()} - ${selectedCheckOut.toLocaleDateString()}`}
       </div>
+      
+      {(pendingCheckIn && isSelectingCheckOut) && (
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-haven-beige/60">Check-in: {pendingCheckIn.toLocaleDateString()}</span>
+          <button 
+            onClick={clearSelection}
+            className="text-xs text-haven-yellow hover:underline"
+          >
+            Clear
+          </button>
+        </div>
+      )}
       
       <Calendar
         mode="single"
-        selected={tempCheckIn}
+        selected={pendingCheckIn}
         onSelect={handleDateSelect}
         disabled={isDateDisabled}
-        modifiers={getDateModifiers()}
+        className="rounded-xl border border-haven-yellow/20 bg-haven-navy-light/50 text-haven-beige [&_.rdp-head_cell]:text-haven-beige/70 [&_.rdp-button]:text-haven-beige hover:[&_.rdp-button:not([disabled])]:bg-haven-yellow/20 [&_.rdp-day_selected]:bg-haven-yellow [&_.rdp-day_selected]:text-haven-navy-dark pointer-events-auto"
         modifiersStyles={{
-          unavailable: { 
+          disabled: { 
             backgroundColor: '#fee2e2', 
             color: '#dc2626',
             textDecoration: 'line-through'
@@ -145,7 +144,6 @@ export const CalendarDatePicker: React.FC<CalendarDatePickerProps> = ({
             color: '#1e293b' 
           }
         }}
-        className="rounded-md border border-haven-yellow/20 bg-haven-navy-light/50 text-haven-beige [&_.rdp-head_cell]:text-haven-beige/70 [&_.rdp-button]:text-haven-beige hover:[&_.rdp-button:not([disabled])]:bg-haven-yellow/20"
       />
       
       {availabilityData.length === 0 && !isLoading && (

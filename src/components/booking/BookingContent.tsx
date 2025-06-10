@@ -80,32 +80,32 @@ export const BookingContent: React.FC<BookingContentProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column - Property Details */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Image Gallery */}
-          <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy overflow-hidden animate-fade-in">
-            <PropertyImageSlider property={property} />
-          </Card>
+      <div className="space-y-8">
+        {/* Image Gallery */}
+        <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy overflow-hidden animate-fade-in">
+          <PropertyImageSlider property={property} />
+        </Card>
 
-          {/* Amenities */}
-          <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy animate-fade-in-delay-2">
-            <CardHeader>
-              <CardTitle className="text-haven-beige">What This Place Offers</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {amenities.map((amenity, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 bg-yellow-gradient/5 rounded-xl border border-haven-yellow/10 hover:border-haven-yellow/30 transition-colors duration-300">
-                    <div className="text-haven-yellow">{amenity.icon}</div>
-                    <span className="text-sm text-haven-beige">{amenity.label}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+        {/* Amenities */}
+        <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy animate-fade-in-delay-2">
+          <CardHeader>
+            <CardTitle className="text-haven-beige">What This Place Offers</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {amenities.map((amenity, index) => (
+                <div key={index} className="flex items-center gap-3 p-3 bg-yellow-gradient/5 rounded-xl border border-haven-yellow/10 hover:border-haven-yellow/30 transition-colors duration-300">
+                  <div className="text-haven-yellow">{amenity.icon}</div>
+                  <span className="text-sm text-haven-beige">{amenity.label}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-          {/* Date Selection */}
+        {/* Date Selection and Booking Summary - Side by Side */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left Column - Date Selection */}
           <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy animate-fade-in-delay">
             <CardHeader>
               <CardTitle className="text-haven-beige flex items-center gap-2">
@@ -130,11 +130,9 @@ export const BookingContent: React.FC<BookingContentProps> = ({
               />
             </CardContent>
           </Card>
-        </div>
 
-        {/* Right Column - Booking Summary */}
-        <div className="lg:col-span-1">
-          <div className="sticky top-8">
+          {/* Right Column - Booking Summary */}
+          <div className="lg:sticky lg:top-8 lg:self-start">
             <EnhancedBookingSummary
               property={property}
               propertyId={propertyId}

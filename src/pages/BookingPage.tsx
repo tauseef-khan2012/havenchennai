@@ -37,7 +37,6 @@ const BookingPage: React.FC = () => {
       
       console.log('BookingPage - Parsed dates:', { checkInDate, checkOutDate });
       
-      // Validate dates
       if (!isNaN(checkInDate.getTime()) && !isNaN(checkOutDate.getTime()) && checkOutDate > checkInDate) {
         console.log('BookingPage - Setting initial dates from URL');
         handleDateRangeSelect(checkInDate, checkOutDate);
@@ -66,7 +65,13 @@ const BookingPage: React.FC = () => {
     console.log('BookingPage - Date selection:', { checkIn, checkOut, propertyId });
     handleDateRangeSelect(checkIn, checkOut);
     
-    // Pricing will be calculated automatically by the useEffect above
+    // Auto-calculate pricing with current guest count
+    if (propertyId) {
+      const guestsParam = searchParams.get('guests');
+      const guestCount = guestsParam ? parseInt(guestsParam) : 2;
+      console.log('BookingPage - Calculating pricing for new dates:', { checkIn, checkOut, guestCount });
+      calculatePricing(propertyId, checkIn, checkOut, guestCount);
+    }
   };
 
   const handleGuestCountChange = (guestCount: number) => {
@@ -135,7 +140,7 @@ const BookingPage: React.FC = () => {
         selectedCheckIn={selectedCheckIn}
         selectedCheckOut={selectedCheckOut}
         priceBreakdown={priceBreakdown}
-        platformComparisons={[]} // Empty for simplified version
+        platformComparisons={[]}
         appliedDiscount={appliedDiscount}
         isCalculatingPrice={isCalculatingPrice}
         onDateRangeSelect={handleDateSelection}

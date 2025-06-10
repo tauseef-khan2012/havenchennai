@@ -71,6 +71,18 @@ export const BookingPageContent: React.FC<BookingPageContentProps> = ({
   const nights = selectedCheckIn && selectedCheckOut ? 
     Math.ceil((selectedCheckOut.getTime() - selectedCheckIn.getTime()) / (1000 * 60 * 60 * 24)) : 0;
 
+  // Enhanced date range selection handler
+  const handleDateRangeSelect = (checkIn: Date, checkOut: Date) => {
+    console.log('BookingPageContent - Date range selected:', { checkIn, checkOut });
+    onDateRangeSelect(checkIn, checkOut);
+  };
+
+  // Enhanced guest count change handler
+  const handleGuestCountChange = (count: number) => {
+    console.log('BookingPageContent - Guest count changed:', count);
+    setGuestCount(count);
+  };
+
   const handleProceedToCheckout = () => {
     setCurrentStep('checkout');
   };
@@ -108,7 +120,6 @@ export const BookingPageContent: React.FC<BookingPageContentProps> = ({
       description: error,
       variant: "destructive"
     });
-    // Stay on payment step to allow retry
   };
 
   const canProceedToCheckout = selectedCheckIn && selectedCheckOut && priceBreakdown && !isCalculatingPrice;
@@ -139,7 +150,6 @@ export const BookingPageContent: React.FC<BookingPageContentProps> = ({
   }
 
   if (currentStep === 'payment' && bookingId && bookingReference && canProceedToCheckout) {
-    // Calculate final total with additional guest charges
     const additionalGuestCharges = Math.max(0, guestCount - 2) * 500;
     const finalPriceBreakdown = {
       ...priceBreakdown,
@@ -172,7 +182,6 @@ export const BookingPageContent: React.FC<BookingPageContentProps> = ({
     );
   }
 
-  // Default booking step
   return (
     <div className="min-h-screen bg-navy-gradient py-8">
       <div className="absolute inset-0 bg-organic-texture opacity-20"></div>
@@ -186,10 +195,10 @@ export const BookingPageContent: React.FC<BookingPageContentProps> = ({
           selectedCheckOut={selectedCheckOut}
           priceBreakdown={priceBreakdown}
           platformComparisons={platformComparisons}
-          onDateRangeSelect={onDateRangeSelect}
+          onDateRangeSelect={handleDateRangeSelect}
           onPlatformBooking={onPlatformBooking}
           guestCount={guestCount}
-          setGuestCount={setGuestCount}
+          setGuestCount={handleGuestCountChange}
           isCalculatingPrice={isCalculatingPrice}
           onProceedToPayment={handleProceedToCheckout}
         />
