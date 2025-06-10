@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
-import { AlertCircle, Users } from 'lucide-react';
+import { AlertCircle, Users, Calendar, MapPin } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { EnhancedPriceSummary } from './EnhancedPriceSummary';
 import { EnhancedDiscountSection } from './EnhancedDiscountSection';
@@ -65,7 +65,6 @@ export const CheckoutStep: React.FC<CheckoutStepProps> = ({
     phone: ''
   });
   
-  // Guest details state
   const [guestDetails, setGuestDetails] = useState<GuestInfo[]>(() => 
     Array.from({ length: guestCount }, () => ({ name: '', age: undefined }))
   );
@@ -168,42 +167,47 @@ export const CheckoutStep: React.FC<CheckoutStepProps> = ({
   const totalWithGuestCharges = priceBreakdown.totalAmountDue + additionalGuestCharges;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto space-y-8">
       {/* Header */}
-      <div className="text-center">
-        <h1 className="text-3xl font-serif text-gray-900 mb-2">Complete Your Booking</h1>
-        <p className="text-gray-600">Just a few more details to secure your stay</p>
+      <div className="text-center animate-fade-in">
+        <div className="inline-flex items-center gap-3 mb-4">
+          <div className="w-12 h-1 bg-yellow-gradient rounded-full"></div>
+          <span className="font-handwritten text-xl text-haven-yellow">Complete Booking</span>
+          <div className="w-12 h-1 bg-yellow-gradient rounded-full"></div>
+        </div>
+        <h1 className="text-3xl font-serif text-haven-beige mb-2">Secure Your Haven Experience</h1>
+        <p className="text-haven-beige/80">Just a few more details to confirm your lakeside retreat</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Column - Forms */}
         <div className="space-y-6">
           {/* Booking Summary */}
-          <Card>
+          <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy animate-fade-in">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-haven-teal" />
-                Booking Details
+              <CardTitle className="flex items-center gap-2 text-haven-beige">
+                <MapPin className="h-5 w-5 text-haven-yellow" />
+                Your Booking Details
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                <h3 className="font-medium text-gray-900">{property.name}</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+              <div className="bg-yellow-gradient/10 p-4 rounded-2xl border border-haven-yellow/20">
+                <h3 className="font-medium text-haven-beige mb-3">{property.name}</h3>
+                <div className="grid grid-cols-2 gap-4 text-sm text-haven-beige/80">
                   <div>
-                    <span className="font-medium">Check-in:</span>
+                    <span className="font-medium text-haven-beige">Check-in:</span>
                     <p>{formatDate(selectedCheckIn)}</p>
                   </div>
                   <div>
-                    <span className="font-medium">Check-out:</span>
+                    <span className="font-medium text-haven-beige">Check-out:</span>
                     <p>{formatDate(selectedCheckOut)}</p>
                   </div>
                   <div>
-                    <span className="font-medium">Guests:</span>
+                    <span className="font-medium text-haven-beige">Guests:</span>
                     <p>{guestCount} {guestCount === 1 ? 'guest' : 'guests'}</p>
                   </div>
                   <div>
-                    <span className="font-medium">Duration:</span>
+                    <span className="font-medium text-haven-beige">Duration:</span>
                     <p>{nights} {nights === 1 ? 'night' : 'nights'}</p>
                   </div>
                 </div>
@@ -212,19 +216,21 @@ export const CheckoutStep: React.FC<CheckoutStepProps> = ({
           </Card>
 
           {/* Enhanced Contact Information */}
-          <EnhancedContactSection
-            contactInfo={contactInfo}
-            onContactInfoChange={handleContactInfoChange}
-            errors={errors}
-            onFieldChange={handleFieldChange}
-          />
+          <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy animate-fade-in-delay">
+            <EnhancedContactSection
+              contactInfo={contactInfo}
+              onContactInfoChange={handleContactInfoChange}
+              errors={errors}
+              onFieldChange={handleFieldChange}
+            />
+          </Card>
 
           {/* Guest Details */}
-          <Card>
+          <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy animate-fade-in-delay-2">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-haven-teal" />
-                Guest Details
+              <CardTitle className="flex items-center gap-2 text-haven-beige">
+                <Users className="h-5 w-5 text-haven-yellow" />
+                Guest Information
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -235,9 +241,9 @@ export const CheckoutStep: React.FC<CheckoutStepProps> = ({
               />
 
               {guestCount > 2 && (
-                <Alert>
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
+                <Alert className="bg-yellow-gradient/10 border-haven-yellow/30">
+                  <AlertCircle className="h-4 w-4 text-haven-yellow" />
+                  <AlertDescription className="text-haven-beige">
                     Additional charge of {formatPrice(500, 'INR')} per guest after the first 2 guests has been added to your total.
                   </AlertDescription>
                 </Alert>
@@ -246,19 +252,20 @@ export const CheckoutStep: React.FC<CheckoutStepProps> = ({
           </Card>
 
           {/* Special Requests */}
-          <Card>
+          <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy animate-fade-in-delay">
             <CardHeader>
-              <CardTitle>Special Requests</CardTitle>
+              <CardTitle className="text-haven-beige">Special Requests</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <Label htmlFor="specialRequests">Additional Information (optional)</Label>
+                <Label htmlFor="specialRequests" className="text-haven-beige">Additional Information (optional)</Label>
                 <Textarea
                   id="specialRequests"
                   value={specialRequests}
                   onChange={(e) => setSpecialRequests(e.target.value)}
                   placeholder="Any special requests or additional information..."
                   rows={3}
+                  className="bg-haven-navy-light/50 border-haven-yellow/20 text-haven-beige placeholder:text-haven-beige/50 focus:border-haven-yellow focus:ring-haven-yellow"
                 />
               </div>
             </CardContent>
@@ -268,20 +275,25 @@ export const CheckoutStep: React.FC<CheckoutStepProps> = ({
         {/* Right Column - Pricing Summary */}
         <div className="space-y-6">
           {/* Enhanced Discount Code */}
-          <EnhancedDiscountSection
-            propertyId={propertyId}
-            checkInDate={selectedCheckIn}
-            checkOutDate={selectedCheckOut}
-            guestCount={guestCount}
-            subtotal={priceBreakdown.subtotalAfterDiscount}
-            appliedDiscount={appliedDiscount}
-            onDiscountApplied={onDiscountApplied}
-          />
+          <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy animate-fade-in">
+            <EnhancedDiscountSection
+              propertyId={propertyId}
+              checkInDate={selectedCheckIn}
+              checkOutDate={selectedCheckOut}
+              guestCount={guestCount}
+              subtotal={priceBreakdown.subtotalAfterDiscount}
+              appliedDiscount={appliedDiscount}
+              onDiscountApplied={onDiscountApplied}
+            />
+          </Card>
 
           {/* Price Summary */}
-          <Card>
+          <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy animate-fade-in-delay">
             <CardHeader>
-              <CardTitle>Price Summary</CardTitle>
+              <CardTitle className="text-haven-beige flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-haven-yellow" />
+                Price Summary
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <EnhancedPriceSummary 
@@ -292,22 +304,22 @@ export const CheckoutStep: React.FC<CheckoutStepProps> = ({
               
               {additionalGuestCharges > 0 && (
                 <>
-                  <Separator className="my-4" />
-                  <div className="flex justify-between items-center">
+                  <Separator className="my-4 bg-haven-yellow/20" />
+                  <div className="flex justify-between items-center text-haven-beige">
                     <span>Additional guests ({guestCount - 2} × {formatPrice(500, 'INR')})</span>
                     <span>{formatPrice(additionalGuestCharges, 'INR')}</span>
                   </div>
-                  <Separator className="my-4" />
-                  <div className="flex justify-between items-center font-bold text-lg">
+                  <Separator className="my-4 bg-haven-yellow/20" />
+                  <div className="flex justify-between items-center font-bold text-lg text-haven-beige">
                     <span>Final Total</span>
-                    <span>{formatPrice(totalWithGuestCharges, priceBreakdown.currency)}</span>
+                    <span className="text-haven-yellow">{formatPrice(totalWithGuestCharges, priceBreakdown.currency)}</span>
                   </div>
                 </>
               )}
               
               {priceBreakdown.savingsFromCompetitors && priceBreakdown.savingsFromCompetitors > 0 && (
-                <div className="mt-4 bg-green-50 p-3 rounded-lg border border-green-200">
-                  <div className="text-sm text-green-800">
+                <div className="mt-4 bg-yellow-gradient/10 p-3 rounded-2xl border border-haven-yellow/30">
+                  <div className="text-sm text-haven-beige">
                     <span className="font-medium">You save {formatPrice(priceBreakdown.savingsFromCompetitors, priceBreakdown.currency)}</span> by booking direct!
                   </div>
                 </div>
@@ -319,13 +331,13 @@ export const CheckoutStep: React.FC<CheckoutStepProps> = ({
           <Button 
             onClick={handleSubmit}
             disabled={isProcessing}
-            className="w-full bg-haven-teal hover:bg-haven-teal/90 text-white py-3 text-lg font-medium"
+            className="w-full bg-yellow-gradient hover:shadow-yellow text-haven-navy py-3 text-lg font-medium transition-all duration-300 transform hover:scale-105 ripple-effect"
             size="lg"
           >
             {isProcessing ? 'Processing...' : 'Proceed to Payment'}
           </Button>
 
-          <p className="text-xs text-gray-500 text-center">
+          <p className="text-xs text-haven-beige/60 text-center">
             By proceeding, you agree to our terms and conditions
           </p>
         </div>

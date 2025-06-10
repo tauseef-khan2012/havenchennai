@@ -81,11 +81,27 @@ const BookingPage: React.FC = () => {
   };
 
   if (isLoading) {
-    return <BookingPageLoadingState />;
+    return (
+      <div className="min-h-screen bg-navy-gradient flex items-center justify-center">
+        <div className="absolute inset-0 bg-organic-texture opacity-20"></div>
+        <div className="absolute inset-0 leaf-pattern opacity-15"></div>
+        <div className="relative z-10">
+          <BookingPageLoadingState />
+        </div>
+      </div>
+    );
   }
 
   if (error || !property) {
-    return <BookingPageNotFound error={error} onRetry={retryFetch} />;
+    return (
+      <div className="min-h-screen bg-navy-gradient flex items-center justify-center">
+        <div className="absolute inset-0 bg-organic-texture opacity-20"></div>
+        <div className="absolute inset-0 leaf-pattern opacity-15"></div>
+        <div className="relative z-10">
+          <BookingPageNotFound error={error} onRetry={retryFetch} />
+        </div>
+      </div>
+    );
   }
 
   return (
