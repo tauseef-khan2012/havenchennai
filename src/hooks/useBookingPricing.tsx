@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { calculateEnhancedPropertyBookingPrice, EnhancedPriceBreakdown } from '@/services/enhancedPriceService';
 import { DiscountApplication } from '@/services/discountService';
@@ -11,6 +11,7 @@ export const useBookingPricing = () => {
   const [basePriceBreakdown, setBasePriceBreakdown] = useState<EnhancedPriceBreakdown | null>(null);
   const [appliedDiscount, setAppliedDiscount] = useState<DiscountApplication | undefined>();
   const [isCalculatingPrice, setIsCalculatingPrice] = useState(false);
+  const [lastCalculationKey, setLastCalculationKey] = useState<string>('');
 
   // Calculate final price breakdown with discount applied
   const getFinalPriceBreakdown = (): EnhancedPriceBreakdown | null => {
@@ -40,10 +41,26 @@ export const useBookingPricing = () => {
     };
   };
 
-  const calculatePricing = async (propertyId: UUID, checkIn: Date, checkOut: Date, guestCount: number = 2) => {
+  const calculatePricing = useCallback(async (propertyId: UUID, checkIn: Date, checkOut: Date, guestCount: number = 2) => {
+    // Create a unique key for this calculation to prevent duplicate requests
+    const calculationKey = `${propertyId}-${checkIn.getTime()}-${checkOut.getTime()}-${guestCount}`;
+    
+    // Skip if this exact calculation is already in progress or completed
+    if (calculationKey === lastCalculationKey && basePriceBreakdown) {
+      console.log('useBookingPricing - Skipping duplicate calculation');
+      return;
+    }
+
+    if (isCalculatingPrice) {
+      console.log('useBookingPricing - Calculation already in progress, skipping');
+      return;
+    }
+
     setIsCalculatingPrice(true);
+    setLastCalculationKey(calculationKey);
+    
     try {
-      console.log('Calculating pricing for:', { propertyId, checkIn, checkOut, guestCount });
+      console.log('useBookingPricing - Starting price calculation:', { propertyId, checkIn, checkOut, guestCount });
       
       const pricing = await calculateEnhancedPropertyBookingPrice(
         propertyId,
@@ -52,15 +69,10 @@ export const useBookingPricing = () => {
         guestCount
       );
       
-      console.log('Base pricing calculated:', pricing);
+      console.log('useBookingPricing - Price calculation completed:', pricing);
       setBasePriceBreakdown(pricing);
     } catch (error) {
-      console.error('Error calculating pricing:', error);
-      toast({
-        title: "Error",
-        description: "Failed to calculate pricing. Using default rates.",
-        variant: "destructive"
-      });
+      console.error('useBookingPricing - Error calculating pricing:', error);
       
       // Fallback pricing
       const nights = calculateNights(checkIn, checkOut);
@@ -69,7 +81,7 @@ export const useBookingPricing = () => {
       const subtotal = basePrice + additionalGuestCharges;
       const gstAmount = subtotal * 0.18;
       
-      setBasePriceBreakdown({
+      const fallbackPricing = {
         basePrice,
         discountAmount: 0,
         subtotalAfterDiscount: subtotal,
@@ -81,19 +93,34 @@ export const useBookingPricing = () => {
           cgst: gstAmount / 2,
           sgst: gstAmount / 2
         }
+      };
+      
+      console.log('useBookingPricing - Using fallback pricing:', fallbackPricing);
+      setBasePriceBreakdown(fallbackPricing);
+      
+      toast({
+        title: "Pricing Notice",
+        description: "Using standard rates. Final pricing will be confirmed.",
+        variant: "default"
       });
     } finally {
       setIsCalculatingPrice(false);
     }
-  };
+  }, [isCalculatingPrice, lastCalculationKey, basePriceBreakdown, toast]);
 
   const handleDiscountApplied = (discount: DiscountApplication) => {
-    console.log('Discount applied:', discount);
+    console.log('useBookingPricing - Discount applied:', discount);
     setAppliedDiscount(discount);
   };
 
   const removeDiscount = () => {
     setAppliedDiscount(undefined);
+  };
+
+  const resetPricing = () => {
+    setBasePriceBreakdown(null);
+    setAppliedDiscount(undefined);
+    setLastCalculationKey('');
   };
 
   return {
@@ -104,6 +131,7 @@ export const useBookingPricing = () => {
     calculatePricing,
     handleDiscountApplied,
     removeDiscount,
+    resetPricing,
     // Legacy compatibility for platform comparisons (empty for now)
     platformComparisons: [],
     fetchPlatformComparisons: async () => {}

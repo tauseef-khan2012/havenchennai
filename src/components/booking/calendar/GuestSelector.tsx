@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Users, Plus, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -14,19 +14,21 @@ export const GuestSelector: React.FC<GuestSelectorProps> = ({
   setGuestCount,
   maxGuests
 }) => {
-  const handleIncrement = () => {
+  const handleIncrement = useCallback(() => {
     if (guestCount < maxGuests) {
-      console.log('GuestSelector - Incrementing guest count from', guestCount, 'to', guestCount + 1);
-      setGuestCount(guestCount + 1);
+      const newCount = guestCount + 1;
+      console.log('GuestSelector - Incrementing guest count from', guestCount, 'to', newCount);
+      setGuestCount(newCount);
     }
-  };
+  }, [guestCount, maxGuests, setGuestCount]);
 
-  const handleDecrement = () => {
+  const handleDecrement = useCallback(() => {
     if (guestCount > 1) {
-      console.log('GuestSelector - Decrementing guest count from', guestCount, 'to', guestCount - 1);
-      setGuestCount(guestCount - 1);
+      const newCount = guestCount - 1;
+      console.log('GuestSelector - Decrementing guest count from', guestCount, 'to', newCount);
+      setGuestCount(newCount);
     }
-  };
+  }, [guestCount, setGuestCount]);
 
   return (
     <div className="space-y-3">
@@ -38,6 +40,7 @@ export const GuestSelector: React.FC<GuestSelectorProps> = ({
       <div className="flex items-center justify-between p-4 bg-haven-navy-light/30 rounded-xl border border-haven-yellow/10">
         <div className="flex items-center gap-4">
           <Button
+            type="button"
             variant="outline"
             size="sm"
             onClick={handleDecrement}
@@ -55,6 +58,7 @@ export const GuestSelector: React.FC<GuestSelectorProps> = ({
           </div>
           
           <Button
+            type="button"
             variant="outline"
             size="sm"
             onClick={handleIncrement}

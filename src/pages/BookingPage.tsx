@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { usePropertyBooking } from '@/hooks/usePropertyBooking';
 import { useBookingPricing } from '@/hooks/useBookingPricing';
 import { useBookingDates } from '@/hooks/useBookingDates';
@@ -19,7 +19,8 @@ const BookingPage: React.FC = () => {
     appliedDiscount,
     isCalculatingPrice,
     calculatePricing,
-    handleDiscountApplied
+    handleDiscountApplied,
+    resetPricing
   } = useBookingPricing();
   const { handleProceedToPayment, handlePlatformBooking } = useBookingNavigation();
 
@@ -44,6 +45,28 @@ const BookingPage: React.FC = () => {
     }
   }, [searchParams, handleDateRangeSelect]);
 
+  // Debounced price calculation to prevent race conditions
+  const debouncedPriceCalculation = useCallback(
+    (checkIn: Date, checkOut: Date, guestCount: number) => {
+      if (!propertyId) return;
+      
+      console.log('BookingPage - Debounced price calculation:', {
+        checkIn,
+        checkOut,
+        propertyId,
+        guestCount
+      });
+      
+      // Add small delay to prevent rapid-fire calculations
+      const timeoutId = setTimeout(() => {
+        calculatePricing(propertyId, checkIn, checkOut, guestCount);
+      }, 300);
+      
+      return () => clearTimeout(timeoutId);
+    },
+    [propertyId, calculatePricing]
+  );
+
   // Auto-calculate pricing when dates change and propertyId is available
   useEffect(() => {
     if (selectedCheckIn && selectedCheckOut && propertyId) {
@@ -57,34 +80,32 @@ const BookingPage: React.FC = () => {
         guestCount
       });
       
-      calculatePricing(propertyId, selectedCheckIn, selectedCheckOut, guestCount);
+      const cleanup = debouncedPriceCalculation(selectedCheckIn, selectedCheckOut, guestCount);
+      return cleanup;
     }
-  }, [selectedCheckIn, selectedCheckOut, propertyId, calculatePricing, searchParams]);
+  }, [selectedCheckIn, selectedCheckOut, propertyId, debouncedPriceCalculation, searchParams]);
 
-  const handleDateSelection = async (checkIn: Date, checkOut: Date) => {
-    console.log('BookingPage - Date selection:', { checkIn, checkOut, propertyId });
-    handleDateRangeSelect(checkIn, checkOut);
+  const handleDateSelection = useCallback(async (checkIn: Date, checkOut: Date) => {
+    console.log('BookingPage - Date selection received:', { checkIn, checkOut, propertyId });
     
-    // Auto-calculate pricing with current guest count
-    if (propertyId) {
-      const guestsParam = searchParams.get('guests');
-      const guestCount = guestsParam ? parseInt(guestsParam) : 2;
-      console.log('BookingPage - Calculating pricing for new dates:', { checkIn, checkOut, guestCount });
-      calculatePricing(propertyId, checkIn, checkOut, guestCount);
-    }
-  };
+    // Reset pricing when dates change
+    resetPricing();
+    
+    // Update dates
+    handleDateRangeSelect(checkIn, checkOut);
+  }, [handleDateRangeSelect, resetPricing, propertyId]);
 
-  const handleGuestCountChange = (guestCount: number) => {
+  const handleGuestCountChange = useCallback((guestCount: number) => {
     console.log('BookingPage - Guest count changed:', { guestCount });
     
     // Recalculate pricing with new guest count if dates are selected
     if (selectedCheckIn && selectedCheckOut && propertyId) {
       console.log('BookingPage - Recalculating pricing for guest count change');
-      calculatePricing(propertyId, selectedCheckIn, selectedCheckOut, guestCount);
+      debouncedPriceCalculation(selectedCheckIn, selectedCheckOut, guestCount);
     }
-  };
+  }, [selectedCheckIn, selectedCheckOut, propertyId, debouncedPriceCalculation]);
 
-  const handlePaymentProceed = () => {
+  const handlePaymentProceed = useCallback(() => {
     const guestsParam = searchParams.get('guests');
     const guestCount = guestsParam ? parseInt(guestsParam) : 2;
     
@@ -106,7 +127,16 @@ const BookingPage: React.FC = () => {
       priceBreakdown,
       appliedDiscount
     );
-  };
+  }, [
+    searchParams,
+    user,
+    propertyId,
+    selectedCheckIn,
+    selectedCheckOut,
+    priceBreakdown,
+    appliedDiscount,
+    handleProceedToPayment
+  ]);
 
   if (isLoading) {
     return (

@@ -62,6 +62,18 @@ export const BookingContent: React.FC<BookingContentProps> = ({
     { icon: <Eye className="h-4 w-4" />, label: "Multi-Level Decks" }
   ];
 
+  // Enhanced date range selection handler with logging
+  const handleDateRangeSelect = (checkIn: Date, checkOut: Date) => {
+    console.log('BookingContent - Date range selection received:', { checkIn, checkOut });
+    onDateRangeSelect(checkIn, checkOut);
+  };
+
+  // Enhanced guest count handler with logging
+  const handleGuestCountChange = (count: number) => {
+    console.log('BookingContent - Guest count change received:', count);
+    setGuestCount(count);
+  };
+
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       {/* Header Section */}
@@ -103,48 +115,63 @@ export const BookingContent: React.FC<BookingContentProps> = ({
           </CardContent>
         </Card>
 
-        {/* Date Selection and Booking Summary - Side by Side */}
+        {/* Main Booking Section - Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Column - Date Selection */}
+          {/* Left Column - Date and Guest Selection */}
           <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy animate-fade-in-delay">
             <CardHeader>
               <CardTitle className="text-haven-beige flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-haven-yellow" />
-                Select Your Dates
+                Select Your Dates & Guests
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <CalendarDatePicker
-                selectedCheckIn={selectedCheckIn}
-                selectedCheckOut={selectedCheckOut}
-                onDateRangeSelect={onDateRangeSelect}
-                propertyId={propertyId}
-              />
+            <CardContent className="space-y-6">
+              <div>
+                <h3 className="text-lg font-medium text-haven-beige mb-4">Choose Dates</h3>
+                <CalendarDatePicker
+                  selectedCheckIn={selectedCheckIn}
+                  selectedCheckOut={selectedCheckOut}
+                  onDateRangeSelect={handleDateRangeSelect}
+                  propertyId={propertyId}
+                />
+              </div>
               
               <Separator className="bg-haven-yellow/20" />
               
-              <GuestSelector
-                guestCount={guestCount}
-                setGuestCount={setGuestCount}
-                maxGuests={property.max_guests || 4}
-              />
+              <div>
+                <h3 className="text-lg font-medium text-haven-beige mb-4">Number of Guests</h3>
+                <GuestSelector
+                  guestCount={guestCount}
+                  setGuestCount={handleGuestCountChange}
+                  maxGuests={property.max_guests || 4}
+                />
+              </div>
             </CardContent>
           </Card>
 
-          {/* Right Column - Booking Summary */}
+          {/* Right Column - Reserve Haven Box */}
           <div className="lg:sticky lg:top-8 lg:self-start">
-            <EnhancedBookingSummary
-              property={property}
-              propertyId={propertyId}
-              guestCount={guestCount}
-              selectedCheckIn={selectedCheckIn}
-              selectedCheckOut={selectedCheckOut}
-              priceBreakdown={priceBreakdown}
-              nights={nights}
-              isCalculatingPrice={isCalculatingPrice}
-              onProceedToPayment={onProceedToPayment}
-              showPropertyDetails={false}
-            />
+            <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy">
+              <CardHeader>
+                <CardTitle className="text-haven-beige text-center text-xl">
+                  Reserve Haven
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <EnhancedBookingSummary
+                  property={property}
+                  propertyId={propertyId}
+                  guestCount={guestCount}
+                  selectedCheckIn={selectedCheckIn}
+                  selectedCheckOut={selectedCheckOut}
+                  priceBreakdown={priceBreakdown}
+                  nights={nights}
+                  isCalculatingPrice={isCalculatingPrice}
+                  onProceedToPayment={onProceedToPayment}
+                  showPropertyDetails={false}
+                />
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
