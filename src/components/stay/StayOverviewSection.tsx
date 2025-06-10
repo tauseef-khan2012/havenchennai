@@ -10,12 +10,12 @@ interface StayOverviewSectionProps {
 
 const StayOverviewSection: React.FC<StayOverviewSectionProps> = ({ forwardRef }) => {
   const amenities = [
-    { icon: Wifi, label: "Wi-Fi (100 Mbps)" },
+    { icon: Wifi, label: "High-Speed Wi-Fi (500 Mbps)" },
     { icon: ChefHat, label: "Fully Equipped Kitchen" },
     { icon: Car, label: "Parking for 2 Cars" },
-    { icon: Bed, label: "Wakefit Mattresses" },
+    { icon: Bed, label: "Wakefit 8-inch Foam-Spring Mattresses" },
     { icon: Monitor, label: "32-inch Monitor/Smart TV" },
-    { icon: Volume2, label: "JBL Flip 5 Speaker" }
+    { icon: Volume2, label: "JBL Flip 5 Premium Speaker" }
   ];
 
   return (
@@ -27,7 +27,7 @@ const StayOverviewSection: React.FC<StayOverviewSectionProps> = ({ forwardRef })
             <div className="aspect-[4/3] rounded-lg overflow-hidden">
               <img 
                 src="/lovable-uploads/0bf49c3a-e3e0-4828-badd-a492dc4dd957.png" 
-                alt="Haven Container Home Exterior"
+                alt="Haven Chennai - Unique container home accommodation beside Muttukadu Lake showcasing sustainable architecture and eco-friendly design"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -35,14 +35,14 @@ const StayOverviewSection: React.FC<StayOverviewSectionProps> = ({ forwardRef })
               <div className="aspect-square rounded-lg overflow-hidden">
                 <img 
                   src="/lovable-uploads/80ae807c-39e1-4519-b19a-ed92c4b221cd.png" 
-                  alt="Rooftop deck with panoramic lake views"
+                  alt="Rooftop deck at Haven container home Chennai with panoramic Muttukadu Lake views and outdoor seating"
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="aspect-square rounded-lg overflow-hidden">
                 <img 
                   src="/lovable-uploads/032b0326-be0f-4d2f-bc40-e4873823e984.png" 
-                  alt="Dedicated workspace with monitor"
+                  alt="Dedicated workspace in Haven Chennai container home featuring 32-inch monitor and ergonomic setup for digital nomads"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -54,18 +54,18 @@ const StayOverviewSection: React.FC<StayOverviewSectionProps> = ({ forwardRef })
             <div>
               <Badge variant="secondary" className="mb-4">
                 <MapPin className="h-3 w-3 mr-1" />
-                Muttukadu Lake, Chennai
+                Padur, Muttukadu Lake, Chennai ECR
               </Badge>
-              <h2 className="text-4xl font-serif font-bold text-gray-900 mb-6">
-                Haven: Two Stacked Container Houses
-              </h2>
+              <h1 className="text-4xl font-serif font-bold text-gray-900 mb-6">
+                Haven: Sustainable Container Home Accommodation
+              </h1>
               <p className="text-lg text-gray-700 leading-relaxed mb-4">
-                Haven is an intimate getaway thoughtfully built using two stacked container houses, aimed at bringing people closer together. 
-                Nestled beside the serene Muttukadu Lake, it blends minimal living with expansive views.
+                Haven is an intimate getaway thoughtfully built using sustainable container architecture, designed to bring people closer together and promote nature immersion. 
+                Located in Padur beside the serene Muttukadu Lake on Chennai's ECR, this unique eco-friendly accommodation blends minimal living with expansive lakeside views.
               </p>
               <p className="text-gray-600 leading-relaxed">
-                Inspired by personal travels and the quiet magic of container living, Haven is more than a stay—it's a feeling. 
-                Every element, from its upcycled materials to its minimal interiors, is rooted in sustainability and mindful living.
+                Inspired by personal travels and the quiet magic of container living, Haven is more than a stay—it's a sustainable lifestyle experience. 
+                Every element, from its upcycled materials to its minimal interiors, is rooted in environmental consciousness and mindful living, making it perfect for eco-conscious travelers seeking unique stays near Chennai.
               </p>
             </div>
 
@@ -89,26 +89,26 @@ const StayOverviewSection: React.FC<StayOverviewSectionProps> = ({ forwardRef })
 
             {/* Key Features */}
             <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-gray-900">What Makes Haven Special</h3>
+              <h2 className="text-xl font-semibold text-gray-900">What Makes Haven Special</h2>
               <ul className="space-y-3">
                 <li className="flex items-start">
                   <Building className="h-5 w-5 text-haven-teal mt-0.5 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700">Two stacked containers with sustainable, upcycled construction</span>
+                  <span className="text-gray-700">Sustainable container architecture with eco-friendly, upcycled construction materials</span>
                 </li>
                 <li className="flex items-start">
                   <MapPin className="h-5 w-5 text-haven-teal mt-0.5 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700">Lakeside location with rich birdlife including pelicans, flamingos, and herons</span>
+                  <span className="text-gray-700">Prime lakeside location with rich birdlife including pelicans, flamingos, herons, and exotic species</span>
                 </li>
                 <li className="flex items-start">
                   <Layers className="h-5 w-5 text-haven-teal mt-0.5 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700">Three deck spaces including a 160 sq ft rooftop deck with panoramic views</span>
+                  <span className="text-gray-700">Three unique deck spaces including a 160 sq ft rooftop deck with panoramic Muttukadu Lake views</span>
                 </li>
               </ul>
             </div>
 
             {/* Amenities Grid */}
             <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-gray-900">Amenities</h3>
+              <h2 className="text-xl font-semibold text-gray-900">Premium Amenities</h2>
               <div className="grid grid-cols-2 gap-3">
                 {amenities.map((amenity, index) => {
                   const Icon = amenity.icon;
@@ -136,15 +136,15 @@ const StayOverviewSection: React.FC<StayOverviewSectionProps> = ({ forwardRef })
             <ul className="space-y-3 text-gray-700">
               <li className="flex items-start">
                 <Bed className="h-4 w-4 text-haven-teal mt-1 mr-2 flex-shrink-0" />
-                <span>Bunk bed setup (queen-size bottom, single top with ladder)</span>
+                <span>Premium bunk bed configuration (queen-size bottom, single top with safety ladder)</span>
               </li>
               <li className="flex items-start">
                 <Monitor className="h-4 w-4 text-haven-teal mt-1 mr-2 flex-shrink-0" />
-                <span>Dedicated workspace with 32-inch monitor, keyboard, and mouse</span>
+                <span>Professional workspace with 32-inch monitor, ergonomic keyboard, and wireless mouse</span>
               </li>
               <li className="flex items-start">
                 <Volume2 className="h-4 w-4 text-haven-teal mt-1 mr-2 flex-shrink-0" />
-                <span>25 curated books and JBL Flip 5 speaker</span>
+                <span>Curated library of 25 books and JBL Flip 5 premium speaker system</span>
               </li>
             </ul>
           </div>
@@ -154,15 +154,15 @@ const StayOverviewSection: React.FC<StayOverviewSectionProps> = ({ forwardRef })
             <ul className="space-y-3 text-gray-700">
               <li className="flex items-start">
                 <Bed className="h-4 w-4 text-haven-teal mt-1 mr-2 flex-shrink-0" />
-                <span>Sofa-cum-bed for two (suitable for guests up to 6 feet tall)</span>
+                <span>Comfortable sofa-cum-bed for two guests (suitable for guests up to 6 feet tall)</span>
               </li>
               <li className="flex items-start">
                 <ChefHat className="h-4 w-4 text-haven-teal mt-1 mr-2 flex-shrink-0" />
-                <span>Fully equipped kitchen with induction stove, utensils, spices, coffee, and teas</span>
+                <span>Fully equipped kitchen with induction stove, premium utensils, spices, coffee, and specialty teas</span>
               </li>
               <li className="flex items-start">
                 <Building className="h-4 w-4 text-haven-teal mt-1 mr-2 flex-shrink-0" />
-                <span>Bathroom with soap, shampoo, towels, and beautifully tiled interiors</span>
+                <span>Modern bathroom with premium toiletries, fresh towels, and beautifully tiled interiors</span>
               </li>
             </ul>
           </div>

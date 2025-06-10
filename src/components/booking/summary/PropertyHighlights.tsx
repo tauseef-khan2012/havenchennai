@@ -7,15 +7,15 @@ interface PropertyHighlightsProps {
 }
 
 const getPropertyHighlights = (property: any) => {
-  // Return actual Haven amenities based on the property description
+  // Return actual Haven amenities based on the updated property description
   const highlights = [
-    { icon: MapPin, text: 'Lakeside Location' },
-    { icon: Wifi, text: 'Wi-Fi (100 Mbps)' },
-    { icon: Coffee, text: 'Full Kitchen' },
+    { icon: MapPin, text: 'Muttukadu Lakeside Location' },
+    { icon: Wifi, text: 'High-Speed Wi-Fi (500 Mbps)' },
+    { icon: Coffee, text: 'Fully Equipped Kitchen' },
     { icon: Car, text: 'Parking for 2 Cars' },
-    { icon: Monitor, text: '32" Monitor/TV' },
-    { icon: Volume2, text: 'JBL Speaker' },
-    { icon: Bed, text: 'Wakefit Mattresses' }
+    { icon: Monitor, text: '32" Monitor/Smart TV' },
+    { icon: Volume2, text: 'JBL Flip 5 Speaker' },
+    { icon: Bed, text: 'Wakefit Premium Mattresses' }
   ];
   
   return highlights.slice(0, 4); // Show top 4 highlights

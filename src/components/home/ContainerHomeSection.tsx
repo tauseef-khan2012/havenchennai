@@ -46,39 +46,39 @@ const ContainerHomeSection = () => {
   const features = [
     {
       icon: <Bed className="h-7 w-7" />,
-      title: "Queen + Bunk Bed & Workspace",
-      description: "Bunk bed setup with queen-size bottom bed and single top bed. Dedicated workspace with 32-inch monitor for remote work.",
+      title: "Queen + Bunk Bed Configuration",
+      description: "Innovative bunk bed setup with queen-size bottom bed and single top bed. Dedicated workspace with 32-inch monitor for remote work in our sustainable container home.",
       image: "/lovable-uploads/457f5e29-0207-45d0-822a-6252f1d6f7da.png",
-      alt: "Bunk bed setup with workspace area featuring desk and monitor"
+      alt: "Haven Chennai container home interior showing bunk bed setup with workspace featuring 32-inch monitor and desk"
     },
     {
       icon: <ChefHat className="h-7 w-7" />,
-      title: "Fully Equipped Kitchen",
-      description: "Complete kitchen with induction stove, utensils, spices, coffee, teas, and refrigerator for all your culinary needs.",
+      title: "Fully Equipped Kitchen Facilities",
+      description: "Complete kitchen with induction stove, cooking utensils, spices, coffee, teas, and refrigerator. Perfect for self-catering during your Muttukadu Lake retreat.",
       image: "/lovable-uploads/5425331e-4704-48e6-913b-0d6a48d98aaf.png",
-      alt: "Fully equipped kitchen with induction cooktop and cooking essentials"
+      alt: "Modern kitchen facilities in Haven container home Chennai with induction cooktop and cooking essentials"
     },
     {
       icon: <BookOpen className="h-7 w-7" />,
-      title: "25-Book Library & JBL Speaker",
-      description: "Carefully curated collection of 25 books and premium JBL Flip 5 speaker for entertainment and relaxation.",
+      title: "Curated Library & Premium Audio",
+      description: "Carefully selected collection of 25 books and premium JBL Flip 5 speaker for entertainment and relaxation during your eco-friendly stay.",
       image: "/lovable-uploads/705f2a35-1b3d-4af4-ad9b-a72ca9c61845.png",
-      alt: "Curated book collection with entertainment setup"
+      alt: "Reading corner with curated book collection and JBL speaker in Haven Chennai lakeside accommodation"
     },
     {
       icon: <Waves className="h-7 w-7" />,
-      title: "Three Deck Levels with Lake Views",
-      description: "160 sq ft rooftop deck with panoramic views, plus ground and first-floor decks overlooking Muttukadu Lake and rich birdlife.",
+      title: "Three-Level Deck Experience",
+      description: "160 sq ft rooftop deck with panoramic Muttukadu Lake views, plus ground and first-floor decks for outdoor relaxation. Ideal for birdwatching and nature immersion.",
       image: "/lovable-uploads/51e2e8f4-cfbe-4d8c-81f2-ac28bc7d3f04.png",
-      alt: "Multi-level decks with panoramic lake views"
+      alt: "Multi-level deck spaces at Haven container home with panoramic Muttukadu Lake views and outdoor seating areas"
     }
   ];
 
   const amenities = [
-    { icon: Wifi, label: "Wi-Fi (100 Mbps)" },
+    { icon: Wifi, label: "High-Speed Wi-Fi (500 Mbps)" },
     { icon: Monitor, label: "32-inch Monitor/Smart TV" },
     { icon: Car, label: "Parking for 2 Cars" },
-    { icon: Volume2, label: "JBL Flip 5 Speaker" }
+    { icon: Volume2, label: "JBL Flip 5 Premium Speaker" }
   ];
 
   return (
@@ -101,11 +101,11 @@ const ContainerHomeSection = () => {
             <div className="w-12 h-1 bg-yellow-gradient rounded-full"></div>
           </div>
           <h1 className="font-serif text-5xl lg:text-6xl xl:text-7xl font-bold text-haven-beige mb-4">
-            Haven: Two Stacked
-            <span className="block text-haven-yellow">Container Houses</span>
+            Haven: Unique Container Home
+            <span className="block text-haven-yellow">Beside Muttukadu Lake</span>
           </h1>
           <h2 className="font-serif text-2xl lg:text-3xl xl:text-4xl mb-6 text-haven-beige/80 font-medium">
-            beside <span className="font-handwritten text-3xl text-haven-yellow">Muttukadu Lake</span>
+            Eco-friendly Lakeside Retreat on <span className="font-handwritten text-3xl text-haven-yellow">Chennai's ECR</span>
           </h2>
         </div>
 
@@ -115,8 +115,8 @@ const ContainerHomeSection = () => {
           <div className="order-1 lg:order-1 animate-fade-in">
             <div className="glass-panel-navy rounded-3xl p-8 lg:p-10 shadow-navy hover-lift transition-all duration-500">
               <p className="text-haven-beige/90 mb-8 leading-relaxed text-lg">
-                An intimate getaway thoughtfully built using <span className="font-semibold text-haven-yellow">two stacked container houses</span>, 
-                aimed at bringing people closer together. Nestled beside the serene Muttukadu Lake, it blends minimal living with expansive views.
+                An intimate getaway thoughtfully built using <span className="font-semibold text-haven-yellow">sustainable container architecture</span>, 
+                designed to promote connection and nature immersion. Located in Padur beside the serene Muttukadu Lake, this eco-friendly accommodation blends minimal living with expansive lakeside views.
               </p>
               
               {/* Enhanced Quick Stats */}
@@ -162,7 +162,7 @@ const ContainerHomeSection = () => {
                 <div className="aspect-[4/3] lg:aspect-[3/2]">
                   <img 
                     src="/lovable-uploads/0bf49c3a-e3e0-4828-badd-a492dc4dd957.png" 
-                    alt="Haven: Two stacked container houses overlooking Muttukadu Lake" 
+                    alt="Haven Chennai - Unique container home accommodation beside Muttukadu Lake showcasing sustainable architecture and lakeside setting" 
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                     loading="lazy" 
                   />
@@ -177,11 +177,11 @@ const ContainerHomeSection = () => {
           <div className="text-center mb-12 animate-fade-in">
             <div className="inline-flex items-center gap-3 mb-6">
               <div className="w-8 h-1 bg-yellow-gradient rounded-full"></div>
-              <span className="font-handwritten text-xl text-haven-yellow">Thoughtful Amenities</span>
+              <span className="font-handwritten text-xl text-haven-yellow">Premium Amenities</span>
               <div className="w-8 h-1 bg-yellow-gradient rounded-full"></div>
             </div>
             <h3 className="font-serif text-3xl lg:text-4xl font-bold text-haven-beige">
-              Premium <span className="text-haven-yellow">Features</span>
+              Thoughtfully Designed <span className="text-haven-yellow">Container Living</span>
             </h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
@@ -208,15 +208,15 @@ const ContainerHomeSection = () => {
             <div className="absolute inset-0 bg-water-ripple opacity-30"></div>
             <div className="relative z-10">
               <h3 className="font-serif text-3xl lg:text-4xl font-bold mb-6">
-                Ready for Your <span className="font-handwritten text-4xl">Lakeside Container Escape</span>?
+                Ready for Your <span className="font-handwritten text-4xl">Muttukadu Lake Escape</span>?
               </h3>
               <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto leading-relaxed">
-                Book your sustainable getaway in our unique stacked container home and experience the perfect blend of intimacy and nature.
+                Book your sustainable getaway in our unique container home and experience the perfect blend of eco-friendly luxury and nature immersion beside Muttukadu Lake.
               </p>
               <div className="flex flex-col sm:flex-row gap-6 justify-center">
                 <Link to="/booking">
                   <Button className="bg-haven-navy text-haven-beige hover:bg-haven-navy-dark px-10 py-4 text-lg font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 shadow-navy ripple-effect">
-                    Book Your Stay
+                    Book Your Lakeside Stay
                   </Button>
                 </Link>
                 <Link to="/stay">
@@ -224,7 +224,7 @@ const ContainerHomeSection = () => {
                     variant="outline" 
                     className="border-2 border-haven-navy text-haven-navy hover:bg-haven-navy/10 px-10 py-4 text-lg rounded-2xl transition-all duration-300 transform hover:scale-105"
                   >
-                    Explore More
+                    Explore Container Home
                   </Button>
                 </Link>
               </div>
