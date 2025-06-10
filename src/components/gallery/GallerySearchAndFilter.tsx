@@ -39,13 +39,12 @@ export interface GallerySortOption {
 }
 
 const CATEGORIES = [
-  'Exterior Views',
+  'Accommodation',
   'Interior Spaces',
-  'Amenities',
   'Surrounding Area',
   'Activities',
   'Dining',
-  'Events'
+  'Amenities'
 ];
 
 export const GallerySearchAndFilter: React.FC<GallerySearchAndFilterProps> = ({
@@ -88,7 +87,7 @@ export const GallerySearchAndFilter: React.FC<GallerySearchAndFilterProps> = ({
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
-            placeholder="Search gallery..."
+            placeholder="Search gallery images..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-10 pr-4"
