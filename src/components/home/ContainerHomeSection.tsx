@@ -105,7 +105,7 @@ const ContainerHomeSection = () => {
             <span className="block text-haven-yellow">Beside Muttukadu Lake</span>
           </h1>
           <h2 className="font-serif text-2xl lg:text-3xl xl:text-4xl mb-6 text-haven-beige/80 font-medium">
-            Eco-friendly Lakeside Retreat on <span className="font-handwritten text-3xl text-haven-yellow">Chennai's ECR</span>
+            Eco-friendly Lakeside Retreat on <span className="font-handwritten text-3xl text-haven-yellow">Chennai's OMR</span>
           </h2>
         </div>
 
@@ -116,7 +116,7 @@ const ContainerHomeSection = () => {
             <div className="glass-panel-navy rounded-3xl p-8 lg:p-10 shadow-navy hover-lift transition-all duration-500">
               <p className="text-haven-beige/90 mb-8 leading-relaxed text-lg">
                 An intimate getaway thoughtfully built using <span className="font-semibold text-haven-yellow">sustainable container architecture</span>, 
-                designed to promote connection and nature immersion. Located in Padur beside the serene Muttukadu Lake, this eco-friendly accommodation blends minimal living with expansive lakeside views.
+                designed to promote connection and nature immersion. Located in Padur beside the serene Muttukadu Lake along Chennai's OMR, this eco-friendly accommodation blends minimal living with expansive lakeside views.
               </p>
               
               {/* Enhanced Quick Stats */}
