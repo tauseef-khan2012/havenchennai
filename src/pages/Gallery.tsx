@@ -326,22 +326,16 @@ const Gallery = () => {
               {filteredAndSortedImages.map((image) => (
                 <Dialog key={image.id}>
                   <DialogTrigger asChild>
-                    <Card className="group overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                    <Card className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-300">
                       <div className="aspect-square relative">
                         <LazyImage
                           src={image.src}
                           lowResSrc={image.lowResSrc}
                           alt={image.alt}
                           aspectRatio="square"
-                          className="group-hover:scale-105 transition-transform duration-300"
+                          className="transition-transform duration-300"
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                         />
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
-                          <div className="text-white text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4">
-                            <h3 className="font-semibold text-lg mb-2">{image.title}</h3>
-                            <p className="text-sm bg-haven-green/80 px-2 py-1 rounded">{image.category}</p>
-                          </div>
-                        </div>
                       </div>
                     </Card>
                   </DialogTrigger>
