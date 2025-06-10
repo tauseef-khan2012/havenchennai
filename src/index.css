@@ -1,5 +1,5 @@
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Caveat:wght@400;500;600&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -31,6 +31,14 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+
+    /* Custom nature-inspired CSS variables */
+    --nature-gradient-primary: linear-gradient(135deg, #007F7F 0%, #3b5249 50%, #65524d 100%);
+    --nature-gradient-sunset: linear-gradient(135deg, #FF6B6B 0%, #FFA500 50%, #FFD700 100%);
+    --nature-gradient-lake: linear-gradient(135deg, #75869b 0%, #007F7F 50%, #3b5249 100%);
+    --nature-gradient-earth: linear-gradient(135deg, #8B5A2B 0%, #65524d 50%, #3b5249 100%);
+    --organic-shadow: 0 10px 40px rgba(59, 82, 73, 0.15);
+    --organic-shadow-hover: 0 20px 60px rgba(59, 82, 73, 0.25);
   }
 
   .dark {
@@ -72,6 +80,9 @@
   .font-serif {
     font-family: "Playfair Display", serif;
   }
+  .font-handwritten {
+    font-family: "Caveat", cursive;
+  }
 }
 
 @layer utilities {
@@ -81,6 +92,57 @@
   
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Enhanced Background Utilities */
+  .bg-nature-gradient {
+    background: var(--nature-gradient-primary);
+  }
+
+  .bg-sunset-gradient {
+    background: var(--nature-gradient-sunset);
+  }
+
+  .bg-lake-gradient {
+    background: var(--nature-gradient-lake);
+  }
+
+  .bg-earth-gradient {
+    background: var(--nature-gradient-earth);
+  }
+
+  .bg-organic-texture {
+    background-image: 
+      radial-gradient(circle at 25% 25%, rgba(0, 127, 127, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(59, 82, 73, 0.1) 0%, transparent 50%);
+  }
+
+  .bg-water-ripple {
+    background-image: 
+      radial-gradient(ellipse 200px 100px at center, rgba(117, 134, 155, 0.1) 0%, transparent 70%),
+      radial-gradient(ellipse 300px 150px at 60% 40%, rgba(0, 127, 127, 0.05) 0%, transparent 70%);
+    background-size: 400px 200px, 600px 300px;
+    animation: water-ripple 8s ease-in-out infinite alternate;
+  }
+
+  /* Glassmorphism Effects */
+  .glass-panel {
+    @apply backdrop-blur-md bg-white/80 border border-white/20;
+    box-shadow: var(--organic-shadow);
+  }
+
+  .glass-panel-dark {
+    @apply backdrop-blur-md bg-haven-dark/80 border border-white/10;
+    box-shadow: var(--organic-shadow);
+  }
+
+  /* Organic Shadows */
+  .shadow-organic {
+    box-shadow: var(--organic-shadow);
+  }
+
+  .shadow-organic-hover {
+    box-shadow: var(--organic-shadow-hover);
   }
 
   /* Animation utilities */
@@ -117,6 +179,44 @@
     }
   }
 
+  @keyframes float-gentle {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes breathe {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+
+  @keyframes water-ripple {
+    0% {
+      background-position: 0% 0%, 0% 0%;
+    }
+    100% {
+      background-position: 100% 100%, -100% -100%;
+    }
+  }
+
+  @keyframes organic-pulse {
+    0%, 100% {
+      opacity: 0.6;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+  }
+
   .animate-fade-in {
     animation: fade-in 0.8s ease-out forwards;
   }
@@ -129,26 +229,140 @@
     animation: fade-in-delay-2 1.6s ease-out forwards;
   }
 
+  .animate-float-gentle {
+    animation: float-gentle 4s ease-in-out infinite;
+  }
+
+  .animate-breathe {
+    animation: breathe 3s ease-in-out infinite;
+  }
+
+  .animate-organic-pulse {
+    animation: organic-pulse 2s ease-in-out infinite;
+  }
+
+  /* Interactive Hover Effects */
+  .hover-lift {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .hover-lift:hover {
+    @apply transform -translate-y-2;
+    box-shadow: var(--organic-shadow-hover);
+  }
+
+  .hover-organic {
+    @apply transition-all duration-500 ease-out;
+  }
+
+  .hover-organic:hover {
+    @apply transform scale-105;
+    filter: brightness(1.1);
+  }
+
+  .ripple-effect {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ripple-effect::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transition: width 0.6s, height 0.6s, top 0.6s, left 0.6s;
+    transform: translate(-50%, -50%);
+  }
+
+  .ripple-effect:hover::before {
+    width: 300px;
+    height: 300px;
+    top: 50%;
+    left: 50%;
+  }
+
+  /* Organic Shapes */
+  .shape-organic {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+
+  .shape-organic-2 {
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  }
+
+  /* Section Dividers */
+  .section-divider::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(59, 82, 73, 0.3), transparent);
+  }
+
   /* Intersection observer visibility */
   section.visible {
     @apply opacity-100 translate-y-0;
   }
+
+  /* Nature-inspired decorative elements */
+  .nature-accent::before {
+    content: '🌿';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    font-size: 1.5rem;
+    opacity: 0.6;
+  }
+
+  .leaf-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%233b5249' fill-opacity='0.05'%3E%3Cpath d='M30 30c0-16.569 13.431-30 30-30v60c-16.569 0-30-13.431-30-30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar with nature theme */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: rgba(245, 242, 238, 0.5);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: linear-gradient(180deg, #007F7F, #3b5249);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: linear-gradient(180deg, #3b5249, #007F7F);
+}
+
+/* Loading animations with nature theme */
+.nature-loading {
+  position: relative;
+}
+
+.nature-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid transparent;
+  border-top: 2px solid #007F7F;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
