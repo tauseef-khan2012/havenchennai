@@ -16,15 +16,16 @@ const StayHeroSection = ({ onBookNowClick, onScrollToNext }: StayHeroSectionProp
 
   return (
     <section 
-      className="h-screen flex items-center justify-center relative snap-start scroll-mt-16"
+      className="h-[40vh] flex items-center justify-center relative snap-start scroll-mt-16"
     >
       <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat animate-kenBurns"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
           backgroundImage: 'url(/lovable-uploads/fdf4ae09-782a-476b-b866-173bf4816200.png)',
-          filter: 'brightness(0.7)'
+          filter: 'brightness(0.6)'
         }}
       />
+      <div className="absolute inset-0 bg-black bg-opacity-30" />
       
       <div className="relative container-custom z-10 text-white">
         <motion.div 
@@ -33,7 +34,7 @@ const StayHeroSection = ({ onBookNowClick, onScrollToNext }: StayHeroSectionProp
           variants={fadeInUp}
           className="max-w-2xl"
         >
-          <h1 className="font-serif text-5xl md:text-6xl font-bold mb-4">
+          <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4">
             Your Lakeside Haven
           </h1>
           <p className="text-xl md:text-2xl mb-8">
@@ -48,7 +49,7 @@ const StayHeroSection = ({ onBookNowClick, onScrollToNext }: StayHeroSectionProp
         </motion.div>
       </div>
       
-      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white animate-bounce">
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white animate-bounce">
         <button 
           onClick={onScrollToNext}
           aria-label="Scroll to learn more"
