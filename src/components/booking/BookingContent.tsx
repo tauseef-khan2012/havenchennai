@@ -6,8 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { 
   MapPin, 
   Users, 
-  Calendar, 
-  Camera,
+  Calendar,
   Wifi,
   Coffee,
   Car,
@@ -17,6 +16,7 @@ import {
 } from 'lucide-react';
 import { PropertyImageSlider } from './PropertyImageSlider';
 import { CalendarDatePicker } from './calendar/CalendarDatePicker';
+import { GuestSelector } from './calendar/GuestSelector';
 import { EnhancedBookingSummary } from './EnhancedBookingSummary';
 import { EnhancedPriceBreakdown } from '@/services/enhancedPriceService';
 import { UUID } from '@/types/booking';
@@ -88,47 +88,6 @@ export const BookingContent: React.FC<BookingContentProps> = ({
             <PropertyImageSlider property={property} />
           </Card>
 
-          {/* Property Description */}
-          <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy animate-fade-in-delay">
-            <CardHeader>
-              <CardTitle className="text-haven-beige flex items-center gap-2">
-                <Camera className="h-5 w-5 text-haven-yellow" />
-                About This Place
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-haven-beige/90 leading-relaxed whitespace-pre-line">
-                {property.long_description}
-              </div>
-              
-              <Separator className="bg-haven-yellow/20" />
-              
-              {/* Quick Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center p-3 bg-yellow-gradient/10 rounded-xl border border-haven-yellow/20">
-                  <Users className="h-5 w-5 text-haven-yellow mx-auto mb-1" />
-                  <div className="text-sm font-medium text-haven-beige">Up to {property.max_guests}</div>
-                  <div className="text-xs text-haven-beige/70">Guests</div>
-                </div>
-                <div className="text-center p-3 bg-yellow-gradient/10 rounded-xl border border-haven-yellow/20">
-                  <MapPin className="h-5 w-5 text-haven-yellow mx-auto mb-1" />
-                  <div className="text-sm font-medium text-haven-beige">Lakeside</div>
-                  <div className="text-xs text-haven-beige/70">Location</div>
-                </div>
-                <div className="text-center p-3 bg-yellow-gradient/10 rounded-xl border border-haven-yellow/20">
-                  <Eye className="h-5 w-5 text-haven-yellow mx-auto mb-1" />
-                  <div className="text-sm font-medium text-haven-beige">3 Levels</div>
-                  <div className="text-xs text-haven-beige/70">Deck Views</div>
-                </div>
-                <div className="text-center p-3 bg-yellow-gradient/10 rounded-xl border border-haven-yellow/20">
-                  <TreePine className="h-5 w-5 text-haven-yellow mx-auto mb-1" />
-                  <div className="text-sm font-medium text-haven-beige">Eco-Friendly</div>
-                  <div className="text-xs text-haven-beige/70">Container Home</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Amenities */}
           <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy animate-fade-in-delay-2">
             <CardHeader>
@@ -154,12 +113,20 @@ export const BookingContent: React.FC<BookingContentProps> = ({
                 Select Your Dates
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               <CalendarDatePicker
                 selectedCheckIn={selectedCheckIn}
                 selectedCheckOut={selectedCheckOut}
                 onDateRangeSelect={onDateRangeSelect}
                 propertyId={propertyId}
+              />
+              
+              <Separator className="bg-haven-yellow/20" />
+              
+              <GuestSelector
+                guestCount={guestCount}
+                setGuestCount={setGuestCount}
+                maxGuests={property.max_guests || 4}
               />
             </CardContent>
           </Card>

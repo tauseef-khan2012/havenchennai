@@ -23,6 +23,8 @@ interface BookingPageContentProps {
   onPlatformBooking: (platform: string, url?: string) => void;
   onDiscountApplied: (discount: DiscountApplication) => void;
   onProceedToPayment: () => void;
+  guestCount: number;
+  setGuestCount: (count: number) => void;
 }
 
 interface ContactInfo {
@@ -48,13 +50,14 @@ export const BookingPageContent: React.FC<BookingPageContentProps> = ({
   onDateRangeSelect,
   onPlatformBooking,
   onDiscountApplied,
-  onProceedToPayment
+  onProceedToPayment,
+  guestCount,
+  setGuestCount
 }) => {
   const { toast } = useToast();
   const { createBookingWithValidation, isProcessing } = useBookingCreation();
   
   const [currentStep, setCurrentStep] = useState<'booking' | 'checkout' | 'payment' | 'confirmation'>('booking');
-  const [guestCount, setGuestCount] = useState(2);
   const [contactInfo, setContactInfo] = useState<ContactInfo>({
     fullName: '',
     email: '',
@@ -169,7 +172,7 @@ export const BookingPageContent: React.FC<BookingPageContentProps> = ({
     );
   }
 
-  // Default booking step - use property as-is without overriding description
+  // Default booking step
   return (
     <div className="min-h-screen bg-navy-gradient py-8">
       <div className="absolute inset-0 bg-organic-texture opacity-20"></div>

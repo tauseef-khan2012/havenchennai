@@ -69,6 +69,16 @@ const BookingPage: React.FC = () => {
     // Pricing will be calculated automatically by the useEffect above
   };
 
+  const handleGuestCountChange = (guestCount: number) => {
+    console.log('BookingPage - Guest count changed:', { guestCount });
+    
+    // Recalculate pricing with new guest count if dates are selected
+    if (selectedCheckIn && selectedCheckOut && propertyId) {
+      console.log('BookingPage - Recalculating pricing for guest count change');
+      calculatePricing(propertyId, selectedCheckIn, selectedCheckOut, guestCount);
+    }
+  };
+
   const handlePaymentProceed = () => {
     const guestsParam = searchParams.get('guests');
     const guestCount = guestsParam ? parseInt(guestsParam) : 2;
@@ -132,6 +142,8 @@ const BookingPage: React.FC = () => {
         onPlatformBooking={handlePlatformBooking}
         onDiscountApplied={handleDiscountApplied}
         onProceedToPayment={handlePaymentProceed}
+        guestCount={searchParams.get('guests') ? parseInt(searchParams.get('guests')!) : 2}
+        setGuestCount={handleGuestCountChange}
       />
     </BookingPageLayout>
   );
