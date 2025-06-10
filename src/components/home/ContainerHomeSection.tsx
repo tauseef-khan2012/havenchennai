@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Calendar, Home, BookOpen, Waves, Bed, ChefHat } from 'lucide-react';
@@ -33,14 +32,14 @@ const ContainerHomeSection = () => {
     icon: <Bed className="h-6 w-6" />,
     title: "Queen + Bunk Bed & Workspace",
     description: "Comfortable sleeping arrangements for up to 4 guests with a dedicated workspace for remote work needs.",
-    image: "/lovable-uploads/98e46d57-3441-4761-9cdf-18542ba4837c.png",
-    alt: "Interior bedroom and workspace area at Haven Chennai container house"
+    image: "/lovable-uploads/457f5e29-0207-45d0-822a-6252f1d6f7da.png",
+    alt: "Bunk bed setup with workspace area featuring desk and chair"
   }, {
     icon: <ChefHat className="h-6 w-6" />,
     title: "Fully Equipped Kitchen & Refrigerator",
     description: "Modern kitchen with all essentials for preparing meals, including refrigerator, induction cooktop, and utensils.",
-    image: "/lovable-uploads/80ae807c-39e1-4519-b19a-ed92c4b221cd.png",
-    alt: "Modern kitchen area with refrigerator and cooking facilities"
+    image: "/lovable-uploads/5425331e-4704-48e6-913b-0d6a48d98aaf.png",
+    alt: "Fully equipped kitchen with induction cooktop, utensils, and storage cabinets"
   }, {
     icon: <BookOpen className="h-6 w-6" />,
     title: "25-Book Library & JBL Flip 5 Speaker",
