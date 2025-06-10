@@ -1,4 +1,6 @@
 
+import { Badge } from '@/components/ui/badge';
+import { Star, MapPin, Clock, Users } from 'lucide-react';
 import { Experience } from '@/data/experiencesData';
 
 interface ExperienceDetailsProps {
@@ -8,57 +10,53 @@ interface ExperienceDetailsProps {
 const ExperienceDetails = ({ experience }: ExperienceDetailsProps) => {
   return (
     <div className="md:col-span-2">
-      <h2 className="font-serif text-3xl font-bold mb-6">About This Experience</h2>
-      <p className="text-gray-700 mb-8">{experience.longDescription}</p>
-      
-      <h3 className="font-serif text-xl font-semibold mb-4">What's Included</h3>
-      <ul className="grid md:grid-cols-2 gap-x-6 gap-y-2 mb-8">
-        {experience.includes.map((item, index) => (
-          <li key={index} className="flex items-start">
-            <svg className="h-5 w-5 text-haven-green mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            <span>{item}</span>
-          </li>
-        ))}
-      </ul>
-      
-      <h3 className="font-serif text-xl font-semibold mb-4">Available Days</h3>
-      <div className="flex flex-wrap gap-2 mb-8">
-        {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => {
-          const isAvailable = experience.availability.includes(day);
-          return (
-            <div 
-              key={day}
-              className={`px-4 py-2 rounded-md border ${
-                isAvailable 
-                  ? 'border-haven-green bg-haven-green bg-opacity-10 text-haven-green' 
-                  : 'border-gray-200 bg-gray-50 text-gray-400'
-              }`}
-            >
-              {day}
-            </div>
-          );
-        })}
+      <div className="mb-6">
+        <div className="flex items-center gap-4 mb-4">
+          <Badge className="bg-haven-green">{experience.category}</Badge>
+          <div className="flex items-center">
+            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+            <span className="text-sm font-medium ml-1">{experience.rating}</span>
+            <span className="text-xs text-gray-500 ml-1">({experience.reviewCount} reviews)</span>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="flex items-center">
+            <Clock className="h-5 w-5 text-haven-green mr-2" />
+            <span className="text-sm">{experience.duration}</span>
+          </div>
+          <div className="flex items-center">
+            <Users className="h-5 w-5 text-haven-green mr-2" />
+            <span className="text-sm">{experience.groupSize}</span>
+          </div>
+          <div className="flex items-center">
+            <MapPin className="h-5 w-5 text-haven-green mr-2" />
+            <span className="text-sm">{experience.location}</span>
+          </div>
+        </div>
       </div>
-      
-      <h3 className="font-serif text-xl font-semibold mb-4">Important Details</h3>
-      <div className="grid md:grid-cols-2 gap-x-6 gap-y-4 mb-8">
-        <div>
-          <p className="font-medium mb-1">What to Bring</p>
-          <p className="text-gray-600">Comfortable clothing, water bottle, and your sense of adventure!</p>
-        </div>
-        <div>
-          <p className="font-medium mb-1">Fitness Level</p>
-          <p className="text-gray-600">Suitable for all fitness levels. No prior experience required.</p>
-        </div>
-        <div>
-          <p className="font-medium mb-1">Age Restrictions</p>
-          <p className="text-gray-600">This experience is suitable for guests 12 years and older.</p>
-        </div>
-        <div>
-          <p className="font-medium mb-1">Weather Policy</p>
-          <p className="text-gray-600">Experiences may be rescheduled in case of severe weather conditions.</p>
+
+      <div className="prose max-w-none">
+        <h2 className="text-2xl font-serif font-bold mb-4">About This Experience</h2>
+        <p className="text-gray-700 leading-relaxed mb-6">{experience.longDescription}</p>
+
+        <h3 className="text-xl font-serif font-semibold mb-4">What's Included</h3>
+        <ul className="space-y-2 mb-6">
+          {experience.includes.map((item, index) => (
+            <li key={index} className="flex items-start">
+              <span className="text-haven-green mr-2">•</span>
+              <span className="text-gray-700">{item}</span>
+            </li>
+          ))}
+        </ul>
+
+        <h3 className="text-xl font-serif font-semibold mb-4">Availability</h3>
+        <div className="flex flex-wrap gap-2">
+          {experience.availability.map((day, index) => (
+            <Badge key={index} variant="outline" className="border-haven-green text-haven-green">
+              {day}
+            </Badge>
+          ))}
         </div>
       </div>
     </div>

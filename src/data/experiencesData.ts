@@ -11,121 +11,145 @@ export interface Experience {
   price: number;
   availability: string[];
   includes: string[];
+  rating: number;
+  reviewCount: number;
+  location: string;
 }
 
 export const experiencesData: Experience[] = [
   {
-    id: "1",
-    title: "Lakeside Meditation & Yoga",
-    description: "Begin your day with a peaceful meditation and yoga session beside the serene Muttukadu Lake.",
-    longDescription: "Connect with nature through a guided meditation and yoga experience at dawn. Our certified instructor will lead you through mindfulness practices and gentle yoga poses designed to help you embrace the peaceful surroundings of Muttukadu Lake. The session concludes with a herbal tea ceremony on the deck as you watch the lake come alive with morning light and activity.",
-    imageUrl: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+    id: "exp1",
+    title: "Yoga Session on the Beach",
+    description: "Start your day with a refreshing yoga session by the beach, with the sound of waves calming your mind.",
+    longDescription: "Begin your morning with a transformative yoga experience on the pristine beaches of ECR. Our certified instructor will guide you through gentle flows and mindfulness practices as the sun rises over the Bay of Bengal. This session combines traditional Hatha and Vinyasa yoga techniques, perfectly suited for all skill levels. The sound of gentle waves and fresh ocean breeze creates an ideal environment for deep relaxation and spiritual connection. The session concludes with a meditation practice and healthy refreshments.",
+    imageUrl: "/lovable-uploads/e4f31ab2-de64-417b-af9f-97d3d17e2f47.png",
     category: "Wellness",
-    duration: "1.5 hours",
+    duration: "1 hour",
+    groupSize: "Up to 8 guests",
+    price: 1200,
+    availability: ["Monday", "Wednesday", "Friday", "Saturday"],
+    includes: [
+      "Certified yoga instructor",
+      "Yoga mats and props provided",
+      "Beachside location setup",
+      "Post-session herbal tea",
+      "Digital guide for home practice"
+    ],
+    rating: 4.8,
+    reviewCount: 124,
+    location: "ECR Beach"
+  },
+  {
+    id: "exp2",
+    title: "Traditional South Indian Cooking Class",
+    description: "Learn the art of traditional South Indian cooking from local experts. Take home recipes and memories.",
+    longDescription: "Immerse yourself in the rich culinary traditions of Tamil Nadu with our hands-on cooking class. Led by local home chefs, you'll learn to prepare authentic dishes using traditional techniques passed down through generations. The class covers spice blending, dosa making, sambar preparation, and regional specialties. You'll work with fresh, locally-sourced ingredients and learn about the cultural significance of each dish. The experience includes a communal meal where you'll enjoy the fruits of your labor.",
+    imageUrl: "/lovable-uploads/43aa0007-941b-4b51-b1a0-a2b67f4bc6d2.png",
+    category: "Cultural",
+    duration: "3 hours",
     groupSize: "Up to 6 guests",
-    price: 799,
+    price: 1800,
     availability: ["Tuesday", "Thursday", "Saturday"],
     includes: [
-      "Guided meditation session",
-      "Yoga instruction for all levels",
-      "Yoga mats and props",
-      "Herbal tea ceremony",
-      "Digital guide to continue your practice"
-    ]
+      "Expert local chef instructor",
+      "All ingredients and cooking utensils",
+      "Recipe cards to take home",
+      "Full meal of prepared dishes",
+      "Spice kit as a souvenir"
+    ],
+    rating: 4.9,
+    reviewCount: 86,
+    location: "Haven Villa Kitchen"
   },
   {
-    id: "2",
-    title: "Birdwatching Safari",
-    description: "Discover the rich birdlife of Muttukadu Lake, including pelicans, flamingos, herons, and exotic migratory birds.",
-    longDescription: "Muttukadu Lake and its surroundings serve as a haven for diverse birdlife, making it a perfect spot for birdwatching enthusiasts. Join our experienced guide for an early morning excursion where you'll have the opportunity to spot pelicans, flamingos, herons, egrets, kingfishers, and various migratory birds. Learn about their habits, migration patterns, and ecological importance while capturing stunning photographs of these magnificent creatures in their natural habitat.",
-    imageUrl: "https://images.unsplash.com/photo-1627495648022-5e935fe5c9d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-    category: "Nature",
-    duration: "3 hours",
-    groupSize: "Up to 8 guests",
-    price: 1499,
-    availability: ["Wednesday", "Friday", "Sunday"],
-    includes: [
-      "Professional birdwatching guide",
-      "Use of binoculars and spotting scopes",
-      "Field guide to local birds",
-      "Light breakfast and refreshments",
-      "Transportation to premium birdwatching spots"
-    ]
-  },
-  {
-    id: "3",
-    title: "Sustainable Container Living Workshop",
-    description: "Learn about eco-friendly container home design and sustainable living practices at Haven.",
-    longDescription: "Inspired by Haven's own container home design, this workshop explores the principles of sustainable living and innovative space utilization. Discover the story behind Haven's creation, the upcycling of shipping containers, and practical tips for incorporating sustainability into your daily life. The session includes a tour of Haven's container home, highlighting its unique features, eco-friendly elements, and clever space-saving solutions that harmonize with the natural surroundings.",
-    imageUrl: "https://images.unsplash.com/photo-1566908829550-e6551b00979b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-    category: "Educational",
-    duration: "2 hours",
-    groupSize: "Up to 10 guests",
-    price: 999,
-    availability: ["Monday", "Saturday"],
-    includes: [
-      "Guided tour of Haven's container home",
-      "Interactive workshop on sustainable living",
-      "Resource guide with practical tips",
-      "Organic refreshments",
-      "Discount voucher for a future stay"
-    ]
-  },
-  {
-    id: "4",
+    id: "exp3",
     title: "Sunset Kayaking Adventure",
-    description: "Paddle through the tranquil waters of Muttukadu Lake as the sun sets, creating a magical atmosphere.",
-    longDescription: "Experience the captivating beauty of Muttukadu Lake from a unique perspective as you glide across its calm waters in a kayak. This guided adventure takes you through scenic routes as the setting sun paints the sky with vibrant colors. Watch for birds returning to their nests and enjoy the peaceful transition from day to evening. Suitable for beginners and experienced paddlers alike, this experience offers the perfect blend of gentle activity and natural immersion.",
-    imageUrl: "https://images.unsplash.com/photo-1472396961693-142e6e269027?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+    description: "Paddle through the beautiful backwaters of ECR during sunset for a memorable experience.",
+    longDescription: "Experience the magic of Tamil Nadu's backwaters as you kayak through serene waterways during the golden hour. This guided adventure takes you through mangrove channels and calm lagoons, offering spectacular views of the sunset reflecting on the water. You'll have opportunities to spot local wildlife including kingfishers, herons, and occasionally dolphins in the distance. The tour includes safety briefing, equipment, and a traditional snack break on a secluded beach. Perfect for beginners and experienced paddlers alike.",
+    imageUrl: "/lovable-uploads/3f68b7dc-fc1b-4cab-ac65-013e5c1e074f.png",
     category: "Adventure",
     duration: "2 hours",
-    groupSize: "Up to 6 guests",
-    price: 1299,
+    groupSize: "Up to 8 guests",
+    price: 1500,
+    availability: ["Wednesday", "Friday", "Saturday", "Sunday"],
+    includes: [
+      "Professional kayaking guide",
+      "High-quality kayaks and safety gear",
+      "Waterproof bag for belongings",
+      "Traditional snacks and refreshments",
+      "Photography service available"
+    ],
+    rating: 4.7,
+    reviewCount: 92,
+    location: "Kovalam Backwaters"
+  },
+  {
+    id: "exp4",
+    title: "Private Romantic Dinner by the Sea",
+    description: "Enjoy a private candlelight dinner by the sea with your loved one. Includes a special menu and wine.",
+    longDescription: "Create unforgettable memories with an intimate dining experience designed for couples. Set on a private stretch of beach with panoramic ocean views, this romantic dinner features a carefully curated menu of local and continental cuisines. The setting includes elegant table arrangements with candles, fairy lights, and fresh flowers. A personal chef will prepare your meal while a dedicated server ensures every detail is perfect. The experience includes welcome cocktails, a multi-course dinner, and live acoustic music upon request.",
+    imageUrl: "/lovable-uploads/d1148760-0de0-44d6-ae11-98a16c4b61fc.png",
+    category: "Couples",
+    duration: "3 hours",
+    groupSize: "2 guests",
+    price: 4500,
+    availability: ["Tuesday", "Thursday", "Friday", "Saturday"],
+    includes: [
+      "Private beachside setup",
+      "Personal chef and server",
+      "Welcome cocktails and wine selection",
+      "Multi-course gourmet dinner",
+      "Floral arrangements and ambient lighting",
+      "Optional live acoustic music"
+    ],
+    rating: 4.9,
+    reviewCount: 64,
+    location: "Private Beach Spot"
+  },
+  {
+    id: "exp5",
+    title: "Ayurvedic Spa Retreat",
+    description: "Indulge in a traditional Ayurvedic spa treatment that will rejuvenate your body and soul.",
+    longDescription: "Restore your balance and vitality with authentic Ayurvedic treatments administered by certified practitioners. This comprehensive spa experience begins with a consultation to determine your dosha (body constitution) and customize treatments accordingly. Services include traditional oil massages, herbal steam therapy, and meditation guidance. All treatments use organic, locally-sourced herbs and oils. The serene environment is designed to promote deep relaxation and healing, making this perfect for stress relief and rejuvenation.",
+    imageUrl: "/lovable-uploads/92fdb568-68f2-4ac8-9908-e0db6e29b56d.png",
+    category: "Wellness",
+    duration: "2 hours",
+    groupSize: "Up to 4 guests",
+    price: 2800,
+    availability: ["Monday", "Wednesday", "Friday", "Sunday"],
+    includes: [
+      "Certified Ayurvedic practitioner",
+      "Personalized dosha consultation",
+      "Traditional oil massage therapy",
+      "Herbal steam treatment",
+      "Organic herbal teas",
+      "Take-home wellness guide"
+    ],
+    rating: 4.8,
+    reviewCount: 116,
+    location: "Haven Spa Center"
+  },
+  {
+    id: "exp6",
+    title: "Ancient Temple Tour",
+    description: "Explore the ancient temples of Mahabalipuram with an expert guide who will share historical insights.",
+    longDescription: "Journey through time as you explore the magnificent 7th-century rock-cut temples and sculptures of Mahabalipuram, a UNESCO World Heritage site. Led by an expert historian and archaeologist, this tour reveals the fascinating stories behind the Pallava dynasty's architectural marvels. You'll visit the Shore Temple, Five Rathas, Arjuna's Penance, and other iconic monuments while learning about ancient Tamil culture, Hindu mythology, and sculptural techniques. The tour includes transportation, entrance fees, and a traditional South Indian lunch.",
+    imageUrl: "/lovable-uploads/a768b355-2a53-4898-91c5-3372bc1fe662.png",
+    category: "Cultural",
+    duration: "5 hours",
+    groupSize: "Up to 10 guests",
+    price: 2000,
     availability: ["Tuesday", "Thursday", "Saturday", "Sunday"],
     includes: [
-      "Kayaking equipment and safety gear",
-      "Professional guide",
-      "Basic paddling instruction",
-      "Waterproof camera for photos",
-      "Post-paddle refreshments on the deck"
-    ]
-  },
-  {
-    id: "5",
-    title: "Stargazing & Night Sky Photography",
-    description: "Observe the stars from Haven's rooftop deck and learn to capture the night sky with your camera.",
-    longDescription: "Take advantage of Haven's minimal light pollution and panoramic rooftop deck for an unforgettable stargazing experience. Our astronomy expert will guide you through the constellations visible from this unique vantage point, sharing stories and scientific insights. Learn night photography techniques to capture the stars, moon, and potentially the Milky Way (depending on the season). The session includes hot beverages and comfortable seating to enhance your enjoyment of the night sky.",
-    imageUrl: "https://images.unsplash.com/photo-1534418984967-97bbd51a96d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-    category: "Educational",
-    duration: "2.5 hours",
-    groupSize: "Up to 8 guests",
-    price: 1799,
-    availability: ["Monday", "Wednesday", "Friday"],
-    includes: [
-      "Guided stargazing with an astronomy expert",
-      "Use of telescope and star charts",
-      "Night photography tutorial",
-      "Hot chocolate and snacks",
-      "Digital star map as a souvenir"
-    ]
-  },
-  {
-    id: "6",
-    title: "Lakeside Culinary Experience",
-    description: "Enjoy a private dining experience on Haven's deck with locally-sourced ingredients and lakeside views.",
-    longDescription: "Indulge in a memorable dining experience on Haven's spacious deck, with the serene Muttukadu Lake as your backdrop. Our chef creates a custom menu featuring locally-sourced ingredients and regional flavors, adapted to your preferences. As the sun sets and lanterns illuminate the deck, you'll enjoy a multi-course meal accompanied by selected beverages. This intimate culinary journey combines exquisite food with Haven's unique ambiance for a truly special occasion.",
-    imageUrl: "https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-    category: "Culinary",
-    duration: "3 hours",
-    groupSize: "2-6 guests",
-    price: 2499,
-    availability: ["Wednesday", "Friday", "Saturday"],
-    includes: [
-      "Customized multi-course dinner",
-      "Welcome drink and beverage pairings",
-      "Private deck setting with ambient lighting",
-      "Personal chef and service",
-      "Digital recipe collection of featured dishes"
-    ]
+      "Expert historian guide",
+      "Air-conditioned transportation",
+      "All entrance fees and permits",
+      "Traditional South Indian lunch",
+      "Historical photo documentation",
+      "Cultural heritage guidebook"
+    ],
+    rating: 4.7,
+    reviewCount: 78,
+    location: "Mahabalipuram"
   }
 ];

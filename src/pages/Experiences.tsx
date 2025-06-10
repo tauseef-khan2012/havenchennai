@@ -33,9 +33,9 @@ const Experiences = () => {
       <Navbar />
       <main>
         <ExperienceHero 
-          title="Lakeside Experiences" 
-          subtitle="Discover unique activities in and around Haven, our intimate container retreat by Muttukadu Lake."
-          backgroundImage="https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80"
+          title="Curated Experiences" 
+          subtitle="Discover authentic cultural, wellness, and adventure activities around Chennai's East Coast Road, carefully selected to enhance your stay at Haven."
+          backgroundImage="/lovable-uploads/dca2b7eb-af54-4c6e-8739-8add4f661dba.png"
         />
         
         <ExperienceFilter 

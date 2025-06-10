@@ -37,7 +37,7 @@ const ExperienceCard = ({
           <p className="text-gray-600 text-sm mb-4 flex-grow">{description}</p>
           <div className="flex justify-between items-center pt-2 border-t border-gray-100">
             <span className="text-sm text-gray-500">{duration}</span>
-            <span className="font-semibold">${price}</span>
+            <span className="font-semibold">₹{price}</span>
           </div>
         </div>
       </div>
