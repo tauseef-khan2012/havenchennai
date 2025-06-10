@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { UUID } from '@/types/booking';
 import { EnhancedPriceBreakdown } from '@/services/enhancedPriceService';
-import { validateContactInfo } from '../validation/ContactValidation';
+import { validateContactForm } from '../validation/ContactValidation';
 import { validateBookingData } from '../validation/BookingValidation';
 import { getDetailedErrorMessage } from '../utils/ErrorMessageHandler';
 
@@ -38,11 +38,18 @@ export const useBookingCreation = () => {
     setIsProcessing(true);
     
     try {
-      // Enhanced validation
-      const contactErrors = validateContactInfo(contact);
+      // Enhanced validation - map ContactInfo to the expected format
+      const contactData = {
+        guestName: contact.fullName,
+        guestEmail: contact.email,
+        guestPhone: contact.phone,
+        specialRequests: requests
+      };
+      
+      const contactValidation = validateContactForm(contactData);
       const bookingErrors = validateBookingData(selectedCheckIn, selectedCheckOut, priceBreakdown, guestCount);
       
-      const allErrors = [...contactErrors, ...bookingErrors];
+      const allErrors = contactValidation.isValid ? bookingErrors : [...contactValidation.errors, ...bookingErrors];
       
       if (allErrors.length > 0) {
         toast({
