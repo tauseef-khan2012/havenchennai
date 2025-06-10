@@ -32,13 +32,19 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
 
-    /* Custom nature-inspired CSS variables */
-    --nature-gradient-primary: linear-gradient(135deg, #007F7F 0%, #3b5249 50%, #65524d 100%);
-    --nature-gradient-sunset: linear-gradient(135deg, #FF6B6B 0%, #FFA500 50%, #FFD700 100%);
-    --nature-gradient-lake: linear-gradient(135deg, #75869b 0%, #007F7F 50%, #3b5249 100%);
-    --nature-gradient-earth: linear-gradient(135deg, #8B5A2B 0%, #65524d 50%, #3b5249 100%);
-    --organic-shadow: 0 10px 40px rgba(59, 82, 73, 0.15);
-    --organic-shadow-hover: 0 20px 60px rgba(59, 82, 73, 0.25);
+    /* Navy blue and yellow theme gradients */
+    --navy-gradient-primary: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+    --yellow-gradient-primary: linear-gradient(135deg, #fbbf24 0%, #fcd34d 50%, #fde047 100%);
+    --navy-yellow-gradient: linear-gradient(135deg, #1e293b 0%, #1e3a8a 30%, #fbbf24 70%, #fcd34d 100%);
+    
+    /* Enhanced nature-inspired gradients with navy/yellow theme */
+    --nature-gradient-primary: linear-gradient(135deg, #1e293b 0%, #0891b2 50%, #fbbf24 100%);
+    --nature-gradient-sunset: linear-gradient(135deg, #1e3a8a 0%, #fbbf24 50%, #fcd34d 100%);
+    --nature-gradient-lake: linear-gradient(135deg, #0c4a6e 0%, #0891b2 50%, #1e293b 100%);
+    --nature-gradient-earth: linear-gradient(135deg, #8B5A2B 0%, #1e293b 50%, #fbbf24 100%);
+    
+    --organic-shadow: 0 10px 40px rgba(30, 41, 59, 0.15);
+    --organic-shadow-hover: 0 20px 60px rgba(30, 41, 59, 0.25);
   }
 
   .dark {
@@ -94,7 +100,19 @@
     text-wrap: balance;
   }
 
-  /* Enhanced Background Utilities */
+  /* Enhanced Background Utilities with Navy/Yellow Theme */
+  .bg-navy-gradient {
+    background: var(--navy-gradient-primary);
+  }
+
+  .bg-yellow-gradient {
+    background: var(--yellow-gradient-primary);
+  }
+
+  .bg-navy-yellow-gradient {
+    background: var(--navy-yellow-gradient);
+  }
+
   .bg-nature-gradient {
     background: var(--nature-gradient-primary);
   }
@@ -113,30 +131,35 @@
 
   .bg-organic-texture {
     background-image: 
-      radial-gradient(circle at 25% 25%, rgba(0, 127, 127, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 75% 75%, rgba(59, 82, 73, 0.1) 0%, transparent 50%);
+      radial-gradient(circle at 25% 25%, rgba(30, 41, 59, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(251, 191, 36, 0.1) 0%, transparent 50%);
   }
 
   .bg-water-ripple {
     background-image: 
-      radial-gradient(ellipse 200px 100px at center, rgba(117, 134, 155, 0.1) 0%, transparent 70%),
-      radial-gradient(ellipse 300px 150px at 60% 40%, rgba(0, 127, 127, 0.05) 0%, transparent 70%);
+      radial-gradient(ellipse 200px 100px at center, rgba(30, 58, 138, 0.1) 0%, transparent 70%),
+      radial-gradient(ellipse 300px 150px at 60% 40%, rgba(8, 145, 178, 0.05) 0%, transparent 70%);
     background-size: 400px 200px, 600px 300px;
     animation: water-ripple 8s ease-in-out infinite alternate;
   }
 
-  /* Glassmorphism Effects */
+  /* Glassmorphism Effects with Navy Theme */
   .glass-panel {
     @apply backdrop-blur-md bg-white/80 border border-white/20;
     box-shadow: var(--organic-shadow);
   }
 
-  .glass-panel-dark {
-    @apply backdrop-blur-md bg-haven-dark/80 border border-white/10;
+  .glass-panel-navy {
+    @apply backdrop-blur-md bg-haven-navy/80 border border-haven-yellow/20;
     box-shadow: var(--organic-shadow);
   }
 
-  /* Organic Shadows */
+  .glass-panel-dark {
+    @apply backdrop-blur-md bg-haven-navy-dark/80 border border-white/10;
+    box-shadow: var(--organic-shadow);
+  }
+
+  /* Organic Shadows with Navy Theme */
   .shadow-organic {
     box-shadow: var(--organic-shadow);
   }
@@ -144,6 +167,16 @@
   .shadow-organic-hover {
     box-shadow: var(--organic-shadow-hover);
   }
+
+  .shadow-navy {
+    box-shadow: 0 10px 40px rgba(30, 41, 59, 0.15);
+  }
+
+  .shadow-yellow {
+    box-shadow: 0 10px 40px rgba(251, 191, 36, 0.15);
+  }
+
+  /* ... keep existing code (animation utilities, interactive hover effects, organic shapes, section dividers, intersection observer, nature-inspired decorative elements, leaf pattern) */
 
   /* Animation utilities */
   @keyframes fade-in {
@@ -273,7 +306,7 @@
     width: 0;
     height: 0;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(251, 191, 36, 0.3);
     transition: width 0.6s, height 0.6s, top 0.6s, left 0.6s;
     transform: translate(-50%, -50%);
   }
@@ -302,7 +335,7 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(59, 82, 73, 0.3), transparent);
+    background: linear-gradient(90deg, transparent, rgba(30, 41, 59, 0.3), transparent);
   }
 
   /* Intersection observer visibility */
@@ -321,11 +354,11 @@
   }
 
   .leaf-pattern {
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%233b5249' fill-opacity='0.05'%3E%3Cpath d='M30 30c0-16.569 13.431-30 30-30v60c-16.569 0-30-13.431-30-30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%231e293b' fill-opacity='0.05'%3E%3Cpath d='M30 30c0-16.569 13.431-30 30-30v60c-16.569 0-30-13.431-30-30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   }
 }
 
-/* Custom scrollbar with nature theme */
+/* Custom scrollbar with navy theme */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -335,15 +368,15 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #007F7F, #3b5249);
+  background: linear-gradient(180deg, #1e293b, #fbbf24);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #3b5249, #007F7F);
+  background: linear-gradient(180deg, #fbbf24, #1e293b);
 }
 
-/* Loading animations with nature theme */
+/* Loading animations with navy theme */
 .nature-loading {
   position: relative;
 }
@@ -357,7 +390,7 @@
   height: 20px;
   margin: -10px 0 0 -10px;
   border: 2px solid transparent;
-  border-top: 2px solid #007F7F;
+  border-top: 2px solid #1e293b;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

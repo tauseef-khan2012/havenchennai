@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,6 +12,7 @@ import { calculateBookingPrice } from '@/services/priceService';
 import { createBooking } from '@/services/bookingService';
 import { createGuestBooking } from '@/services/guestBookingService';
 import { PriceBreakdown, UUID } from '@/types/booking';
+import { Calendar, Users, CreditCard, Shield } from 'lucide-react';
 
 const BookingPaymentPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -194,10 +194,10 @@ const BookingPaymentPage: React.FC = () => {
 
   if (isLoadingPrice) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Spinner className="mx-auto mb-4" />
-          <p>Loading booking details...</p>
+      <div className="min-h-screen bg-navy-gradient flex items-center justify-center">
+        <div className="text-center glass-panel-navy rounded-3xl p-12 animate-fade-in">
+          <Spinner className="mx-auto mb-4 text-haven-yellow" />
+          <p className="text-haven-beige font-serif text-lg">Loading booking details...</p>
         </div>
       </div>
     );
@@ -205,11 +205,14 @@ const BookingPaymentPage: React.FC = () => {
 
   if (!priceBreakdown) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-4">Unable to Load Booking</h2>
-          <p className="text-gray-600 mb-4">There was an error loading your booking details.</p>
-          <Button onClick={() => navigate('/booking')}>
+      <div className="min-h-screen bg-navy-gradient flex items-center justify-center">
+        <div className="text-center glass-panel-navy rounded-3xl p-12 animate-fade-in">
+          <h2 className="text-xl font-serif font-semibold mb-4 text-haven-beige">Unable to Load Booking</h2>
+          <p className="text-haven-beige/80 mb-4">There was an error loading your booking details.</p>
+          <Button 
+            onClick={() => navigate('/booking')}
+            className="bg-yellow-gradient hover:shadow-yellow text-haven-navy font-semibold"
+          >
             Return to Booking
           </Button>
         </div>
@@ -218,44 +221,99 @@ const BookingPaymentPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-navy-gradient py-8">
+      <div className="absolute inset-0 bg-organic-texture opacity-20"></div>
+      <div className="absolute inset-0 leaf-pattern opacity-15"></div>
+      
+      {/* Floating decorative elements */}
+      <div className="absolute top-16 left-8 w-20 h-20 rounded-organic bg-haven-yellow/10 animate-float-gentle"></div>
+      <div className="absolute bottom-20 right-12 w-16 h-16 rounded-organic-2 bg-haven-navy-light/20 animate-float-gentle" style={{ animationDelay: '1s' }}></div>
+      
+      <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-serif font-bold text-gray-900">Complete Your Booking</h1>
-            <p className="text-gray-600 mt-2">Review your details and proceed to payment</p>
+          <div className="mb-8 text-center animate-fade-in">
+            <div className="inline-flex items-center gap-3 mb-4">
+              <div className="w-12 h-1 bg-yellow-gradient rounded-full"></div>
+              <span className="font-handwritten text-2xl text-haven-yellow">Secure Booking</span>
+              <div className="w-12 h-1 bg-yellow-gradient rounded-full"></div>
+            </div>
+            <h1 className="text-4xl font-serif font-bold text-haven-beige mb-2">Complete Your Booking</h1>
+            <p className="text-haven-beige/80">Review your details and proceed to secure payment</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <EnhancedContactSection
-                contactInfo={contactInfo}
-                onContactInfoChange={setContactInfo}
-                errors={errors}
-                onFieldChange={handleFieldChange}
-              />
+            <div className="space-y-6 animate-fade-in-delay">
+              <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy">
+                <CardHeader>
+                  <CardTitle className="text-haven-beige font-serif flex items-center gap-2">
+                    <Users className="h-5 w-5 text-haven-yellow" />
+                    Contact Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <EnhancedContactSection
+                    contactInfo={contactInfo}
+                    onContactInfoChange={setContactInfo}
+                    errors={errors}
+                    onFieldChange={handleFieldChange}
+                  />
+                </CardContent>
+              </Card>
             </div>
 
-            <div className="space-y-6">
-              <Card>
+            <div className="space-y-6 animate-fade-in-delay-2">
+              <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy">
                 <CardHeader>
-                  <CardTitle>Booking Summary</CardTitle>
+                  <CardTitle className="text-haven-beige font-serif flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-haven-yellow" />
+                    Booking Summary
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div>
-                      <h4 className="font-medium">Dates</h4>
-                      <p className="text-sm text-gray-600">
-                        {checkInDate && checkOutDate && (
-                          `${new Date(checkInDate).toLocaleDateString()} - ${new Date(checkOutDate).toLocaleDateString()}`
-                        )}
-                      </p>
-                    </div>
-                    <div>
-                      <h4 className="font-medium">Guests</h4>
-                      <p className="text-sm text-gray-600">{guestCount} guests</p>
+                    <div className="glass-panel rounded-2xl p-4 border-l-4 border-haven-yellow">
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <h4 className="font-medium text-haven-beige">Check-in</h4>
+                          <p className="text-haven-beige/80">
+                            {checkInDate && new Date(checkInDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-haven-beige">Check-out</h4>
+                          <p className="text-haven-beige/80">
+                            {checkOutDate && new Date(checkOutDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-haven-beige">Guests</h4>
+                          <p className="text-haven-beige/80">{guestCount} guests</p>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-haven-beige">Duration</h4>
+                          <p className="text-haven-beige/80">
+                            {checkInDate && checkOutDate && 
+                              Math.ceil((new Date(checkOutDate).getTime() - new Date(checkInDate).getTime()) / (1000 * 60 * 60 * 24))
+                            } nights
+                          </p>
+                        </div>
+                      </div>
                     </div>
                     <PriceSummary priceBreakdown={priceBreakdown} />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <Shield className="h-5 w-5 text-haven-yellow mt-0.5" />
+                    <div className="text-sm">
+                      <p className="font-medium text-haven-beige mb-1">Secure Payment</p>
+                      <p className="text-haven-beige/80">
+                        Your payment is processed securely through Razorpay with bank-level encryption
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -264,16 +322,26 @@ const BookingPaymentPage: React.FC = () => {
                 <Button
                   variant="outline"
                   onClick={() => navigate('/booking')}
-                  className="flex-1"
+                  className="flex-1 glass-panel border-haven-yellow/30 text-haven-beige hover:bg-haven-navy-light/50"
                 >
                   Back
                 </Button>
                 <Button
                   onClick={handleProceedToPayment}
                   disabled={isProcessing || isPaymentLoading}
-                  className="flex-1 bg-green-700 hover:bg-green-800"
+                  className="flex-1 bg-yellow-gradient hover:shadow-yellow text-haven-navy font-semibold py-3 text-lg transition-all duration-300 transform hover:scale-105 ripple-effect"
                 >
-                  {isProcessing || isPaymentLoading ? 'Processing...' : 'Proceed to Payment'}
+                  {isProcessing || isPaymentLoading ? (
+                    <>
+                      <Spinner className="mr-2 h-4 w-4" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="mr-2 h-5 w-5" />
+                      Proceed to Payment
+                    </>
+                  )}
                 </Button>
               </div>
             </div>

@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -58,39 +57,40 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				// Enhanced Haven brand colors with nature-inspired variations
+				// Navy blue and yellow theme with nature-inspired variations
 				haven: {
-					'green': '#3b5249',
-					'green-light': '#4a6358',
-					'green-dark': '#2d3f37',
+					// Navy blue primary palette
+					'navy': '#1e293b', // Primary navy
+					'navy-light': '#334155',
+					'navy-dark': '#0f172a',
+					'navy-muted': '#475569',
+					// Yellow accent palette
+					'yellow': '#fbbf24', // Primary yellow
+					'yellow-light': '#fcd34d',
+					'yellow-dark': '#f59e0b',
+					'yellow-warm': '#fde047',
+					'yellow-gold': '#eab308',
+					// Supporting nature colors
 					'beige': '#F5F2EE',
 					'beige-warm': '#F7F4F0',
 					'beige-cool': '#F3F0EC',
-					'dark': '#2C2F33',
-					'teal': '#007F7F',
-					'teal-light': '#1a9999',
-					'teal-dark': '#006666',
-					'brown': '#65524d',
-					'brown-light': '#7a6560',
-					'brown-dark': '#50413d',
-					'blue': '#75869b',
-					'blue-light': '#8a9bb2',
-					'blue-dark': '#607184',
-					'light-blue': '#bfd7ea',
-					'light-blue-soft': '#d4e4f1',
-					'light-blue-pale': '#e8f2f8',
-					// Nature-inspired accent colors
-					'sunset': '#FF6B6B',
-					'sunset-orange': '#FFA500',
-					'sunset-gold': '#FFD700',
-					'forest': '#228B22',
-					'forest-deep': '#006400',
-					'lake': '#4682B4',
-					'lake-deep': '#1e3a5f',
+					'teal': '#0891b2',
+					'teal-light': '#0ea5e9',
+					'teal-dark': '#0c4a6e',
+					'green': '#16a34a',
+					'green-light': '#22c55e',
+					'green-dark': '#15803d',
+					'sage': '#9CAF88',
 					'earth': '#8B5A2B',
 					'stone': '#A9A9A9',
-					'moss': '#7CB342',
-					'sage': '#9CAF88',
+					// Enhanced navy variations
+					'navy-blue': '#1e3a8a',
+					'navy-slate': '#1e293b',
+					'navy-midnight': '#0c1425',
+					// Enhanced yellow variations
+					'amber': '#f59e0b',
+					'amber-warm': '#fbbf24',
+					'amber-gold': '#d97706',
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
@@ -122,6 +122,9 @@ export default {
 				'hero-mobile': ['2.5rem', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
 			},
 			backgroundImage: {
+				'navy-gradient': 'var(--navy-gradient-primary)',
+				'yellow-gradient': 'var(--yellow-gradient-primary)',
+				'navy-yellow-gradient': 'var(--navy-yellow-gradient)',
 				'nature-gradient': 'var(--nature-gradient-primary)',
 				'sunset-gradient': 'var(--nature-gradient-sunset)',
 				'lake-gradient': 'var(--nature-gradient-lake)',
@@ -130,9 +133,11 @@ export default {
 			boxShadow: {
 				'organic': 'var(--organic-shadow)',
 				'organic-hover': 'var(--organic-shadow-hover)',
-				'soft': '0 4px 20px rgba(59, 82, 73, 0.1)',
-				'medium': '0 8px 30px rgba(59, 82, 73, 0.15)',
-				'large': '0 15px 50px rgba(59, 82, 73, 0.2)',
+				'soft': '0 4px 20px rgba(30, 41, 59, 0.1)',
+				'medium': '0 8px 30px rgba(30, 41, 59, 0.15)',
+				'large': '0 15px 50px rgba(30, 41, 59, 0.2)',
+				'navy': '0 10px 40px rgba(30, 41, 59, 0.15)',
+				'yellow': '0 10px 40px rgba(251, 191, 36, 0.15)',
 			},
 			keyframes: {
 				'accordion-down': {

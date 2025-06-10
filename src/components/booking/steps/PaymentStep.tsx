@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,7 +15,7 @@ import {
 } from '@/types/booking';
 import { createBooking } from '@/services/bookingService';
 import { createGuestBooking } from '@/services/guestBookingService';
-import { CreditCard, AlertCircle, CheckCircle } from 'lucide-react';
+import { CreditCard, AlertCircle, CheckCircle, Shield, Users, Calendar } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export interface PaymentStepProps {
@@ -153,91 +152,125 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="text-2xl font-serif">Payment Details</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="text-lg font-medium mb-3">Booking Summary</h3>
-            <PriceSummary priceBreakdown={priceBreakdown} />
-            
-            {/* Contact Information Summary */}
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <h4 className="font-medium mb-2">Contact Details</h4>
-              <div className="space-y-1 text-sm">
-                <p><span className="font-medium">Name:</span> {contactInfo.fullName}</p>
-                <p><span className="font-medium">Email:</span> {contactInfo.email}</p>
-                <p><span className="font-medium">Phone:</span> {contactInfo.phone}</p>
-              </div>
-              {!user && (
-                <p className="text-xs text-gray-600 mt-2">
-                  Booking as guest • You can create an account later to manage your bookings
-                </p>
-              )}
+    <div className="min-h-screen bg-navy-gradient py-8">
+      <div className="absolute inset-0 bg-organic-texture opacity-20"></div>
+      <div className="absolute inset-0 leaf-pattern opacity-15"></div>
+      
+      {/* Floating decorative elements */}
+      <div className="absolute top-16 left-8 w-20 h-20 rounded-organic bg-haven-yellow/10 animate-float-gentle"></div>
+      <div className="absolute bottom-20 right-12 w-16 h-16 rounded-organic-2 bg-haven-navy-light/20 animate-float-gentle" style={{ animationDelay: '1s' }}></div>
+      
+      <div className="container mx-auto px-4 relative z-10">
+        <Card className="w-full max-w-4xl mx-auto glass-panel-navy border-haven-yellow/20 shadow-navy animate-fade-in">
+          <CardHeader className="text-center">
+            <div className="inline-flex items-center gap-3 mb-4 justify-center">
+              <div className="w-12 h-1 bg-yellow-gradient rounded-full"></div>
+              <span className="font-handwritten text-2xl text-haven-yellow">Secure Payment</span>
+              <div className="w-12 h-1 bg-yellow-gradient rounded-full"></div>
             </div>
-            
-            {/* Booking Status */}
-            <div className="mt-4">
-              {user ? (
-                <div className="flex items-center gap-2 text-sm text-green-600">
-                  <CheckCircle className="h-4 w-4" />
-                  <span>Signed in • Faster checkout</span>
+            <CardTitle className="text-3xl font-serif text-haven-beige">Payment Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-6">
+                <div className="glass-panel rounded-3xl p-6 border-l-4 border-haven-yellow">
+                  <h3 className="text-lg font-medium mb-3 text-haven-beige flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-haven-yellow" />
+                    Booking Summary
+                  </h3>
+                  <PriceSummary priceBreakdown={priceBreakdown} />
                 </div>
-              ) : (
-                <div className="flex items-center gap-2 text-sm text-blue-600">
-                  <CheckCircle className="h-4 w-4" />
-                  <span>Guest booking • No account required</span>
+                
+                {/* Contact Information Summary */}
+                <div className="glass-panel rounded-3xl p-6 border-l-4 border-haven-yellow">
+                  <h4 className="font-medium mb-3 text-haven-beige flex items-center gap-2">
+                    <Users className="h-5 w-5 text-haven-yellow" />
+                    Contact Details
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <p className="text-haven-beige/80"><span className="font-medium text-haven-beige">Name:</span> {contactInfo.fullName}</p>
+                    <p className="text-haven-beige/80"><span className="font-medium text-haven-beige">Email:</span> {contactInfo.email}</p>
+                    <p className="text-haven-beige/80"><span className="font-medium text-haven-beige">Phone:</span> {contactInfo.phone}</p>
+                  </div>
+                  {!user && (
+                    <p className="text-xs text-haven-beige/60 mt-3 italic">
+                      Booking as guest • You can create an account later to manage your bookings
+                    </p>
+                  )}
                 </div>
-              )}
-            </div>
-          </div>
-          
-          <div>
-            <h3 className="text-lg font-medium mb-3">Payment Method</h3>
-            <div className="bg-green-50 p-4 rounded-lg border border-green-200 flex items-center">
-              <CreditCard className="h-5 w-5 mr-2 text-green-600" />
-              <div>
-                <p className="font-medium">Razorpay</p>
-                <p className="text-sm text-muted-foreground">Secure payment gateway</p>
+                
+                {/* Booking Status */}
+                <div className="glass-panel rounded-2xl p-4">
+                  {user ? (
+                    <div className="flex items-center gap-2 text-sm text-haven-yellow">
+                      <CheckCircle className="h-4 w-4" />
+                      <span>Signed in • Faster checkout</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 text-sm text-haven-yellow">
+                      <CheckCircle className="h-4 w-4" />
+                      <span>Guest booking • No account required</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div className="space-y-6">
+                <div className="glass-panel rounded-3xl p-6 border-l-4 border-haven-yellow">
+                  <h3 className="text-lg font-medium mb-3 text-haven-beige flex items-center gap-2">
+                    <CreditCard className="h-5 w-5 text-haven-yellow" />
+                    Payment Method
+                  </h3>
+                  <div className="bg-yellow-gradient/10 p-4 rounded-2xl border border-haven-yellow/30 flex items-center">
+                    <Shield className="h-5 w-5 mr-3 text-haven-yellow" />
+                    <div>
+                      <p className="font-medium text-haven-beige">Razorpay</p>
+                      <p className="text-sm text-haven-beige/80">Secure payment gateway</p>
+                    </div>
+                  </div>
+                </div>
+                
+                {bookingCreated && bookingId && (
+                  <div className="glass-panel rounded-3xl p-6 border-l-4 border-haven-yellow animate-scale-up">
+                    <PaymentReceipt 
+                      status="Unpaid"
+                      amount={priceBreakdown.totalAmountDue}
+                      currency={priceBreakdown.currency}
+                      bookingReference={bookingReference || undefined}
+                    />
+                  </div>
+                )}
               </div>
             </div>
             
-            {bookingCreated && bookingId && (
-              <div className="mt-4">
-                <PaymentReceipt 
-                  status="Unpaid"
-                  amount={priceBreakdown.totalAmountDue}
-                  currency={priceBreakdown.currency}
-                  bookingReference={bookingReference || undefined}
-                />
-              </div>
+            {paymentError && (
+              <Alert variant="destructive" className="glass-panel border-red-500/50">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Payment Error</AlertTitle>
+                <AlertDescription>{paymentError}</AlertDescription>
+              </Alert>
             )}
-          </div>
-        </div>
-        
-        {paymentError && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Payment Error</AlertTitle>
-            <AlertDescription>{paymentError}</AlertDescription>
-          </Alert>
-        )}
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline" onClick={onBack} disabled={isLoading || isSubmitting}>
-          Back
-        </Button>
-        <Button 
-          onClick={handlePayment} 
-          disabled={isLoading || isSubmitting || bookingCreated}
-          className="bg-green-700 hover:bg-green-800"
-        >
-          {isLoading || isSubmitting ? 'Processing...' : 'Proceed to Payment'}
-        </Button>
-      </CardFooter>
-    </Card>
+          </CardContent>
+          <CardFooter className="flex justify-between bg-haven-navy-dark/20 rounded-b-lg p-6">
+            <Button 
+              variant="outline" 
+              onClick={onBack} 
+              disabled={isLoading || isSubmitting}
+              className="glass-panel border-haven-yellow/30 text-haven-beige hover:bg-haven-navy-light/50"
+            >
+              Back
+            </Button>
+            <Button 
+              onClick={handlePayment} 
+              disabled={isLoading || isSubmitting || bookingCreated}
+              className="bg-yellow-gradient hover:shadow-yellow text-haven-navy font-semibold px-8 py-3 text-lg transition-all duration-300 transform hover:scale-105 ripple-effect"
+            >
+              {isLoading || isSubmitting ? 'Processing...' : 'Proceed to Payment'}
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    </div>
   );
 };
 
