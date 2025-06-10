@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Calendar, Home, BookOpen, Waves, Bed, ChefHat } from 'lucide-react';
@@ -44,14 +45,14 @@ const ContainerHomeSection = () => {
     icon: <BookOpen className="h-6 w-6" />,
     title: "25-Book Library & JBL Flip 5 Speaker",
     description: "Curated collection of books and premium sound system for entertainment during your stay.",
-    image: "/lovable-uploads/7ef10cc7-1183-4067-8e12-ead8cd47788f.png",
-    alt: "Interior living area with library and entertainment setup"
+    image: "/lovable-uploads/705f2a35-1b3d-4af4-ad9b-a72ca9c61845.png",
+    alt: "Collection of books on shelf with fire extinguisher and safety equipment"
   }, {
     icon: <Waves className="h-6 w-6" />,
     title: "Three Panoramic Decks",
     description: "Stunning 360° views of Muttukadu Lake from three different decks, perfect for sunrise and sunset moments.",
-    image: "/lovable-uploads/ea3b40a2-e087-4627-aecc-211b123dc269.png",
-    alt: "Panoramic deck views overlooking Muttukadu Lake"
+    image: "/lovable-uploads/51e2e8f4-cfbe-4d8c-81f2-ac28bc7d3f04.png",
+    alt: "Aerial view of yellow container deck levels with seating areas"
   }];
 
   return <section className="py-8 lg:py-12 bg-gradient-to-br from-haven-beige via-white to-haven-beige/30 relative overflow-hidden">
