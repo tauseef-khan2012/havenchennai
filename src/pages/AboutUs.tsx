@@ -2,7 +2,7 @@
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import PageHero from '@/components/shared/PageHero';
-import { Heart, Leaf, Users, Quote } from 'lucide-react';
+import { Heart, Leaf, Users, Quote, Mail, Phone, MapPin } from 'lucide-react';
 
 const AboutUs = () => {
   return (
@@ -137,6 +137,91 @@ const AboutUs = () => {
                 <p className="text-gray-600 leading-relaxed">
                   As we grow, our commitment remains unwavering: to provide authentic experiences that restore both people and planet, 
                   proving that conscious choices create the most meaningful journeys.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Contact Us Section */}
+        <section className="py-20 bg-white border-t border-gray-100">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-serif font-bold mb-6 text-gray-900">Get in Touch</h2>
+              <p className="text-lg text-gray-700 leading-relaxed">
+                Ready to plan your mindful escape? We're here to help you create the perfect retreat experience.
+              </p>
+            </div>
+            
+            <div className="bg-haven-teal/5 rounded-2xl p-8 shadow-lg border border-haven-teal/10" itemScope itemType="https://schema.org/Organization">
+              <meta itemProp="name" content="Haven Chennai" />
+              <meta itemProp="description" content="Sustainable Container Home Experience by Muttukadu Lake" />
+              
+              <div className="grid md:grid-cols-3 gap-8 text-center">
+                <div className="space-y-4" itemProp="email">
+                  <div className="w-16 h-16 bg-haven-teal/10 rounded-full flex items-center justify-center mx-auto">
+                    <Mail className="h-8 w-8 text-haven-teal" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-serif font-bold mb-2 text-gray-900">Email</h3>
+                    <a 
+                      href="mailto:havenchennai@gmail.com" 
+                      className="text-haven-teal hover:text-haven-teal/80 transition-colors font-medium"
+                      itemProp="email"
+                    >
+                      havenchennai@gmail.com
+                    </a>
+                  </div>
+                </div>
+                
+                <div className="space-y-4" itemProp="telephone">
+                  <div className="w-16 h-16 bg-haven-teal/10 rounded-full flex items-center justify-center mx-auto">
+                    <Phone className="h-8 w-8 text-haven-teal" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-serif font-bold mb-2 text-gray-900">Phone</h3>
+                    <div className="space-y-1">
+                      <div>
+                        <a 
+                          href="tel:+916380983578" 
+                          className="text-haven-teal hover:text-haven-teal/80 transition-colors font-medium block"
+                          itemProp="telephone"
+                        >
+                          +91 6380983578
+                        </a>
+                      </div>
+                      <div>
+                        <a 
+                          href="tel:+919787943154" 
+                          className="text-haven-teal hover:text-haven-teal/80 transition-colors font-medium block"
+                          itemProp="telephone"
+                        >
+                          +91 9787943154
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-4" itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
+                  <div className="w-16 h-16 bg-haven-teal/10 rounded-full flex items-center justify-center mx-auto">
+                    <MapPin className="h-8 w-8 text-haven-teal" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-serif font-bold mb-2 text-gray-900">Address</h3>
+                    <address className="text-gray-700 not-italic leading-relaxed">
+                      <span itemProp="streetAddress">Gsquare Omega, 4th Cross Street,<br />Modern Layout Second Main Road</span><br />
+                      <span itemProp="addressLocality">Padur</span>, <span itemProp="addressRegion">Tamil Nadu</span> <span itemProp="postalCode">603103</span><br />
+                      <span itemProp="addressCountry">India</span>
+                    </address>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-8 pt-8 border-t border-haven-teal/10 text-center">
+                <p className="text-gray-600">
+                  We typically respond to inquiries within 24 hours. For immediate assistance, 
+                  please call us directly during business hours.
                 </p>
               </div>
             </div>
