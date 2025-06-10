@@ -3,7 +3,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { MapPin, Navigation, Phone, Mail, Clock, Send } from 'lucide-react';
+import { Phone, Mail, Clock, Send } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -71,7 +71,7 @@ const AboutUs = () => {
           <div className="relative h-full container-custom flex flex-col justify-center">
             <div className="max-w-2xl animate-fade-up">
               <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">About Haven</h1>
-              <p className="text-xl text-white">Discover our story, values, and the perfect lakeside location where nature meets luxury.</p>
+              <p className="text-xl text-white">Discover our story and values that guide our lakeside retreat experience.</p>
             </div>
           </div>
         </section>
@@ -102,124 +102,21 @@ const AboutUs = () => {
             </div>
           </div>
         </section>
-
-        {/* Location Section */}
-        <section className="py-16 bg-haven-beige bg-opacity-20">
-          <div className="container-custom">
-            <h2 className="font-serif text-3xl font-bold text-center mb-12">Our Perfect Location</h2>
-            
-            <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
-              <div>
-                <h3 className="font-serif text-2xl font-semibold mb-4">Finding Haven</h3>
-                <p className="text-gray-700 mb-4">
-                  Haven is strategically located adjacent to the beautiful Muttukadu Lake, offering stunning views of the Muttukadu Bridge and nearby boathouse. Our unique container retreat provides the perfect balance of seclusion and accessibility.
-                </p>
-                
-                <div className="space-y-6 mt-8">
-                  <div className="flex items-start gap-3">
-                    <div className="h-10 w-10 bg-haven-green bg-opacity-10 rounded-full flex items-center justify-center">
-                      <MapPin className="text-haven-green flex-shrink-0" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold">Address</h4>
-                      <p className="text-gray-600">Haven Container Retreat, Muttukadu Lake Road, ECR, Chennai, Tamil Nadu, India</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3">
-                    <div className="h-10 w-10 bg-haven-green bg-opacity-10 rounded-full flex items-center justify-center">
-                      <Navigation className="text-haven-green flex-shrink-0" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold">Getting Here</h4>
-                      <div className="space-y-2 mt-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-600">From Chennai city center</span>
-                          <span className="bg-haven-beige bg-opacity-30 px-3 py-1 rounded-full text-sm">40 min</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-600">From Chennai International Airport</span>
-                          <span className="bg-haven-beige bg-opacity-30 px-3 py-1 rounded-full text-sm">35 min</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-600">From Mahabalipuram</span>
-                          <span className="bg-haven-beige bg-opacity-30 px-3 py-1 rounded-full text-sm">15 min</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="h-[450px] bg-gray-200 rounded-lg overflow-hidden shadow-lg">
-                <iframe 
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7764.696126654798!2d80.24515492272668!3d12.815201699999992!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a52598a9d672347%3A0xf97ab4362c317298!2sMuttukadu%20Boat%20House!5e0!3m2!1sen!2sus!4v1716565790945!5m2!1sen!2sus" 
-                  width="100%" 
-                  height="100%" 
-                  style={{ border: 0 }} 
-                  allowFullScreen={true} 
-                  loading="lazy" 
-                  referrerPolicy="no-referrer-when-downgrade"
-                ></iframe>
-              </div>
-            </div>
-
-            {/* Natural Surroundings */}
-            <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
-              <div>
-                <h3 className="font-serif text-2xl font-semibold mb-4">Muttukadu Lake & Backwaters</h3>
-                <p className="text-gray-700 mb-4">
-                  Haven sits adjacent to the picturesque Muttukadu Lake, offering breathtaking views from our decks and rooftop. The lake is connected by the Buckingham Canal and opens into the Bay of Bengal, creating a unique ecosystem of backwaters that support diverse wildlife.
-                </p>
-                <p className="text-gray-700">
-                  The tranquil waters are perfect for kayaking, birdwatching, or simply enjoying the sunset. Depending on the season, you might witness stunning views of the lake changing colors throughout the day.
-                </p>
-              </div>
-              <div className="rounded-lg overflow-hidden shadow-lg">
-                <img 
-                  src="/lovable-uploads/92fdb568-68f2-4ac8-9908-e0db6e29b56d.png" 
-                  alt="View of Muttukadu Lake from Haven's rooftop" 
-                  className="w-full h-[350px] object-cover"
-                />
-              </div>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-12 items-center md:flex-row-reverse">
-              <div className="md:order-2">
-                <h3 className="font-serif text-2xl font-semibold mb-4">Rich Birdlife & Wildlife</h3>
-                <p className="text-gray-700 mb-4">
-                  The area around Haven serves as a habitat for diverse birdlife, making it a paradise for birdwatchers and nature enthusiasts. During your stay, you might spot pelicans, flamingos, herons, egrets, kingfishers, and various exotic and migratory birds.
-                </p>
-                <p className="text-gray-700">
-                  The best times for birdwatching are early morning and late afternoon when the birds are most active. Our rooftop deck and ground floor deck provide excellent vantage points for observing these magnificent creatures in their natural habitat.
-                </p>
-              </div>
-              <div className="rounded-lg overflow-hidden shadow-lg md:order-1">
-                <img 
-                  src="/lovable-uploads/6f37f539-1310-49d2-965a-0c02228f5ced.png" 
-                  alt="Sunset view from Haven's rooftop" 
-                  className="w-full h-[350px] object-cover"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
         
         {/* Our Values */}
-        <section className="py-16">
+        <section className="py-16 bg-haven-beige bg-opacity-20">
           <div className="container-custom">
             <h2 className="font-serif text-3xl font-bold text-center mb-12">Our Values</h2>
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               <div className="bg-white p-8 rounded-lg shadow-md">
                 <div className="text-haven-green mb-4">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
                   </svg>
                 </div>
-                <h3 className="font-serif text-xl font-semibold mb-3">Environmental Stewardship</h3>
+                <h3 className="font-serif text-xl font-semibold mb-3">Stillness</h3>
                 <p className="text-gray-600">
-                  We're committed to minimizing our environmental footprint, using renewable energy, implementing water conservation measures, and supporting local reforestation efforts.
+                  We believe in the power of quiet moments.
                 </p>
               </div>
               
@@ -229,21 +126,46 @@ const AboutUs = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                   </svg>
                 </div>
-                <h3 className="font-serif text-xl font-semibold mb-3">Community Connection</h3>
+                <h3 className="font-serif text-xl font-semibold mb-3">Connection</h3>
                 <p className="text-gray-600">
-                  We collaborate with local experts, source ingredients from nearby farms, and contribute to community initiatives that preserve the cultural heritage of our region.
+                  Fostering deeper bonds with self, others, and the environment.
                 </p>
               </div>
               
               <div className="bg-white p-8 rounded-lg shadow-md">
                 <div className="text-haven-green mb-4">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                  </svg>
+                </div>
+                <h3 className="font-serif text-xl font-semibold mb-3">Mindful Design</h3>
+                <p className="text-gray-600">
+                  Every element has a purpose; minimalism meets comfort.
+                </p>
+              </div>
+              
+              <div className="bg-white p-8 rounded-lg shadow-md">
+                <div className="text-haven-green mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
+                  </svg>
+                </div>
+                <h3 className="font-serif text-xl font-semibold mb-3">Sustainability</h3>
+                <p className="text-gray-600">
+                  A deep respect for the planet, woven into our operations.
+                </p>
+              </div>
+              
+              <div className="bg-white p-8 rounded-lg shadow-md lg:col-start-2">
+                <div className="text-haven-green mb-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
                 </div>
-                <h3 className="font-serif text-xl font-semibold mb-3">Authentic Experiences</h3>
+                <h3 className="font-serif text-xl font-semibold mb-3">Authenticity</h3>
                 <p className="text-gray-600">
-                  We believe in the power of genuine connections with nature and local culture, creating experiences that inspire, educate, and refresh our guests.
+                  Real experiences, real stories, real impact.
                 </p>
               </div>
             </div>
@@ -251,7 +173,7 @@ const AboutUs = () => {
         </section>
         
         {/* Meet the Team */}
-        <section className="py-16 bg-haven-beige bg-opacity-20">
+        <section className="py-16">
           <div className="container-custom">
             <h2 className="font-serif text-3xl font-bold text-center mb-12">Meet Our Team</h2>
             <div className="grid md:grid-cols-3 gap-8">
@@ -298,7 +220,7 @@ const AboutUs = () => {
         </section>
 
         {/* Contact Section */}
-        <section className="py-16">
+        <section className="py-16 bg-haven-beige bg-opacity-20">
           <div className="container-custom">
             <h2 className="font-serif text-3xl font-bold text-center mb-12">Get in Touch</h2>
             
@@ -327,18 +249,6 @@ const AboutUs = () => {
                       <h4 className="font-semibold text-lg">Call Us</h4>
                       <p className="text-gray-600">+91 98765 43210</p>
                       <p className="text-gray-600">+91 87654 32109</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-4">
-                    <div className="bg-haven-green bg-opacity-10 p-3 rounded-full">
-                      <MapPin className="h-6 w-6 text-haven-green" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-lg">Visit Us</h4>
-                      <p className="text-gray-600">Haven Container Retreat</p>
-                      <p className="text-gray-600">Muttukadu Lake Road, ECR</p>
-                      <p className="text-gray-600">Chennai, Tamil Nadu 603112</p>
                     </div>
                   </div>
                   
