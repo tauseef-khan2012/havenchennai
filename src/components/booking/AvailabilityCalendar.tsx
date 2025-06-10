@@ -27,73 +27,16 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
   setGuestCount,
   maxGuests
 }) => {
-  const [availabilityData, setAvailabilityData] = useState<AvailabilityInfo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectingCheckOut, setSelectingCheckOut] = useState(false);
   const [tempCheckIn, setTempCheckIn] = useState<Date | undefined>(selectedCheckIn);
 
   useEffect(() => {
-    const fetchAvailability = async () => {
-      setIsLoading(true);
-      try {
-        const startDate = new Date();
-        const endDate = addDays(new Date(), 365); // Load next year
-        
-        const availability = await checkPropertyAvailabilityDetailed(
-          propertyId,
-          startDate,
-          endDate
-        );
-        
-        setAvailabilityData(availability);
-      } catch (error) {
-        console.error('Error fetching availability:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (propertyId) {
-      fetchAvailability();
-    }
+    // Set loading to false since CalendarDatePicker handles its own loading
+    setIsLoading(false);
   }, [propertyId]);
-
-  const handleDateSelect = (date: Date | undefined) => {
-    if (!date) return;
-
-    if (!selectingCheckOut && !tempCheckIn) {
-      // Selecting check-in date
-      setTempCheckIn(date);
-      setSelectingCheckOut(true);
-    } else if (selectingCheckOut && tempCheckIn) {
-      // Selecting check-out date
-      if (isBefore(date, tempCheckIn)) {
-        // If selected date is before check-in, restart selection
-        setTempCheckIn(date);
-        setSelectingCheckOut(true);
-      } else {
-        // Valid check-out selection
-        const { isAvailable } = isDateRangeAvailable(availabilityData, tempCheckIn, date);
-        
-        if (isAvailable) {
-          onDateRangeSelect(tempCheckIn, date);
-          setSelectingCheckOut(false);
-        } else {
-          // Show error or restart selection
-          setTempCheckIn(date);
-          setSelectingCheckOut(true);
-        }
-      }
-    } else {
-      // Reset and start new selection
-      setTempCheckIn(date);
-      setSelectingCheckOut(true);
-    }
-  };
 
   const clearSelection = () => {
     setTempCheckIn(undefined);
-    setSelectingCheckOut(false);
   };
 
   if (isLoading) {
@@ -112,17 +55,15 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
         tempCheckIn={tempCheckIn}
         selectedCheckIn={selectedCheckIn}
         selectedCheckOut={selectedCheckOut}
-        selectingCheckOut={selectingCheckOut}
+        selectingCheckOut={false}
         onClearSelection={clearSelection}
       />
       
       <CalendarDatePicker
-        availabilityData={availabilityData}
-        tempCheckIn={tempCheckIn}
         selectedCheckIn={selectedCheckIn}
         selectedCheckOut={selectedCheckOut}
-        selectingCheckOut={selectingCheckOut}
-        onDateSelect={handleDateSelect}
+        onDateRangeSelect={onDateRangeSelect}
+        propertyId={propertyId}
       />
       
       <GuestSelector
