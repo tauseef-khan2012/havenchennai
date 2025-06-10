@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Calendar, Home, BookOpen, Waves, Bed, ChefHat } from 'lucide-react';
@@ -33,26 +32,26 @@ const ContainerHomeSection = () => {
     icon: <Bed className="h-6 w-6" />,
     title: "Queen + Bunk Bed & Workspace",
     description: "Comfortable sleeping arrangements for up to 4 guests with a dedicated workspace for remote work needs.",
-    image: "/lovable-uploads/d1148760-0de0-44d6-ae11-98a16c4b61fc.png",
-    alt: "Container interior workspace at Haven Chennai"
+    image: "/lovable-uploads/98e46d57-3441-4761-9cdf-18542ba4837c.png",
+    alt: "Interior bedroom and workspace area at Haven Chennai container house"
   }, {
     icon: <ChefHat className="h-6 w-6" />,
     title: "Fully Equipped Kitchen & Refrigerator",
     description: "Modern kitchen with all essentials for preparing meals, including refrigerator, induction cooktop, and utensils.",
-    image: "/lovable-uploads/e4f31ab2-de64-417b-af9f-97d3d17e2f47.png",
-    alt: "Container ground-floor living and kitchen"
+    image: "/lovable-uploads/80ae807c-39e1-4519-b19a-ed92c4b221cd.png",
+    alt: "Modern kitchen area with refrigerator and cooking facilities"
   }, {
     icon: <BookOpen className="h-6 w-6" />,
     title: "25-Book Library & JBL Flip 5 Speaker",
     description: "Curated collection of books and premium sound system for entertainment during your stay.",
-    image: "/lovable-uploads/d1148760-0de0-44d6-ae11-98a16c4b61fc.png",
-    alt: "Container interior with library and entertainment setup"
+    image: "/lovable-uploads/7ef10cc7-1183-4067-8e12-ead8cd47788f.png",
+    alt: "Interior living area with library and entertainment setup"
   }, {
     icon: <Waves className="h-6 w-6" />,
     title: "Three Panoramic Decks",
     description: "Stunning 360° views of Muttukadu Lake from three different decks, perfect for sunrise and sunset moments.",
     image: "/lovable-uploads/ea3b40a2-e087-4627-aecc-211b123dc269.png",
-    alt: "Three panoramic decks at Haven Chennai"
+    alt: "Panoramic deck views overlooking Muttukadu Lake"
   }];
 
   return <section className="py-8 lg:py-12 bg-gradient-to-br from-haven-beige via-white to-haven-beige/30 relative overflow-hidden">
