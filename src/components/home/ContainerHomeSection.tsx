@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Calendar, Home, BookOpen, Waves, Bed, ChefHat } from 'lucide-react';
@@ -73,38 +74,46 @@ const ContainerHomeSection = () => {
           <h2 className="font-serif lg:text-3xl xl:text-4xl mb-3 text-haven-dark font-semibold text-xl mx-0 px-0">besides Muttukadu Lake</h2>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-6 lg:gap-8 items-center mb-8">
-          {/* Hero Image */}
-          <div className="order-2 lg:order-1">
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl group">
-              
-            </div>
-          </div>
-          
-          {/* Content */}
-          <div className="order-1 lg:order-2">
+        {/* Main Content Grid - Fixed responsive layout */}
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-8 items-start mb-8">
+          {/* Content Column - Responsive positioning */}
+          <div className="order-1 lg:order-1">
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-lg border border-white/20">
-              <p className="text-gray-700 mb-4 leading-relaxed">Experience the perfect blend of comfort and nature in our fully-equipped container guest house, featuring panoramic lake views, modern amenities, and thoughtfully designed spaces for your ideal getaway.</p>
+              <p className="text-gray-700 mb-6 leading-relaxed">Experience the perfect blend of comfort and nature in our fully-equipped container guest house, featuring panoramic lake views, modern amenities, and thoughtfully designed spaces for your ideal getaway.</p>
               
-              {/* Quick Stats */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="text-center bg-haven-teal/10 p-3 rounded">
-                  <div className="text-2xl font-bold text-haven-teal">5</div>
-                  <div className="text-sm text-gray-600">Max Guests</div>
+              {/* Quick Stats - Improved responsive grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div className="text-center bg-haven-teal/10 p-4 rounded-lg">
+                  <div className="text-3xl font-bold text-haven-teal mb-1">5</div>
+                  <div className="text-sm text-gray-600 font-medium">Max Guests</div>
                 </div>
-                <div className="text-center bg-haven-green/10 p-3 rounded">
-                  <div className="text-2xl font-bold text-haven-green">3</div>
-                  <div className="text-sm text-gray-600">Deck Levels</div>
+                <div className="text-center bg-haven-green/10 p-4 rounded-lg">
+                  <div className="text-3xl font-bold text-haven-green mb-1">3</div>
+                  <div className="text-sm text-gray-600 font-medium">Deck Levels</div>
                 </div>
               </div>
               
-              <Link to="/booking">
-                <Button className="w-full bg-haven-teal hover:bg-haven-teal/90 text-white text-lg py-3 rounded-xl transition-all duration-300 transform hover:scale-105">
+              {/* CTA Button - Full width on mobile, proper sizing on desktop */}
+              <Link to="/booking" className="block">
+                <Button className="w-full bg-haven-teal hover:bg-haven-teal/90 text-white text-lg py-4 rounded-xl transition-all duration-300 transform hover:scale-105">
                   <Calendar className="h-5 w-5 mr-2" />
                   Check Availability
                 </Button>
               </Link>
+            </div>
+          </div>
+
+          {/* Hero Image Column - Proper aspect ratio and positioning */}
+          <div className="order-2 lg:order-2">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl group">
+              <div className="aspect-[4/3] lg:aspect-[3/2]">
+                <img 
+                  src="/lovable-uploads/0bf49c3a-e3e0-4828-badd-a492dc4dd957.png" 
+                  alt="Haven container house exterior with multiple deck levels overlooking Muttukadu Lake" 
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                  loading="lazy" 
+                />
+              </div>
             </div>
           </div>
         </div>
