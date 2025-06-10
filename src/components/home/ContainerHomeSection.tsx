@@ -1,4 +1,5 @@
 
+
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Calendar, Home, BookOpen, Waves, Bed, ChefHat } from 'lucide-react';
@@ -32,7 +33,7 @@ const ContainerHomeSection = () => {
   const features = [{
     icon: <Bed className="h-6 w-6" />,
     title: "Queen + Bunk Bed & Workspace",
-    description: "Comfortable sleeping arrangements for up to 4 guests with a dedicated workspace for remote work needs.",
+    description: "Comfortable sleeping arrangements for up to 5 guests with a dedicated workspace for remote work needs.",
     image: "/lovable-uploads/457f5e29-0207-45d0-822a-6252f1d6f7da.png",
     alt: "Bunk bed setup with workspace area featuring desk and chair"
   }, {
@@ -154,3 +155,4 @@ const ContainerHomeSection = () => {
 };
 
 export default ContainerHomeSection;
+
