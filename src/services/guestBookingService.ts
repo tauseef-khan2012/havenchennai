@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { UUID, BookingType, PriceBreakdown } from '@/types/booking';
 
@@ -18,27 +17,40 @@ export interface GuestBookingData {
 }
 
 /**
- * Enhanced validation for guest booking data
+ * Enhanced validation for guest booking data with security checks
  */
 const validateGuestBookingData = (bookingData: GuestBookingData): void => {
   const errors: string[] = [];
 
-  // Basic required fields
+  // Basic required fields with enhanced validation
   if (!bookingData.guestName?.trim()) {
     errors.push('Guest name is required');
+  } else if (bookingData.guestName.trim().length > 100) {
+    errors.push('Guest name must be less than 100 characters');
+  } else if (!/^[a-zA-Z\s]+$/.test(bookingData.guestName.trim())) {
+    errors.push('Guest name can only contain letters and spaces');
   }
   
   if (!bookingData.guestEmail?.trim()) {
     errors.push('Guest email is required');
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(bookingData.guestEmail.trim())) {
     errors.push('Invalid email format');
+  } else if (bookingData.guestEmail.trim().length > 254) {
+    errors.push('Email address is too long');
   }
   
   if (!bookingData.guestPhone?.trim()) {
     errors.push('Guest phone is required');
+  } else if (!/^[\+]?[\d\s\-\(\)]{7,15}$/.test(bookingData.guestPhone.trim())) {
+    errors.push('Invalid phone number format');
   }
 
-  // Type-specific validation
+  // Special requests validation
+  if (bookingData.specialRequests && bookingData.specialRequests.length > 500) {
+    errors.push('Special requests must be less than 500 characters');
+  }
+
+  // Type-specific validation with enhanced security
   if (bookingData.type === 'property') {
     if (!bookingData.propertyId) {
       errors.push('Property ID is required for property bookings');
@@ -49,11 +61,27 @@ const validateGuestBookingData = (bookingData: GuestBookingData): void => {
     if (!bookingData.checkOutDate) {
       errors.push('Check-out date is required for property bookings');
     }
-    if (bookingData.checkInDate && bookingData.checkOutDate && bookingData.checkInDate >= bookingData.checkOutDate) {
-      errors.push('Check-out date must be after check-in date');
+    if (bookingData.checkInDate && bookingData.checkOutDate) {
+      if (bookingData.checkInDate >= bookingData.checkOutDate) {
+        errors.push('Check-out date must be after check-in date');
+      }
+      // Prevent bookings too far in advance (max 2 years)
+      const maxAdvanceDate = new Date();
+      maxAdvanceDate.setFullYear(maxAdvanceDate.getFullYear() + 2);
+      if (bookingData.checkInDate > maxAdvanceDate) {
+        errors.push('Bookings cannot be made more than 2 years in advance');
+      }
+      // Prevent past bookings
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (bookingData.checkInDate < today) {
+        errors.push('Cannot book dates in the past');
+      }
     }
     if (!bookingData.numberOfGuests || bookingData.numberOfGuests < 1) {
       errors.push('Number of guests must be at least 1');
+    } else if (bookingData.numberOfGuests > 20) {
+      errors.push('Number of guests cannot exceed 20');
     }
   } else if (bookingData.type === 'experience') {
     if (!bookingData.instanceId) {
@@ -61,19 +89,61 @@ const validateGuestBookingData = (bookingData: GuestBookingData): void => {
     }
     if (!bookingData.numberOfAttendees || bookingData.numberOfAttendees < 1) {
       errors.push('Number of attendees must be at least 1');
+    } else if (bookingData.numberOfAttendees > 50) {
+      errors.push('Number of attendees cannot exceed 50');
     }
   }
 
-  // Price validation
+  // Enhanced price validation
   if (!bookingData.priceBreakdown) {
     errors.push('Price breakdown is required');
-  } else if (bookingData.priceBreakdown.totalAmountDue <= 0) {
-    errors.push('Total amount must be greater than 0');
+  } else {
+    if (bookingData.priceBreakdown.totalAmountDue <= 0) {
+      errors.push('Total amount must be greater than 0');
+    } else if (bookingData.priceBreakdown.totalAmountDue > 500000) {
+      errors.push('Total amount cannot exceed ₹5,00,000');
+    }
+    if (!['INR', 'USD'].includes(bookingData.priceBreakdown.currency)) {
+      errors.push('Invalid currency. Only INR and USD are supported.');
+    }
   }
 
   if (errors.length > 0) {
     throw new Error(`Validation failed: ${errors.join(', ')}`);
   }
+};
+
+/**
+ * Rate limiting check for guest bookings
+ */
+const checkRateLimit = async (email: string): Promise<void> => {
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  
+  // Check recent bookings from this email
+  const { data: recentBookings, error } = await supabase
+    .from('bookings')
+    .select('id')
+    .eq('guest_email', email.trim().toLowerCase())
+    .gte('created_at', oneHourAgo);
+
+  if (error) {
+    console.error('Error checking rate limit:', error);
+    throw new Error('Unable to verify booking rate limit');
+  }
+
+  if (recentBookings && recentBookings.length >= 3) {
+    throw new Error('Rate limit exceeded. Maximum 3 bookings per hour per email address.');
+  }
+};
+
+/**
+ * Sanitize text input to prevent XSS
+ */
+const sanitizeTextInput = (input: string): string => {
+  return input
+    .trim()
+    .replace(/[<>]/g, '') // Remove angle brackets
+    .substring(0, 500); // Limit length
 };
 
 /**
@@ -88,32 +158,44 @@ export const createGuestBooking = async (
     // Validate input data
     validateGuestBookingData(bookingData);
     
-    const bookingReference = generateBookingReference(bookingData.type);
+    // Check rate limiting
+    await checkRateLimit(bookingData.guestEmail);
     
-    if (bookingData.type === 'property') {
+    // Sanitize inputs
+    const sanitizedData = {
+      ...bookingData,
+      guestName: sanitizeTextInput(bookingData.guestName),
+      guestEmail: bookingData.guestEmail.trim().toLowerCase(),
+      guestPhone: bookingData.guestPhone.trim(),
+      specialRequests: bookingData.specialRequests ? sanitizeTextInput(bookingData.specialRequests) : undefined
+    };
+    
+    const bookingReference = generateBookingReference(sanitizedData.type);
+    
+    if (sanitizedData.type === 'property') {
       console.log('Creating property guest booking');
       // Create property booking for guest
       const { data, error } = await supabase
         .from('bookings')
         .insert({
           user_id: null, // Guest booking
-          guest_name: bookingData.guestName.trim(),
-          guest_email: bookingData.guestEmail.trim().toLowerCase(),
-          guest_phone: bookingData.guestPhone.trim(),
-          property_id: bookingData.propertyId,
-          check_in_date: bookingData.checkInDate?.toISOString().split('T')[0],
-          check_out_date: bookingData.checkOutDate?.toISOString().split('T')[0],
-          number_of_guests: bookingData.numberOfGuests,
-          base_price_total: bookingData.priceBreakdown.basePrice,
-          cleaning_fee_total: bookingData.priceBreakdown.cleaningFee || 0,
-          taxes_total: bookingData.priceBreakdown.taxAmount,
-          discounts_total: bookingData.priceBreakdown.discountAmount,
-          total_amount_due: bookingData.priceBreakdown.totalAmountDue,
-          currency: bookingData.priceBreakdown.currency,
+          guest_name: sanitizedData.guestName,
+          guest_email: sanitizedData.guestEmail,
+          guest_phone: sanitizedData.guestPhone,
+          property_id: sanitizedData.propertyId,
+          check_in_date: sanitizedData.checkInDate?.toISOString().split('T')[0],
+          check_out_date: sanitizedData.checkOutDate?.toISOString().split('T')[0],
+          number_of_guests: sanitizedData.numberOfGuests,
+          base_price_total: sanitizedData.priceBreakdown.basePrice,
+          cleaning_fee_total: sanitizedData.priceBreakdown.cleaningFee || 0,
+          taxes_total: sanitizedData.priceBreakdown.taxAmount,
+          discounts_total: sanitizedData.priceBreakdown.discountAmount,
+          total_amount_due: sanitizedData.priceBreakdown.totalAmountDue,
+          currency: sanitizedData.priceBreakdown.currency,
           booking_reference: bookingReference,
           booking_status: 'Pending Payment',
           payment_status: 'Unpaid',
-          special_requests: bookingData.specialRequests || ''
+          special_requests: sanitizedData.specialRequests || ''
         })
         .select()
         .single();
@@ -130,24 +212,24 @@ export const createGuestBooking = async (
         bookingReference: bookingReference
       };
       
-    } else if (bookingData.type === 'experience') {
+    } else if (sanitizedData.type === 'experience') {
       console.log('Creating experience guest booking');
       // Create experience booking for guest
       const { data, error } = await supabase
         .from('experience_bookings')
         .insert({
           user_id: null, // Guest booking
-          guest_name: bookingData.guestName.trim(),
-          guest_email: bookingData.guestEmail.trim().toLowerCase(),
-          guest_phone: bookingData.guestPhone.trim(),
-          experience_instance_id: bookingData.instanceId,
-          number_of_attendees: bookingData.numberOfAttendees,
-          total_amount_due: bookingData.priceBreakdown.totalAmountDue,
-          currency: bookingData.priceBreakdown.currency,
+          guest_name: sanitizedData.guestName,
+          guest_email: sanitizedData.guestEmail,
+          guest_phone: sanitizedData.guestPhone,
+          experience_instance_id: sanitizedData.instanceId,
+          number_of_attendees: sanitizedData.numberOfAttendees,
+          total_amount_due: sanitizedData.priceBreakdown.totalAmountDue,
+          currency: sanitizedData.priceBreakdown.currency,
           booking_reference: bookingReference,
           booking_status: 'Pending Payment',
           payment_status: 'Unpaid',
-          special_requests: bookingData.specialRequests || ''
+          special_requests: sanitizedData.specialRequests || ''
         })
         .select()
         .single();
@@ -164,7 +246,7 @@ export const createGuestBooking = async (
         bookingReference: bookingReference
       };
     } else {
-      throw new Error(`Invalid booking type: ${bookingData.type}`);
+      throw new Error(`Invalid booking type: ${sanitizedData.type}`);
     }
   } catch (error) {
     console.error('Error creating guest booking:', error);
