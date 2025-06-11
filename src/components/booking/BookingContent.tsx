@@ -12,7 +12,8 @@ import {
   Car,
   Waves,
   TreePine,
-  Eye
+  Eye,
+  CreditCard
 } from 'lucide-react';
 import { PropertyImageSlider } from './PropertyImageSlider';
 import { CalendarDatePicker } from './calendar/CalendarDatePicker';
