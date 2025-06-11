@@ -1,8 +1,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { EnhancedPriceBreakdown } from '@/services/enhancedPriceService';
-import { DiscountApplication } from '@/services/discountService';
+import { SimplePriceBreakdown } from '@/services/simplePricingService';
 import { UUID } from '@/types/booking';
 
 export const useBookingNavigation = () => {
@@ -15,8 +14,8 @@ export const useBookingNavigation = () => {
     selectedCheckIn: Date | undefined,
     selectedCheckOut: Date | undefined,
     guestCount: number,
-    priceBreakdown: EnhancedPriceBreakdown | null,
-    appliedDiscount: DiscountApplication | undefined
+    priceBreakdown: SimplePriceBreakdown | null,
+    appliedDiscount: any | undefined
   ) => {
     if (!selectedCheckIn || !selectedCheckOut || !priceBreakdown) {
       toast({
@@ -33,7 +32,7 @@ export const useBookingNavigation = () => {
       checkIn: selectedCheckIn.toISOString(),
       checkOut: selectedCheckOut.toISOString(),
       guests: guestCount.toString(),
-      ...(appliedDiscount?.isValid && appliedDiscount.discountCode && { 
+      ...(appliedDiscount && { 
         discountCode: appliedDiscount.discountCode 
       })
     });
