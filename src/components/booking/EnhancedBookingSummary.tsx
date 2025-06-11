@@ -3,9 +3,10 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Calendar, Users, MapPin, Clock } from 'lucide-react';
+import { Calendar, Users, CreditCard, Calculator } from 'lucide-react';
 import { SimplePriceSummary } from './SimplePriceSummary';
 import { SimplePriceBreakdown } from '@/services/simplePricingService';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import { UUID } from '@/types/booking';
 
 interface EnhancedBookingSummaryProps {
@@ -33,16 +34,10 @@ export const EnhancedBookingSummary: React.FC<EnhancedBookingSummaryProps> = ({
   onProceedToPayment,
   showPropertyDetails = true
 }) => {
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+  const { formatPrice } = useCurrency();
 
-  const canProceed = selectedCheckIn && selectedCheckOut && priceBreakdown && !isCalculatingPrice;
   const hasDatesSelected = selectedCheckIn && selectedCheckOut;
+  const canProceed = hasDatesSelected && priceBreakdown && !isCalculatingPrice;
 
   console.log('EnhancedBookingSummary - State check:', {
     selectedCheckIn,
@@ -53,93 +48,105 @@ export const EnhancedBookingSummary: React.FC<EnhancedBookingSummaryProps> = ({
     canProceed
   });
 
-  return (
-    <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy">
-      <CardContent className="p-6 space-y-6">
-        {/* Property Details */}
-        {showPropertyDetails && (
-          <div className="space-y-3">
-            <div className="flex items-start gap-3">
-              <MapPin className="h-4 w-4 text-haven-yellow mt-1 flex-shrink-0" />
-              <div>
-                <h3 className="font-medium text-haven-beige">{property.name}</h3>
-                <p className="text-sm text-haven-beige/60">{property.location_details || 'Lakeside Location'}</p>
-              </div>
-            </div>
-          </div>
-        )}
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
 
-        {/* Booking Details - Show when dates are selected */}
-        {hasDatesSelected ? (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-3">
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-haven-yellow" />
-                  <span className="text-haven-beige">Check-in</span>
-                </div>
-                <span className="font-medium text-haven-beige">{formatDate(selectedCheckIn!)}</span>
-              </div>
-              
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-haven-yellow" />
-                  <span className="text-haven-beige">Check-out</span>
-                </div>
-                <span className="font-medium text-haven-beige">{formatDate(selectedCheckOut!)}</span>
-              </div>
-              
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-haven-yellow" />
-                  <span className="text-haven-beige">Duration</span>
-                </div>
-                <span className="font-medium text-haven-beige">{nights} {nights === 1 ? 'night' : 'nights'}</span>
-              </div>
-              
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-haven-yellow" />
-                  <span className="text-haven-beige">Guests</span>
-                </div>
-                <span className="font-medium text-haven-beige">{guestCount} {guestCount === 1 ? 'guest' : 'guests'}</span>
-              </div>
-            </div>
-            
-            <Separator className="bg-haven-yellow/20" />
-            
-            {/* Pricing */}
-            {priceBreakdown ? (
-              <div className="space-y-4">
-                <SimplePriceSummary priceBreakdown={priceBreakdown} />
-                
-                <Button 
-                  onClick={onProceedToPayment}
-                  className="w-full bg-haven-yellow hover:bg-haven-yellow/90 text-haven-navy-dark py-3 text-lg font-medium"
-                  disabled={!canProceed}
-                  size="lg"
-                >
-                  {isCalculatingPrice ? 'Calculating...' : 'Continue to Checkout'}
-                </Button>
+  return (
+    <div className="space-y-6">
+      {showPropertyDetails && (
+        <div className="text-center">
+          <h3 className="text-xl font-serif text-haven-beige mb-2">{property?.name}</h3>
+          <p className="text-sm text-haven-beige/70">Padur, Chennai OMR</p>
+        </div>
+      )}
+
+      {/* Date and Guest Selection Summary */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between p-4 bg-yellow-gradient/10 rounded-2xl border border-haven-yellow/20">
+          <div className="flex items-center gap-2 text-haven-beige">
+            <Calendar className="h-4 w-4 text-haven-yellow" />
+            <span className="text-sm font-medium">Dates</span>
+          </div>
+          <div className="text-right">
+            {hasDatesSelected ? (
+              <div className="text-sm text-haven-beige">
+                <div>{formatDate(selectedCheckIn!)}</div>
+                <div className="text-haven-beige/60">to {formatDate(selectedCheckOut!)}</div>
+                <div className="text-xs text-haven-yellow">{nights} {nights === 1 ? 'night' : 'nights'}</div>
               </div>
             ) : (
-              <div className="text-center py-4">
-                <div className="text-sm text-haven-beige/60">
-                  {isCalculatingPrice ? 'Calculating pricing...' : 'Loading pricing...'}
-                </div>
-              </div>
+              <span className="text-sm text-haven-beige/60">Select dates</span>
             )}
           </div>
+        </div>
+
+        <div className="flex items-center justify-between p-4 bg-yellow-gradient/10 rounded-2xl border border-haven-yellow/20">
+          <div className="flex items-center gap-2 text-haven-beige">
+            <Users className="h-4 w-4 text-haven-yellow" />
+            <span className="text-sm font-medium">Guests</span>
+          </div>
+          <div className="text-sm text-haven-beige">
+            {guestCount} {guestCount === 1 ? 'guest' : 'guests'}
+          </div>
+        </div>
+      </div>
+
+      <Separator className="bg-haven-yellow/20" />
+
+      {/* Price Breakdown */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 text-haven-beige">
+          <Calculator className="h-4 w-4 text-haven-yellow" />
+          <span className="text-sm font-medium">Price Breakdown</span>
+        </div>
+
+        {isCalculatingPrice ? (
+          <div className="flex items-center justify-center p-6">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-haven-yellow"></div>
+            <span className="ml-2 text-sm text-haven-beige/60">Calculating...</span>
+          </div>
+        ) : priceBreakdown ? (
+          <SimplePriceSummary priceBreakdown={priceBreakdown} />
+        ) : hasDatesSelected ? (
+          <div className="text-center p-4 text-haven-beige/60">
+            <span className="text-sm">Price calculation in progress...</span>
+          </div>
         ) : (
-          <div className="text-center py-8">
-            <Calendar className="h-12 w-12 text-haven-beige/30 mx-auto mb-4" />
-            <h3 className="font-medium text-haven-beige mb-2">Select your dates</h3>
-            <p className="text-haven-beige/60 text-sm">
-              Choose your check-in and check-out dates to see pricing and availability
-            </p>
+          <div className="text-center p-4 text-haven-beige/60">
+            <span className="text-sm">Select dates to see pricing</span>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+
+      {/* Action Button */}
+      <Button
+        onClick={onProceedToPayment}
+        disabled={!canProceed}
+        className="w-full bg-yellow-gradient hover:shadow-yellow text-haven-navy font-semibold py-3 text-lg transition-all duration-300 transform hover:scale-105 ripple-effect disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+        size="lg"
+      >
+        {!hasDatesSelected ? (
+          'Select dates to continue'
+        ) : isCalculatingPrice ? (
+          'Calculating price...'
+        ) : (
+          <>
+            <CreditCard className="h-5 w-5 mr-2" />
+            Reserve Now {priceBreakdown ? `• ${formatPrice(priceBreakdown.totalAmount, priceBreakdown.currency)}` : ''}
+          </>
+        )}
+      </Button>
+
+      {canProceed && (
+        <p className="text-xs text-haven-beige/60 text-center">
+          No account required • Secure guest booking
+        </p>
+      )}
+    </div>
   );
 };

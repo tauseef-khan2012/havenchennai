@@ -26,13 +26,11 @@ export const calculateSimplePropertyPrice = (
   // Base price: ₹4000 per night
   const basePrice = 4000 * nights;
   
-  // Additional guest charges: 3rd guest = ₹500, 4th = ₹1000, 5th = ₹1500
+  // Additional guest charges: ₹500 for each guest after the 2nd
   let additionalGuestCharges = 0;
   if (guestCount > 2) {
     const additionalGuests = guestCount - 2;
-    for (let i = 1; i <= additionalGuests; i++) {
-      additionalGuestCharges += i * 500;
-    }
+    additionalGuestCharges = additionalGuests * 500; // ₹500 per additional guest
   }
   
   // Subtotal

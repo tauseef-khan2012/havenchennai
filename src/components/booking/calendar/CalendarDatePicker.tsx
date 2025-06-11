@@ -125,6 +125,25 @@ export const CalendarDatePicker: React.FC<CalendarDatePickerProps> = ({
     setTempCheckIn(undefined);
     setTempCheckOut(undefined);
     setIsSelectingCheckOut(false);
+    
+    // Create a temporary future date for clearing - this will trigger the parent to reset
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dayAfter = new Date();
+    dayAfter.setDate(dayAfter.getDate() + 2);
+    
+    // Call parent with temporary dates, then immediately clear them
+    // This ensures the parent state gets reset properly
+    setTimeout(() => {
+      // Reset parent state by navigating without date params
+      const url = new URL(window.location.href);
+      url.searchParams.delete('checkIn');
+      url.searchParams.delete('checkOut');
+      window.history.replaceState({}, '', url.toString());
+      
+      // Force page reload to reset state
+      window.location.reload();
+    }, 100);
   };
 
   if (isLoading) {
