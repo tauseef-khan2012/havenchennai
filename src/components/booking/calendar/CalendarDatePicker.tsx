@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Calendar } from '@/components/ui/calendar';
-import { addDays, isBefore, startOfDay } from 'date-fns';
+import { addDays, isBefore, startOfDay, isAfter, isSameDay } from 'date-fns';
 import { checkPropertyAvailabilityDetailed } from '@/services/availabilityService';
 import { UUID } from '@/types/booking';
 
@@ -48,6 +48,7 @@ export const CalendarDatePicker: React.FC<CalendarDatePickerProps> = ({
 
   // Reset temp state when external dates change
   useEffect(() => {
+    console.log('CalendarDatePicker - External dates changed:', { selectedCheckIn, selectedCheckOut });
     setTempCheckIn(selectedCheckIn);
     setTempCheckOut(selectedCheckOut);
     if (selectedCheckIn && !selectedCheckOut) {
@@ -72,6 +73,21 @@ export const CalendarDatePicker: React.FC<CalendarDatePickerProps> = ({
     
     const availabilityInfo = availabilityData.find(info => info.date === dateStr);
     return availabilityInfo && !availabilityInfo.isAvailable;
+  };
+
+  // Check if date is in selected range
+  const isDateInRange = (date: Date): boolean => {
+    if (!tempCheckIn || !tempCheckOut) return false;
+    return isAfter(date, tempCheckIn) && isBefore(date, tempCheckOut);
+  };
+
+  // Check if date is start or end of range
+  const isRangeStart = (date: Date): boolean => {
+    return tempCheckIn ? isSameDay(date, tempCheckIn) : false;
+  };
+
+  const isRangeEnd = (date: Date): boolean => {
+    return tempCheckOut ? isSameDay(date, tempCheckOut) : false;
   };
 
   const handleDateSelect = (date: Date | undefined) => {
@@ -103,6 +119,7 @@ export const CalendarDatePicker: React.FC<CalendarDatePickerProps> = ({
   };
 
   const clearSelection = () => {
+    console.log('CalendarDatePicker - Clearing selection');
     setTempCheckIn(undefined);
     setTempCheckOut(undefined);
     setIsSelectingCheckOut(false);
@@ -158,13 +175,23 @@ export const CalendarDatePicker: React.FC<CalendarDatePickerProps> = ({
           row: "flex w-full mt-2",
           cell: "h-9 w-9 text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
           day: "h-9 w-9 p-0 font-normal text-haven-beige hover:bg-haven-yellow/20 hover:text-haven-yellow rounded-md transition-colors",
-          day_range_end: "bg-haven-yellow text-haven-navy-dark font-medium",
+          day_range_end: "bg-haven-yellow text-haven-navy-dark font-medium rounded-r-md",
           day_selected: "bg-haven-yellow text-haven-navy-dark hover:bg-haven-yellow hover:text-haven-navy-dark focus:bg-haven-yellow focus:text-haven-navy-dark font-medium",
           day_today: "bg-haven-yellow/30 text-haven-beige font-medium",
           day_outside: "text-haven-beige/30 opacity-50",
           day_disabled: "text-haven-beige/30 opacity-30 line-through",
-          day_range_middle: "bg-haven-yellow/20 text-haven-beige",
+          day_range_middle: "bg-haven-yellow/20 text-haven-beige rounded-none",
           day_hidden: "invisible",
+        }}
+        modifiers={{
+          range_start: tempCheckIn ? [tempCheckIn] : [],
+          range_end: tempCheckOut ? [tempCheckOut] : [],
+          range_middle: tempCheckIn && tempCheckOut ? (date) => isDateInRange(date) : () => false,
+        }}
+        modifiersClassNames={{
+          range_start: "bg-haven-yellow text-haven-navy-dark font-medium rounded-l-md",
+          range_end: "bg-haven-yellow text-haven-navy-dark font-medium rounded-r-md",
+          range_middle: "bg-haven-yellow/20 text-haven-beige rounded-none",
         }}
       />
       

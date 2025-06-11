@@ -21,6 +21,8 @@ export const GuestSelector: React.FC<GuestSelectorProps> = ({
       const newCount = guestCount + 1;
       console.log('GuestSelector - Incrementing guest count from', guestCount, 'to', newCount);
       setGuestCount(newCount);
+    } else {
+      console.log('GuestSelector - Cannot increment:', { disabled, guestCount, maxGuests });
     }
   }, [guestCount, maxGuests, setGuestCount, disabled]);
 
@@ -29,8 +31,12 @@ export const GuestSelector: React.FC<GuestSelectorProps> = ({
       const newCount = guestCount - 1;
       console.log('GuestSelector - Decrementing guest count from', guestCount, 'to', newCount);
       setGuestCount(newCount);
+    } else {
+      console.log('GuestSelector - Cannot decrement:', { disabled, guestCount });
     }
   }, [guestCount, setGuestCount, disabled]);
+
+  console.log('GuestSelector - Render:', { guestCount, maxGuests, disabled });
 
   return (
     <div className="space-y-3">

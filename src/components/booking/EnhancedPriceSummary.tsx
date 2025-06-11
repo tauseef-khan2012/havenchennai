@@ -18,13 +18,13 @@ export const EnhancedPriceSummary: React.FC<EnhancedPriceSummaryProps> = ({
 }) => {
   const { formatPrice } = useCurrency();
 
-  const baseNightlyRate = nights ? priceBreakdown.basePrice / nights : priceBreakdown.basePrice;
+  const baseNightlyRate = nights && nights > 0 ? priceBreakdown.basePrice / nights : priceBreakdown.basePrice;
 
   return (
     <div className="space-y-4">
       {/* Base pricing */}
       <div className="space-y-3">
-        {nights && (
+        {nights && nights > 0 && (
           <div className="flex justify-between items-center text-haven-beige">
             <span>{formatPrice(baseNightlyRate, priceBreakdown.currency)} × {nights} {nights === 1 ? 'night' : 'nights'}</span>
             <span>{formatPrice(priceBreakdown.basePrice, priceBreakdown.currency)}</span>
