@@ -149,11 +149,12 @@ export const BookingContent: React.FC<BookingContentProps> = ({
             </CardContent>
           </Card>
 
-          {/* Right Column - Reserve Haven Box */}
+          {/* Right Column - Reserve Haven Box (removed duplicate title) */}
           <div className="lg:sticky lg:top-8 lg:self-start">
             <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy">
               <CardHeader>
-                <CardTitle className="text-haven-beige text-center text-xl">
+                <CardTitle className="text-haven-beige text-center text-xl flex items-center justify-center gap-2">
+                  <CreditCard className="h-5 w-5 text-haven-yellow" />
                   Reserve Haven
                 </CardTitle>
               </CardHeader>

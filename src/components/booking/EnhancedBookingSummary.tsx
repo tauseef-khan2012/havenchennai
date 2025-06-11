@@ -46,16 +46,19 @@ export const EnhancedBookingSummary: React.FC<EnhancedBookingSummaryProps> = ({
   };
 
   const canProceed = selectedCheckIn && selectedCheckOut && priceBreakdown && !isCalculatingPrice;
+  const hasDatesSelected = selectedCheckIn && selectedCheckOut;
+
+  console.log('EnhancedBookingSummary - State check:', {
+    selectedCheckIn,
+    selectedCheckOut,
+    priceBreakdown: !!priceBreakdown,
+    isCalculatingPrice,
+    hasDatesSelected,
+    canProceed
+  });
 
   return (
     <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy">
-      <CardHeader className="bg-haven-navy-light/30">
-        <CardTitle className="text-xl font-serif text-haven-beige flex items-center gap-2">
-          <CreditCard className="h-5 w-5 text-haven-yellow" />
-          Reserve Haven
-        </CardTitle>
-      </CardHeader>
-      
       <CardContent className="p-6 space-y-6">
         {/* Property Details */}
         {showPropertyDetails && (
@@ -70,8 +73,8 @@ export const EnhancedBookingSummary: React.FC<EnhancedBookingSummaryProps> = ({
           </div>
         )}
 
-        {/* Booking Details */}
-        {selectedCheckIn && selectedCheckOut ? (
+        {/* Booking Details - Show when dates are selected */}
+        {hasDatesSelected ? (
           <div className="space-y-4">
             <div className="grid grid-cols-1 gap-3">
               <div className="flex items-center justify-between text-sm">
@@ -79,7 +82,7 @@ export const EnhancedBookingSummary: React.FC<EnhancedBookingSummaryProps> = ({
                   <Calendar className="h-4 w-4 text-haven-yellow" />
                   <span className="text-haven-beige">Check-in</span>
                 </div>
-                <span className="font-medium text-haven-beige">{formatDate(selectedCheckIn)}</span>
+                <span className="font-medium text-haven-beige">{formatDate(selectedCheckIn!)}</span>
               </div>
               
               <div className="flex items-center justify-between text-sm">
@@ -87,7 +90,7 @@ export const EnhancedBookingSummary: React.FC<EnhancedBookingSummaryProps> = ({
                   <Calendar className="h-4 w-4 text-haven-yellow" />
                   <span className="text-haven-beige">Check-out</span>
                 </div>
-                <span className="font-medium text-haven-beige">{formatDate(selectedCheckOut)}</span>
+                <span className="font-medium text-haven-beige">{formatDate(selectedCheckOut!)}</span>
               </div>
               
               <div className="flex items-center justify-between text-sm">
@@ -141,7 +144,7 @@ export const EnhancedBookingSummary: React.FC<EnhancedBookingSummaryProps> = ({
             ) : (
               <div className="text-center py-4">
                 <div className="text-sm text-haven-beige/60">
-                  {isCalculatingPrice ? 'Calculating pricing...' : 'Select dates to see pricing'}
+                  {isCalculatingPrice ? 'Calculating pricing...' : 'Loading pricing...'}
                 </div>
               </div>
             )}
