@@ -19,7 +19,7 @@ import { PropertyImageSlider } from './PropertyImageSlider';
 import { CalendarDatePicker } from './calendar/CalendarDatePicker';
 import { GuestSelector } from './calendar/GuestSelector';
 import { EnhancedBookingSummary } from './EnhancedBookingSummary';
-import { EnhancedPriceBreakdown } from '@/services/enhancedPriceService';
+import { SimplePriceBreakdown } from '@/services/simplePricingService';
 import { UUID } from '@/types/booking';
 
 interface BookingContentProps {
@@ -27,7 +27,7 @@ interface BookingContentProps {
   property: any;
   selectedCheckIn?: Date;
   selectedCheckOut?: Date;
-  priceBreakdown: EnhancedPriceBreakdown | null;
+  priceBreakdown: SimplePriceBreakdown | null;
   platformComparisons: any[];
   onDateRangeSelect: (checkIn: Date, checkOut: Date) => void;
   onPlatformBooking: (platform: string, url?: string) => void;
@@ -35,6 +35,7 @@ interface BookingContentProps {
   setGuestCount: (count: number) => void;
   isCalculatingPrice: boolean;
   onProceedToPayment: () => void;
+  nights: number;
 }
 
 export const BookingContent: React.FC<BookingContentProps> = ({
@@ -49,11 +50,9 @@ export const BookingContent: React.FC<BookingContentProps> = ({
   guestCount,
   setGuestCount,
   isCalculatingPrice,
-  onProceedToPayment
+  onProceedToPayment,
+  nights
 }) => {
-  const nights = selectedCheckIn && selectedCheckOut ? 
-    Math.ceil((selectedCheckOut.getTime() - selectedCheckIn.getTime()) / (1000 * 60 * 60 * 24)) : 0;
-
   const amenities = [
     { icon: <Wifi className="h-4 w-4" />, label: "High-Speed WiFi" },
     { icon: <Coffee className="h-4 w-4" />, label: "Full Kitchen" },
@@ -144,13 +143,13 @@ export const BookingContent: React.FC<BookingContentProps> = ({
                 <GuestSelector
                   guestCount={guestCount}
                   setGuestCount={handleGuestCountChange}
-                  maxGuests={property.max_guests || 4}
+                  maxGuests={property.max_guests || 5}
                 />
               </div>
             </CardContent>
           </Card>
 
-          {/* Right Column - Reserve Haven Box (removed duplicate title) */}
+          {/* Right Column - Reserve Haven Box */}
           <div className="lg:sticky lg:top-8 lg:self-start">
             <Card className="glass-panel-navy border-haven-yellow/20 shadow-navy">
               <CardHeader>

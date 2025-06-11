@@ -1,7 +1,7 @@
 
 import React, { useEffect, useCallback, useState } from 'react';
 import { usePropertyBooking } from '@/hooks/usePropertyBooking';
-import { useBookingPricing } from '@/hooks/useBookingPricing';
+import { useSimpleBookingPricing } from '@/hooks/useSimpleBookingPricing';
 import { useBookingDates } from '@/hooks/useBookingDates';
 import { useBookingNavigation } from '@/hooks/useBookingNavigation';
 import { useSearchParams, useNavigate } from 'react-router-dom';
@@ -24,12 +24,10 @@ const BookingPage: React.FC = () => {
   
   const {
     priceBreakdown,
-    appliedDiscount,
     isCalculatingPrice,
     calculatePricing,
-    handleDiscountApplied,
     resetPricing
-  } = useBookingPricing();
+  } = useSimpleBookingPricing();
   const { handleProceedToPayment, handlePlatformBooking } = useBookingNavigation();
 
   // Update URL when guest count changes
@@ -73,28 +71,6 @@ const BookingPage: React.FC = () => {
     }
   }, [searchParams, handleDateRangeSelect, guestCount]);
 
-  // Debounced price calculation to prevent race conditions
-  const debouncedPriceCalculation = useCallback(
-    (checkIn: Date, checkOut: Date, guests: number) => {
-      if (!propertyId) return;
-      
-      console.log('BookingPage - Debounced price calculation:', {
-        checkIn,
-        checkOut,
-        propertyId,
-        guests
-      });
-      
-      // Add small delay to prevent rapid-fire calculations
-      const timeoutId = setTimeout(() => {
-        calculatePricing(propertyId, checkIn, checkOut, guests);
-      }, 300);
-      
-      return () => clearTimeout(timeoutId);
-    },
-    [propertyId, calculatePricing]
-  );
-
   // Auto-calculate pricing when dates or guest count changes
   useEffect(() => {
     if (selectedCheckIn && selectedCheckOut && propertyId && guestCount > 0) {
@@ -105,10 +81,9 @@ const BookingPage: React.FC = () => {
         guestCount
       });
       
-      const cleanup = debouncedPriceCalculation(selectedCheckIn, selectedCheckOut, guestCount);
-      return cleanup;
+      calculatePricing(propertyId, selectedCheckIn, selectedCheckOut, guestCount);
     }
-  }, [selectedCheckIn, selectedCheckOut, propertyId, guestCount, debouncedPriceCalculation]);
+  }, [selectedCheckIn, selectedCheckOut, propertyId, guestCount, calculatePricing]);
 
   const handleDateSelection = useCallback(async (checkIn: Date, checkOut: Date) => {
     console.log('BookingPage - Date selection received:', { checkIn, checkOut, propertyId });
@@ -148,7 +123,7 @@ const BookingPage: React.FC = () => {
       selectedCheckOut,
       guestCount,
       priceBreakdown,
-      appliedDiscount
+      undefined // No discount for simplified version
     );
   }, [
     user,
@@ -157,9 +132,11 @@ const BookingPage: React.FC = () => {
     selectedCheckOut,
     guestCount,
     priceBreakdown,
-    appliedDiscount,
     handleProceedToPayment
   ]);
+
+  const nights = selectedCheckIn && selectedCheckOut ? 
+    Math.ceil((selectedCheckOut.getTime() - selectedCheckIn.getTime()) / (1000 * 60 * 60 * 24)) : 0;
 
   if (isLoading) {
     return (
@@ -194,14 +171,15 @@ const BookingPage: React.FC = () => {
         selectedCheckOut={selectedCheckOut}
         priceBreakdown={priceBreakdown}
         platformComparisons={[]}
-        appliedDiscount={appliedDiscount}
+        appliedDiscount={undefined}
         isCalculatingPrice={isCalculatingPrice}
         onDateRangeSelect={handleDateSelection}
         onPlatformBooking={handlePlatformBooking}
-        onDiscountApplied={handleDiscountApplied}
+        onDiscountApplied={() => {}} // No discount functionality
         onProceedToPayment={handlePaymentProceed}
         guestCount={guestCount}
         setGuestCount={handleGuestCountChange}
+        nights={nights}
       />
     </BookingPageLayout>
   );

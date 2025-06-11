@@ -3,11 +3,9 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { Calendar, Users, MapPin, Clock, CreditCard } from 'lucide-react';
-import { EnhancedPriceSummary } from './EnhancedPriceSummary';
-import { EnhancedPriceBreakdown } from '@/services/enhancedPriceService';
-import { useCurrency } from '@/contexts/CurrencyContext';
+import { Calendar, Users, MapPin, Clock } from 'lucide-react';
+import { SimplePriceSummary } from './SimplePriceSummary';
+import { SimplePriceBreakdown } from '@/services/simplePricingService';
 import { UUID } from '@/types/booking';
 
 interface EnhancedBookingSummaryProps {
@@ -16,7 +14,7 @@ interface EnhancedBookingSummaryProps {
   guestCount: number;
   selectedCheckIn?: Date;
   selectedCheckOut?: Date;
-  priceBreakdown: EnhancedPriceBreakdown | null;
+  priceBreakdown: SimplePriceBreakdown | null;
   nights: number;
   isCalculatingPrice: boolean;
   onProceedToPayment: () => void;
@@ -35,8 +33,6 @@ export const EnhancedBookingSummary: React.FC<EnhancedBookingSummaryProps> = ({
   onProceedToPayment,
   showPropertyDetails = true
 }) => {
-  const { formatPrice } = useCurrency();
-
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-US', {
       weekday: 'short',
@@ -115,22 +111,7 @@ export const EnhancedBookingSummary: React.FC<EnhancedBookingSummaryProps> = ({
             {/* Pricing */}
             {priceBreakdown ? (
               <div className="space-y-4">
-                <EnhancedPriceSummary 
-                  priceBreakdown={priceBreakdown} 
-                  nights={nights}
-                  showCompetitorComparison={false}
-                />
-                
-                {priceBreakdown.savingsFromCompetitors && priceBreakdown.savingsFromCompetitors > 0 && (
-                  <div className="bg-green-900/20 p-3 rounded-lg border border-green-400/20">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-green-400">Direct Booking Savings</span>
-                      <Badge variant="secondary" className="bg-green-900/30 text-green-400 border-green-400/20">
-                        Save {formatPrice(priceBreakdown.savingsFromCompetitors, priceBreakdown.currency)}
-                      </Badge>
-                    </div>
-                  </div>
-                )}
+                <SimplePriceSummary priceBreakdown={priceBreakdown} />
                 
                 <Button 
                   onClick={onProceedToPayment}
