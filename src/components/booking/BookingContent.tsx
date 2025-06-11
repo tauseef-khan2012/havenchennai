@@ -76,7 +76,7 @@ export const BookingContent: React.FC<BookingContentProps> = ({
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
-      {/* Header Section */}
+      {/* Header Section - Restored Original */}
       <div className="text-center animate-fade-in">
         <div className="inline-flex items-center gap-3 mb-4">
           <div className="w-12 h-1 bg-yellow-gradient rounded-full"></div>

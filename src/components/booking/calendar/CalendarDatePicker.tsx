@@ -1,9 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { Calendar } from '@/components/ui/calendar';
+import { Button } from '@/components/ui/button';
 import { addDays, isBefore, startOfDay, isAfter, isSameDay } from 'date-fns';
 import { checkPropertyAvailabilityDetailed } from '@/services/availabilityService';
 import { UUID } from '@/types/booking';
+import { X } from 'lucide-react';
 
 interface CalendarDatePickerProps {
   selectedCheckIn?: Date;
@@ -136,21 +138,29 @@ export const CalendarDatePicker: React.FC<CalendarDatePickerProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="text-sm text-haven-beige/80">
-        {!tempCheckIn && "Select your check-in date"}
-        {tempCheckIn && isSelectingCheckOut && "Now select your check-out date"}
-        {tempCheckIn && tempCheckOut && `${tempCheckIn.toLocaleDateString()} - ${tempCheckOut.toLocaleDateString()}`}
+      <div className="flex items-center justify-between">
+        <div className="text-sm text-haven-beige/80">
+          {!tempCheckIn && "Select your check-in date"}
+          {tempCheckIn && isSelectingCheckOut && "Now select your check-out date"}
+          {tempCheckIn && tempCheckOut && `${tempCheckIn.toLocaleDateString()} - ${tempCheckOut.toLocaleDateString()}`}
+        </div>
+        
+        {(tempCheckIn || tempCheckOut) && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearSelection}
+            className="text-haven-yellow hover:text-haven-yellow/80 p-1 h-auto"
+          >
+            <X className="h-4 w-4" />
+            <span className="ml-1 text-xs">Clear</span>
+          </Button>
+        )}
       </div>
       
       {(tempCheckIn && isSelectingCheckOut) && (
         <div className="flex items-center gap-2">
           <span className="text-xs text-haven-beige/60">Check-in: {tempCheckIn.toLocaleDateString()}</span>
-          <button 
-            onClick={clearSelection}
-            className="text-xs text-haven-yellow hover:underline"
-          >
-            Clear
-          </button>
         </div>
       )}
       
