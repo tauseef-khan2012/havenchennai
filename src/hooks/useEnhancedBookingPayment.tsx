@@ -152,7 +152,9 @@ export const useEnhancedBookingPayment = () => {
         amount,
         currency,
         customerDetails,
-        bookingReference
+        bookingReference,
+        customOnSuccess,
+        customOnFailure
       );
 
       return true;
