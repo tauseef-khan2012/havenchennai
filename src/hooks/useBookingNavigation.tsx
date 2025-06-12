@@ -1,12 +1,12 @@
 
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { SimplePriceBreakdown } from '@/services/simplePricingService';
 import { UUID } from '@/types/booking';
 import { createGuestBooking } from '@/services/guestBookingService';
 
 export const useBookingNavigation = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { toast } = useToast();
 
   const handleProceedToPayment = async (
@@ -21,6 +21,16 @@ export const useBookingNavigation = () => {
     specialRequests?: string,
     guestDetails?: { name: string; age?: number }[]
   ) => {
+    console.log('handleProceedToPayment called with:', {
+      user: user?.id,
+      propertyId,
+      selectedCheckIn,
+      selectedCheckOut,
+      guestCount,
+      priceBreakdown: !!priceBreakdown,
+      contactInfo
+    });
+
     if (!selectedCheckIn || !selectedCheckOut || !priceBreakdown) {
       toast({
         title: "Missing information",
@@ -30,69 +40,27 @@ export const useBookingNavigation = () => {
       return;
     }
 
-    // If contact info is provided, create the booking directly
-    if (contactInfo) {
-      try {
-        const guestBookingData = {
-          type: 'property' as const,
-          guestName: contactInfo.fullName,
-          guestEmail: contactInfo.email,
-          guestPhone: contactInfo.phone,
-          priceBreakdown: {
-            totalAmountDue: priceBreakdown.totalAmount,
-            currency: priceBreakdown.currency,
-            basePrice: priceBreakdown.basePrice,
-            taxAmount: priceBreakdown.gstAmount,
-            subtotal: priceBreakdown.subtotal
-          },
-          propertyId,
-          checkInDate: selectedCheckIn,
-          checkOutDate: selectedCheckOut,
-          numberOfGuests: guestCount,
-          specialRequests: specialRequests || ''
-        };
-        
-        const result = await createGuestBooking(guestBookingData);
-        
-        toast({
-          title: 'Booking created!',
-          description: 'Redirecting to payment...',
-        });
-
-        // Navigate to payment with booking details
-        const bookingParams = new URLSearchParams({
-          bookingId: result.bookingId,
-          bookingReference: result.bookingReference,
-          propertyId,
-          checkIn: selectedCheckIn.toISOString(),
-          checkOut: selectedCheckOut.toISOString(),
-          guests: guestCount.toString(),
-          amount: priceBreakdown.totalAmount.toString(),
-          currency: priceBreakdown.currency
-        });
-
-        navigate(`/booking/payment?${bookingParams.toString()}`);
-      } catch (error: any) {
-        console.error('Error creating guest booking:', error);
-        toast({
-          title: "Booking error",
-          description: error.message || "Failed to create booking. Please try again.",
-          variant: "destructive"
-        });
-      }
-    } else {
-      // Navigate to the payment page to collect contact info
-      const bookingParams = new URLSearchParams({
+    try {
+      // Navigate to checkout page with booking details
+      const checkoutParams = new URLSearchParams({
         propertyId,
-        checkIn: selectedCheckIn.toISOString(),
-        checkOut: selectedCheckOut.toISOString(),
+        start: selectedCheckIn.toISOString().split('T')[0],
+        end: selectedCheckOut.toISOString().split('T')[0],
         guests: guestCount.toString(),
-        ...(appliedDiscount && { 
-          discountCode: appliedDiscount.discountCode 
-        })
+        total: priceBreakdown.totalAmount.toString(),
+        currency: priceBreakdown.currency
       });
 
-      navigate(`/booking/payment?${bookingParams.toString()}`);
+      console.log('Navigating to checkout with params:', checkoutParams.toString());
+      router.push(`/checkout?${checkoutParams.toString()}`);
+      
+    } catch (error: any) {
+      console.error('Error navigating to checkout:', error);
+      toast({
+        title: "Navigation error",
+        description: error.message || "Failed to proceed to checkout. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
