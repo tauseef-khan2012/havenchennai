@@ -71,3 +71,13 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+## Next.js Booking Flow
+
+The project now includes a Next.js 14 application located in the root `app/` directory. Start the dev server with:
+
+```bash
+npm run dev
+```
+
+The booking experience lives at `/booking` and proceeds through `/checkout`, `/payment`, and `/confirmation` routes.
