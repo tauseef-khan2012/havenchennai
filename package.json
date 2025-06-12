@@ -1,4 +1,8 @@
-"build:dev": "vite build --mode development"
+{
+  "scripts": {
+    "build:dev": "vite build --mode development"
+  }
+}
 {
   "scripts": {
     "dev": "vite",
@@ -8,6 +12,7 @@
     "other-scripts": "..."
   }
 }
+
 {
   "name": "vite_react_shadcn_ts",
   "private": true,
