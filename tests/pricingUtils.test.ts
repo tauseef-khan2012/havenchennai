@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest'
 import { generateBookingReference, calculateNights, applyDiscount, calculateTax, formatPrice } from '../src/utils/bookingUtils'
 
 describe('generateBookingReference', () => {
@@ -42,3 +41,4 @@ describe('formatPrice', () => {
     expect(formatPrice(1234.5, 'USD')).toBe('$1,234.50')
   })
 })
+

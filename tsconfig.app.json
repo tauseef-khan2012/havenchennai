@@ -26,5 +26,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"]
+  "include": ["next-env.d.ts", "app/**/*.ts", "app/**/*.tsx", "src"]
 }
