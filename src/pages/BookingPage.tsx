@@ -4,8 +4,7 @@ import { usePropertyBooking } from '@/hooks/usePropertyBooking';
 import { useSimpleBookingPricing } from '@/hooks/useSimpleBookingPricing';
 import { useBookingDates } from '@/hooks/useBookingDates';
 import { useBookingNavigation } from '@/hooks/useBookingNavigation';
-import { useSearchParams } from 'react-router-dom';
-import { useRouter } from 'next/navigation';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { BookingPageLayout } from '@/components/booking/BookingPageLayout';
 import { BookingPageLoadingState } from '@/components/booking/BookingPageLoadingState';
 import { BookingPageNotFound } from '@/components/booking/BookingPageNotFound';
@@ -13,7 +12,7 @@ import { BookingPageContent } from '@/components/booking/BookingPageContent';
 
 const BookingPage: React.FC = () => {
   const [searchParams] = useSearchParams();
-  const router = useRouter();
+  const navigate = useNavigate();
   const { property, propertyId, isLoading, error, user, retryFetch } = usePropertyBooking();
   const { selectedCheckIn, selectedCheckOut, handleDateRangeSelect } = useBookingDates();
   
@@ -31,16 +30,16 @@ const BookingPage: React.FC = () => {
   } = useSimpleBookingPricing();
   const { handleProceedToPayment, handlePlatformBooking } = useBookingNavigation();
 
-  // Update URL when guest count changes - using Next.js router
+  // Update URL when guest count changes - using React Router navigation
   const updateGuestCount = useCallback((newGuestCount: number) => {
     console.log('BookingPage - Guest count changing from', guestCount, 'to', newGuestCount);
     setGuestCount(newGuestCount);
     
-    // Update URL params using Next.js router
+    // Update URL params using React Router navigation
     const currentUrl = new URL(window.location.href);
     currentUrl.searchParams.set('guests', newGuestCount.toString());
-    router.replace(currentUrl.pathname + currentUrl.search);
-  }, [guestCount, router]);
+    navigate(currentUrl.pathname + currentUrl.search, { replace: true });
+  }, [guestCount, navigate]);
 
   // Parse URL parameters and set initial dates/guests
   useEffect(() => {
@@ -95,12 +94,12 @@ const BookingPage: React.FC = () => {
     // Update dates
     handleDateRangeSelect(checkIn, checkOut);
     
-    // Update URL params using Next.js router
+    // Update URL params using React Router navigation
     const currentUrl = new URL(window.location.href);
     currentUrl.searchParams.set('checkIn', checkIn.toISOString().split('T')[0]);
     currentUrl.searchParams.set('checkOut', checkOut.toISOString().split('T')[0]);
-    router.replace(currentUrl.pathname + currentUrl.search);
-  }, [handleDateRangeSelect, resetPricing, propertyId, router]);
+    navigate(currentUrl.pathname + currentUrl.search, { replace: true });
+  }, [handleDateRangeSelect, resetPricing, propertyId, navigate]);
 
   const handleGuestCountChange = useCallback((newGuestCount: number) => {
     console.log('BookingPage - Guest count change received:', { oldCount: guestCount, newCount: newGuestCount });
