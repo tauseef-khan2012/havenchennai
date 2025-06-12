@@ -89,31 +89,30 @@ export const useBookingPayment = () => {
     bookingType: BookingType,
     amount: number,
     currency: string,
-    bookingReference: string
+    bookingReference: string,
+    contactDetails?: { name: string; email: string; phone?: string }
   ): Promise<boolean> => {
-    if (!user) {
-      toast({
-        title: 'Authentication required',
-        description: 'Please sign in to process payment.',
-        variant: 'destructive'
-      });
-      return false;
-    }
     
     setIsLoading(true);
-    
+
     try {
       // Validate input
       if (!bookingId || !bookingType || amount <= 0 || !currency || !bookingReference) {
         throw new Error('Invalid payment details');
       }
 
-      // Ensure user has necessary details
-      const userName = user.user_metadata?.full_name || 'Guest';
-      const userEmail = user.email || '';
-      
+      // Determine contact details
+      const userName = contactDetails?.name || user?.user_metadata?.full_name || 'Guest';
+      const userEmail = contactDetails?.email || user?.email || '';
+      const userPhone = contactDetails?.phone || (user?.user_metadata?.phone_number as string | undefined) || '';
+
       if (!userEmail) {
-        throw new Error('User email not available');
+        toast({
+          title: 'Contact information required',
+          description: 'Please provide an email address to continue with payment.',
+          variant: 'destructive'
+        });
+        return false;
       }
       
       // Initiate payment with payment gateway
@@ -142,7 +141,7 @@ export const useBookingPayment = () => {
         prefill: {
           name: userName,
           email: userEmail,
-          contact: user.user_metadata?.phone_number || ''
+          contact: userPhone
         },
         notes: {
           bookingId,
