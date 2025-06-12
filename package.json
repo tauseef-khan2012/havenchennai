@@ -1,3 +1,4 @@
+"build:dev": "vite build --mode development"
 {
   "name": "vite_react_shadcn_ts",
   "private": true,
