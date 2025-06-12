@@ -1,12 +1,11 @@
 
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { SimplePriceBreakdown } from '@/services/simplePricingService';
 import { UUID } from '@/types/booking';
-import { createGuestBooking } from '@/services/guestBookingService';
 
 export const useBookingNavigation = () => {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleProceedToPayment = async (
@@ -41,18 +40,18 @@ export const useBookingNavigation = () => {
     }
 
     try {
-      // Navigate to checkout page with booking details
+      // Navigate to booking checkout page with booking details
       const checkoutParams = new URLSearchParams({
         propertyId,
-        start: selectedCheckIn.toISOString().split('T')[0],
-        end: selectedCheckOut.toISOString().split('T')[0],
+        checkIn: selectedCheckIn.toISOString(),
+        checkOut: selectedCheckOut.toISOString(),
         guests: guestCount.toString(),
         total: priceBreakdown.totalAmount.toString(),
         currency: priceBreakdown.currency
       });
 
-      console.log('Navigating to checkout with params:', checkoutParams.toString());
-      router.push(`/checkout?${checkoutParams.toString()}`);
+      console.log('Navigating to booking checkout with params:', checkoutParams.toString());
+      navigate(`/booking/checkout?${checkoutParams.toString()}`);
       
     } catch (error: any) {
       console.error('Error navigating to checkout:', error);
