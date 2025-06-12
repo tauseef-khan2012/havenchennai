@@ -81,7 +81,7 @@ export const useBookingNavigation = () => {
         });
       }
     } else {
-      // Navigate to checkout first to collect contact info
+      // Navigate to the payment page to collect contact info
       const bookingParams = new URLSearchParams({
         propertyId,
         checkIn: selectedCheckIn.toISOString(),
@@ -92,7 +92,7 @@ export const useBookingNavigation = () => {
         })
       });
 
-      navigate(`/booking/checkout?${bookingParams.toString()}`);
+      navigate(`/booking/payment?${bookingParams.toString()}`);
     }
   };
 
