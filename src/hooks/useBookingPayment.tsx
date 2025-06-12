@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { UUID, BookingType } from '@/types/booking';
@@ -17,6 +17,10 @@ export const useBookingPayment = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+
+  const bookingIdRef = useRef<UUID | null>(null);
+  const bookingTypeRef = useRef<BookingType | null>(null);
+  const orderIdRef = useRef<string | null>(null);
   
   const handlePaymentSuccess = async (
     paymentId: string, 
@@ -80,6 +84,34 @@ export const useBookingPayment = () => {
     
     return false;
   };
+
+  const { processPayment: razorpayProcessPayment, isReady: isRazorpayReady } =
+    useRazorpayPayment({
+      onSuccess: async (paymentId, orderId, signature) => {
+        if (!bookingIdRef.current || !bookingTypeRef.current) {
+          return false;
+        }
+        return await handlePaymentSuccess(
+          paymentId,
+          orderId,
+          signature,
+          bookingIdRef.current,
+          bookingTypeRef.current
+        );
+      },
+      onFailure: async (error) => {
+        if (!orderIdRef.current || !bookingIdRef.current || !bookingTypeRef.curren
+t) {
+          return false;
+        }
+        return await handlePaymentError(
+          error,
+          orderIdRef.current,
+          bookingIdRef.current,
+          bookingTypeRef.current
+        );
+      }
+    });
 
   /**
    * Process payment for a booking
@@ -154,18 +186,13 @@ export const useBookingPayment = () => {
         }
       };
       
-      // Use production Razorpay integration
-      const razorpay = useRazorpayPayment({
-        onSuccess: async (paymentId, orderId, signature) => {
-          return await handlePaymentSuccess(paymentId, orderId, signature, bookingId, bookingType);
-        },
-        onFailure: async (error) => {
-          return await handlePaymentError(error, orderId, bookingId, bookingType);
-        }
-      });
-      
+      // Store details for callback handlers
+      orderIdRef.current = orderId;
+      bookingIdRef.current = bookingId;
+      bookingTypeRef.current = bookingType;
+
       // Check if Razorpay is ready before processing payment
-      if (!razorpay.isReady) {
+      if (!isRazorpayReady) {
         toast({
           title: 'Payment gateway not ready',
           description: 'Please try again in a few moments.',
@@ -173,8 +200,8 @@ export const useBookingPayment = () => {
         });
         return false;
       }
-      
-      razorpay.processPayment(options);
+
+      razorpayProcessPayment(options);
       return true;
       
     } catch (error) {
@@ -190,7 +217,7 @@ export const useBookingPayment = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [user, toast]);
+  }, [user, toast, razorpayProcessPayment, isRazorpayReady]);
 
   return {
     isLoading,
