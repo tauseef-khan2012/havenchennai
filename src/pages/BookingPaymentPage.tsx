@@ -174,7 +174,12 @@ const BookingPaymentPage: React.FC = () => {
         'property',
         priceBreakdown.totalAmountDue,
         priceBreakdown.currency,
-        bookingResult.bookingReference
+        bookingResult.bookingReference,
+        !user ? {
+          name: contactInfo.fullName,
+          email: contactInfo.email,
+          phone: contactInfo.phone
+        } : undefined
       );
 
       if (success) {
