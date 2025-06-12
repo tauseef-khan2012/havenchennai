@@ -56,7 +56,9 @@ export const useRazorpayStandardCheckout = ({
       email: string;
       phone?: string;
     },
-    bookingReference: string
+    bookingReference: string,
+    onSuccessOverride?: (paymentId: string, orderId: string, signature: string) => void,
+    onFailureOverride?: (error: any) => void
   ) => {
     setIsLoading(true);
 
@@ -120,7 +122,8 @@ export const useRazorpayStandardCheckout = ({
           razorpay_signature: string;
         }) => {
           console.log('Payment successful:', response);
-          onSuccess(
+          const successHandler = onSuccessOverride || onSuccess;
+          successHandler(
             response.razorpay_payment_id,
             response.razorpay_order_id,
             response.razorpay_signature
@@ -129,7 +132,8 @@ export const useRazorpayStandardCheckout = ({
         modal: {
           ondismiss: () => {
             console.log('Payment modal dismissed');
-            onFailure({
+            const failureHandler = onFailureOverride || onFailure;
+            failureHandler({
               code: 'PAYMENT_CANCELLED',
               message: 'Payment was cancelled by user'
             });
@@ -142,7 +146,8 @@ export const useRazorpayStandardCheckout = ({
       
       rzp.on('payment.failed', (response: any) => {
         console.error('Payment failed:', response);
-        onFailure({
+        const failureHandler = onFailureOverride || onFailure;
+        failureHandler({
           code: response.error.code,
           message: response.error.description,
           razorpayOrderId: orderData.orderId
