@@ -1,87 +1,60 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import { Home, Bed, Image, MapPin } from 'lucide-react';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface StayDropdownProps {
   isActive: (path: string) => boolean;
 }
 
 const StayDropdown = ({ isActive }: StayDropdownProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  
   const stayPages = [
-    { 
-      to: "/stay", 
-      label: "Overview", 
-      icon: Home,
-      description: "General information about our container home"
-    },
-    { 
-      to: "/stay/amenities", 
-      label: "Amenities", 
-      icon: Bed,
-      description: "Luxury amenities and facilities"
-    },
-    { 
-      to: "/stay/deck-views", 
-      label: "Deck Views", 
-      icon: Image,
-      description: "Stunning deck views and outdoor spaces"
-    },
-    { 
-      to: "/stay/location", 
-      label: "Location", 
-      icon: MapPin,
-      description: "Property location and nearby attractions"
-    }
+    { to: "/stay", label: "Overview" },
+    { to: "/stay/amenities", label: "Amenities" },
+    { to: "/stay/deck-views", label: "Deck Views" },
+    { to: "/stay/location", label: "Location" }
   ];
-
-  const isStayActive = stayPages.some(page => isActive(page.to));
-
+  
   return (
-    <NavigationMenu>
-      <NavigationMenuList>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger 
-            className={`${isStayActive ? 'text-haven-teal' : 'text-gray-700'} font-medium hover:text-haven-teal/70 transition-colors`}
-          >
-            The Stay
-          </NavigationMenuTrigger>
-          <NavigationMenuContent>
-            <div className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-              {stayPages.map((page) => {
-                const Icon = page.icon;
-                return (
-                  <NavigationMenuLink key={page.to} asChild>
-                    <Link
-                      to={page.to}
-                      className={`block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground ${
-                        isActive(page.to) ? 'bg-accent text-accent-foreground' : ''
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 text-sm font-medium leading-none">
-                        <Icon className="h-4 w-4" />
-                        {page.label}
-                      </div>
-                      <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                        {page.description}
-                      </p>
-                    </Link>
-                  </NavigationMenuLink>
-                );
-              })}
-            </div>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-      </NavigationMenuList>
-    </NavigationMenu>
+    <div 
+      className="relative"
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
+    >
+      <Link
+        to="/stay"
+        className={cn(
+          "text-base font-semibold transition-colors hover:text-haven-teal flex items-center gap-1",
+          isActive("/stay") ? "text-haven-teal" : "text-gray-700"
+        )}
+      >
+        The Stay
+        <ChevronDown className={cn(
+          "h-4 w-4 transition-transform duration-200",
+          isOpen ? "rotate-180" : ""
+        )} />
+      </Link>
+      
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-2 z-50">
+          {stayPages.map((page) => (
+            <Link
+              key={page.to}
+              to={page.to}
+              className={cn(
+                "block px-4 py-2 text-sm hover:bg-gray-50 transition-colors",
+                isActive(page.to) ? "text-haven-teal font-medium" : "text-gray-700"
+              )}
+            >
+              {page.label}
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 
