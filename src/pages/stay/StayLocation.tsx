@@ -12,7 +12,11 @@ const StayLocation = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <LocationHero />
+      <LocationHero
+        title="Find Us"
+        subtitle="Lakeside tranquility in Muttukadu"
+        backgroundImage="/lovable-uploads/0bf49c3a-e3e0-4828-badd-a492dc4dd957.png"
+      />
       
       {/* Navigation Section - Sticky */}
       <div className="sticky top-16 z-30 w-full">
