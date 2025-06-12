@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { UUID, BookingType } from '@/types/booking';
@@ -17,6 +17,17 @@ export const useBookingPayment = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+
+  const successHandlerRef = useRef<
+    ((paymentId: string, orderId: string, signature: string) => Promise<boolean> | void) | null
+  >(null);
+  const failureHandlerRef = useRef<((error: any) => Promise<boolean> | void) | null>(null);
+
+  const razorpay = useRazorpayPayment({
+    onSuccess: (paymentId, orderId, signature) =>
+      successHandlerRef.current?.(paymentId, orderId, signature),
+    onFailure: (error) => failureHandlerRef.current?.(error)
+  });
   
   const handlePaymentSuccess = async (
     paymentId: string, 
@@ -153,15 +164,10 @@ export const useBookingPayment = () => {
         }
       };
       
-      // Use production Razorpay integration
-      const razorpay = useRazorpayPayment({
-        onSuccess: async (paymentId, orderId, signature) => {
-          return await handlePaymentSuccess(paymentId, orderId, signature, bookingId, bookingType);
-        },
-        onFailure: async (error) => {
-          return await handlePaymentError(error, orderId, bookingId, bookingType);
-        }
-      });
+      successHandlerRef.current = async (paymentId, oid, signature) =>
+        await handlePaymentSuccess(paymentId, oid, signature, bookingId, bookingType);
+      failureHandlerRef.current = async (error) =>
+        await handlePaymentError(error, orderId, bookingId, bookingType);
       
       // Check if Razorpay is ready before processing payment
       if (!razorpay.isReady) {
@@ -189,7 +195,7 @@ export const useBookingPayment = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [user, toast]);
+  }, [user, toast, razorpay]);
 
   return {
     isLoading,
