@@ -1,6 +1,8 @@
+
 import { z } from 'zod';
 import { contactValidationSchema } from '@/components/booking/validation/ContactValidation';
-import { GuestBookingData } from '@/services/guestBookingService'; // We'll keep GuestBookingData in the main service for now
+// Updated import path for GuestBookingData
+import { GuestBookingData } from '@/services/booking/data/createGuestBooking'; 
 
 /**
  * Enhanced validation for guest booking data with security checks
@@ -86,3 +88,4 @@ export const validateGuestBookingData = (bookingData: GuestBookingData): void =>
     throw new Error(`Validation failed: ${errors.join(', ')}`);
   }
 };
+
