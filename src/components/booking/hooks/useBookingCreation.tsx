@@ -1,6 +1,6 @@
-
 import { useState } from 'react';
-import { createBooking, createGuestBooking } from '@/services/bookingService';
+import { createBooking } from '@/services/bookingService';
+import { createGuestBooking } from '@/services/booking/data/createGuestBooking';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { UUID } from '@/types/booking';

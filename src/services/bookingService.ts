@@ -1,9 +1,8 @@
-
-import { 
-  UUID, 
+import {
+  UUID,
   BookingType,
   BookingData,
-  GuestInfo
+  // GuestInfo // This was imported but not used in the provided snippet, assuming it's used elsewhere or can be removed if truly unused.
 } from '@/types/booking';
 import { createPropertyBooking } from './propertyBookingService';
 import { createExperienceBooking } from './experienceBookingService';
@@ -38,11 +37,11 @@ export const createBooking = async (
         throw new Error(result.error);
       }
 
-      return { 
-        bookingId: result.bookingId, 
-        bookingReference: result.bookingReference 
+      return {
+        bookingId: result.bookingId,
+        bookingReference: result.bookingReference
       };
-      
+
     } else if (bookingData.type === 'experience') {
       if (!bookingData.experience) {
         throw new Error('Missing experience booking details');
@@ -57,9 +56,9 @@ export const createBooking = async (
         bookingData.experience.specialRequests
       );
       
-      return { 
-        bookingId: booking.id, 
-        bookingReference: booking.bookingReference 
+      return {
+        bookingId: booking.id,
+        bookingReference: booking.bookingReference
       };
     } else {
       throw new Error('Invalid booking type');
@@ -179,5 +178,7 @@ export const updateBookingPaymentStatus = async (
 export { checkPropertyAvailability, checkExperienceInstanceAvailability } from './availabilityService';
 export { calculateBookingPrice, calculatePropertyBookingPrice, calculateExperienceBookingPrice } from './priceService';
 
-// Export guest booking functions
-export { createGuestBooking, getGuestBookingsByEmail, linkGuestBookingsToUser } from './guestBookingService';
+// Export guest booking functions directly from their new data layer paths
+export { createGuestBooking } from './booking/data/createGuestBooking';
+export { getGuestBookingsByEmail } from './booking/data/getGuestBookingsByEmail';
+export { linkGuestBookingsToUser } from './booking/data/linkGuestBookingsToUser';

@@ -1,13 +1,13 @@
-
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { 
-  UUID, 
+import {
+  UUID,
   BookingType,
   GuestInfo
 } from '@/types/booking';
-import { createBooking, createGuestBooking } from '@/services/bookingService';
+import { createBooking } from '@/services/bookingService';
+import { createGuestBooking } from '@/services/booking/data/createGuestBooking';
 import { checkPropertyAvailability } from '@/services/availabilityService';
 import { calculateEnhancedPropertyBookingPrice } from '@/services/enhancedPriceService';
 
