@@ -1,130 +1,83 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { UUID, BookingType, PriceBreakdown } from '@/types/booking';
-import { validateGuestBookingData } from '../validation/guestBookingValidationService';
-import { checkRateLimit } from '../rateLimit/guestBookingRateLimitService';
-import { sanitizeTextInput } from '../utils/guestBookingSanitizationService';
-import { generateBookingReference } from '../utils/bookingReferenceService';
+import { z } from 'zod';
 
-export interface GuestBookingData {
-  type: BookingType;
-  guestName: string;
-  guestEmail: string;
-  guestPhone: string;
-  priceBreakdown: PriceBreakdown;
-  propertyId?: UUID;
-  checkInDate?: Date;
-  checkOutDate?: Date;
-  numberOfGuests?: number;
-  specialRequests?: string;
-  instanceId?: UUID;
-  numberOfAttendees?: number;
-}
+// Comprehensive Zod schema for guest bookings input validation
+export const guestBookingSchema = z.object({
+  type: z.enum(['property', 'experience']),
+  guestName: z.string().min(1, 'Name is required').max(100),
+  guestEmail: z.string().email(),
+  guestPhone: z.string().min(7, 'Phone is required').max(25),
+  priceBreakdown: z.object({
+    basePrice: z.number(),
+    subtotalAfterDiscount: z.number(),
+    discountAmount: z.number(),
+    taxPercentage: z.number(),
+    taxAmount: z.number(),
+    totalAmountDue: z.number().min(0),
+    currency: z.string(),
+  }),
+  // Property fields (for stay bookings)
+  propertyId: z.string().uuid().optional(),
+  checkInDate: z.coerce.date().optional(),
+  checkOutDate: z.coerce.date().optional(),
+  numberOfGuests: z.number().int().min(1).max(15).optional(),
+  specialRequests: z.string().max(500).optional(),
+  // Experience booking fields
+  instanceId: z.string().uuid().optional(),
+  numberOfAttendees: z.number().int().min(1).max(25).optional()
+});
 
-/**
- * Creates a booking for a guest user (no authentication required)
- */
-export const createGuestBooking = async (
-  bookingData: GuestBookingData
-): Promise<{ bookingId: UUID, bookingReference: string }> => {
-  try {
-    console.log('Creating guest booking with data:', bookingData);
-    
-    validateGuestBookingData(bookingData);
-    
-    await checkRateLimit(bookingData.guestEmail);
-    
-    const sanitizedData = {
-      ...bookingData,
-      guestName: bookingData.guestName, 
-      guestEmail: bookingData.guestEmail, 
-      guestPhone: bookingData.guestPhone, 
-      specialRequests: bookingData.specialRequests ? sanitizeTextInput(bookingData.specialRequests) : undefined,
-    };
-    
-    const bookingReference = generateBookingReference(sanitizedData.type);
-    
-    if (sanitizedData.type === 'property') {
-      console.log('Creating property guest booking');
-      const { data, error } = await supabase
-        .from('bookings')
-        .insert({
-          user_id: null, // Guest booking
-          guest_name: sanitizedData.guestName,
-          guest_email: sanitizedData.guestEmail,
-          guest_phone: sanitizedData.guestPhone,
-          property_id: sanitizedData.propertyId,
-          check_in_date: sanitizedData.checkInDate?.toISOString().split('T')[0],
-          check_out_date: sanitizedData.checkOutDate?.toISOString().split('T')[0],
-          number_of_guests: sanitizedData.numberOfGuests,
-          base_price_total: sanitizedData.priceBreakdown.basePrice,
-          cleaning_fee_total: sanitizedData.priceBreakdown.cleaningFee || 0,
-          taxes_total: sanitizedData.priceBreakdown.taxAmount,
-          discounts_total: sanitizedData.priceBreakdown.discountAmount,
-          total_amount_due: sanitizedData.priceBreakdown.totalAmountDue,
-          currency: sanitizedData.priceBreakdown.currency,
-          booking_reference: bookingReference,
-          booking_status: 'Pending Payment',
-          payment_status: 'Unpaid',
-          special_requests: sanitizedData.specialRequests || ''
-        })
-        .select()
-        .single();
+export type GuestBookingData = z.infer<typeof guestBookingSchema>;
 
-      if (error) {
-        console.error('Supabase error creating property booking:', error);
-        throw new Error(`Failed to create property booking: ${error.message}`);
-      }
-      
-      console.log('Property booking created successfully:', data);
-      
-      return {
-        bookingId: data.id,
-        bookingReference: bookingReference
-      };
-      
-    } else if (sanitizedData.type === 'experience') {
-      console.log('Creating experience guest booking');
-      const { data, error } = await supabase
-        .from('experience_bookings')
-        .insert({
-          user_id: null, // Guest booking
-          guest_name: sanitizedData.guestName,
-          guest_email: sanitizedData.guestEmail,
-          guest_phone: sanitizedData.guestPhone,
-          experience_instance_id: sanitizedData.instanceId,
-          number_of_attendees: sanitizedData.numberOfAttendees,
-          total_amount_due: sanitizedData.priceBreakdown.totalAmountDue,
-          currency: sanitizedData.priceBreakdown.currency,
-          booking_reference: bookingReference,
-          booking_status: 'Pending Payment',
-          payment_status: 'Unpaid',
-          special_requests: sanitizedData.specialRequests || ''
-        })
-        .select()
-        .single();
+// Enforce validation on all guest bookings
+export const createGuestBooking = async (data: GuestBookingData) => {
+  // Validate shape and basic rules
+  const result = guestBookingSchema.safeParse(data);
+  if (!result.success) {
+    throw new Error(
+      result.error.issues.map(issue => `${issue.path.join('.')}: ${issue.message}`).join('. ')
+    );
+  }
 
-      if (error) {
-        console.error('Supabase error creating experience booking:', error);
-        throw new Error(`Failed to create experience booking: ${error.message}`);
-      }
-      
-      console.log('Experience booking created successfully:', data);
-      
-      return {
-        bookingId: data.id,
-        bookingReference: bookingReference
-      };
-    } else {
-      throw new Error(`Invalid booking type: ${sanitizedData.type}`);
-    }
-  } catch (error) {
-    console.error('Error creating guest booking:', error);
-    
-    if (error instanceof Error) {
-      throw error;
-    } else {
-      throw new Error('An unexpected error occurred while creating the booking');
-    }
+  // Insert logic (property or experience)
+  if (data.type === 'property') {
+    const { error, data: booking } = await supabase
+      .from('bookings')
+      .insert({
+        guest_name: data.guestName,
+        guest_email: data.guestEmail.trim().toLowerCase(),
+        guest_phone: data.guestPhone,
+        property_id: data.propertyId,
+        check_in_date: data.checkInDate,
+        check_out_date: data.checkOutDate,
+        number_of_guests: data.numberOfGuests,
+        special_requests: data.specialRequests,
+        total_amount_due: data.priceBreakdown.totalAmountDue,
+        base_price_total: data.priceBreakdown.basePrice,
+        currency: data.priceBreakdown.currency
+      })
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    return booking;
+  } else {
+    // Insert for experience booking
+    const { error, data: booking } = await supabase
+      .from('experience_bookings')
+      .insert({
+        guest_name: data.guestName,
+        guest_email: data.guestEmail.trim().toLowerCase(),
+        guest_phone: data.guestPhone,
+        experience_instance_id: data.instanceId,
+        number_of_attendees: data.numberOfAttendees,
+        special_requests: data.specialRequests,
+        total_amount_due: data.priceBreakdown.totalAmountDue,
+        currency: data.priceBreakdown.currency
+      })
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    return booking;
   }
 };
