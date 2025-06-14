@@ -30,6 +30,20 @@ export const guestBookingSchema = z.object({
 
 export type GuestBookingData = z.infer<typeof guestBookingSchema>;
 
+// Simple booking reference generator (could be improved to make more robust)
+function generateBookingReference(): string {
+  // e.g. "BK-20240614-xxxxxx"
+  const date = new Date();
+  return (
+    'BK-' +
+    date.getFullYear().toString().slice(-2) +
+    ('0' + (date.getMonth() + 1)).slice(-2) +
+    ('0' + date.getDate()).slice(-2) +
+    '-' +
+    Math.random().toString(36).substr(2, 6).toUpperCase()
+  );
+}
+
 // Enforce validation on all guest bookings
 export const createGuestBooking = async (data: GuestBookingData) => {
   // Validate shape and basic rules
@@ -40,32 +54,45 @@ export const createGuestBooking = async (data: GuestBookingData) => {
     );
   }
 
+  // Generate booking reference
+  const bookingReference = generateBookingReference();
+
   // Insert logic (property or experience)
   if (data.type === 'property') {
     const { error, data: booking } = await supabase
       .from('bookings')
-      .insert({
+      .insert([{
         guest_name: data.guestName,
         guest_email: data.guestEmail.trim().toLowerCase(),
         guest_phone: data.guestPhone,
         property_id: data.propertyId,
-        check_in_date: data.checkInDate,
-        check_out_date: data.checkOutDate,
+        check_in_date: data.checkInDate ? (typeof data.checkInDate === 'string'
+          ? data.checkInDate
+          : data.checkInDate.toISOString().slice(0, 10)) : undefined,
+        check_out_date: data.checkOutDate ? (typeof data.checkOutDate === 'string'
+          ? data.checkOutDate
+          : data.checkOutDate.toISOString().slice(0, 10)) : undefined,
         number_of_guests: data.numberOfGuests,
         special_requests: data.specialRequests,
         total_amount_due: data.priceBreakdown.totalAmountDue,
         base_price_total: data.priceBreakdown.basePrice,
-        currency: data.priceBreakdown.currency
-      })
+        currency: data.priceBreakdown.currency,
+        booking_reference: bookingReference,
+        booking_status: 'Pending Payment',
+        payment_status: 'Unpaid',
+      }])
       .select()
-      .single();
+      .maybeSingle();
     if (error) throw new Error(error.message);
-    return booking;
+    return {
+      ...booking,
+      bookingReference
+    };
   } else {
     // Insert for experience booking
     const { error, data: booking } = await supabase
       .from('experience_bookings')
-      .insert({
+      .insert([{
         guest_name: data.guestName,
         guest_email: data.guestEmail.trim().toLowerCase(),
         guest_phone: data.guestPhone,
@@ -73,11 +100,17 @@ export const createGuestBooking = async (data: GuestBookingData) => {
         number_of_attendees: data.numberOfAttendees,
         special_requests: data.specialRequests,
         total_amount_due: data.priceBreakdown.totalAmountDue,
-        currency: data.priceBreakdown.currency
-      })
+        currency: data.priceBreakdown.currency,
+        booking_reference: bookingReference,
+        booking_status: 'Pending Payment',
+        payment_status: 'Unpaid',
+      }])
       .select()
-      .single();
+      .maybeSingle();
     if (error) throw new Error(error.message);
-    return booking;
+    return {
+      ...booking,
+      bookingReference
+    };
   }
 };
