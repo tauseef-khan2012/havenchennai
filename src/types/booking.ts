@@ -20,6 +20,8 @@ export type PaymentStatus =
 
 export type ChannelType = 'airbnb' | 'booking.com' | 'agoda' | 'direct';
 
+export type Currency = 'INR' | 'USD';
+
 export interface PriceBreakdown {
   basePrice: number;
   discountPercentage?: number;
@@ -30,7 +32,7 @@ export interface PriceBreakdown {
   cleaningFee?: number;
   addonExperiencesTotal?: number;
   totalAmountDue: number;
-  currency: string;
+  currency: Currency;
 }
 
 export interface PropertyBookingDetails {
@@ -69,7 +71,7 @@ export interface PaymentInitiationData {
   bookingId: UUID;
   bookingType: BookingType;
   amount: number;
-  currency: string;
+  currency: Currency;
   userEmail: string;
   userName: string;
   bookingReference: string;
@@ -95,7 +97,7 @@ export interface PaymentRecord {
   bookingId: UUID;
   bookingType: BookingType;
   amount: number;
-  currency: string;
+  currency: Currency;
   transactionId: string;
   paymentMethod: string;
   paymentStatus: PaymentStatus;

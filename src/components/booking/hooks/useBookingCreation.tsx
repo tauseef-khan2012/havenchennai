@@ -1,9 +1,10 @@
+
 import { useState } from 'react';
 import { createBooking } from '@/services/bookingService';
 import { createGuestBooking } from '@/services/booking/data/createGuestBooking';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { UUID } from '@/types/booking';
+import { UUID, Currency } from '@/types/booking';
 import { EnhancedPriceBreakdown } from '@/services/enhancedPriceService';
 import { validateContactForm } from '../validation/ContactValidation';
 import { validateBookingData } from '../validation/BookingValidation';
@@ -84,7 +85,8 @@ export const useBookingCreation = () => {
           userId: user.id,
           priceBreakdown: {
             ...priceBreakdown!,
-            totalAmountDue: finalTotal
+            totalAmountDue: finalTotal,
+            currency: 'INR' as Currency
           },
           guests: guests.map(guest => ({
             name: guest.name,
@@ -111,7 +113,8 @@ export const useBookingCreation = () => {
           guestPhone: contact.phone.trim(),
           priceBreakdown: {
             ...priceBreakdown!,
-            totalAmountDue: finalTotal
+            totalAmountDue: finalTotal,
+            currency: 'INR' as Currency
           },
           propertyId,
           checkInDate: selectedCheckIn!,

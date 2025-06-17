@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,10 +12,11 @@ import {
   PriceBreakdown, 
   PropertyBookingDetails,
   ExperienceBookingDetails,
-  GuestInfo
+  GuestInfo,
+  Currency
 } from '@/types/booking';
 import { createBooking } from '@/services/bookingService';
-import { createGuestBooking } from '@/services/guestBookingService';
+import { createGuestBooking } from '@/services/booking/data/createGuestBooking';
 import { CreditCard, AlertCircle, CheckCircle, Shield, Users, Calendar } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -112,7 +114,10 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
           guestName: contactInfo.fullName,
           guestEmail: contactInfo.email,
           guestPhone: contactInfo.phone,
-          priceBreakdown: priceBreakdown,
+          priceBreakdown: {
+            ...priceBreakdown,
+            currency: 'INR' as Currency
+          },
           propertyId: propertyDetails?.propertyId,
           checkInDate: propertyDetails?.checkInDate,
           checkOutDate: propertyDetails?.checkOutDate,
