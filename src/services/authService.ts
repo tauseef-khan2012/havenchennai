@@ -7,6 +7,8 @@ import {
   SignUpCredentials,
   AuthError
 } from '@/types/auth';
+import { authSecurity } from '@/services/security/authSecurity';
+import { sanitizeEmailInput } from '@/services/security/inputSanitization';
 
 // Cache user profiles to reduce database queries
 const profileCache = new Map<string, any>();
@@ -14,12 +16,28 @@ const CACHE_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
 
 export async function signInWithEmail({ email, password, rememberMe = false }: SignInCredentials) {
   try {
+    const sanitizedEmail = sanitizeEmailInput(email);
+    
+    // Check if email is locked out
+    if (authSecurity.isEmailLockedOut(sanitizedEmail)) {
+      const remaining = authSecurity.getRemainingAttempts(sanitizedEmail);
+      throw new Error(`Account temporarily locked. ${remaining} attempts remaining. Please try again later.`);
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({
-      email,
+      email: sanitizedEmail,
       password,
     });
 
-    if (error) throw createAuthError(error.message, error);
+    if (error) {
+      authSecurity.recordLoginAttempt(sanitizedEmail, false);
+      throw createAuthError(error.message, error);
+    }
+
+    // Record successful login
+    authSecurity.recordLoginAttempt(sanitizedEmail, true);
+    authSecurity.clearLoginAttempts(sanitizedEmail);
+    
     return data;
   } catch (error: any) {
     console.error('Login error:', error);
@@ -61,14 +79,23 @@ export async function signInWithProvider(provider: AuthProvider) {
 
 export async function signUp({ email, password, fullName, phone, countryCode, acceptTerms }: SignUpCredentials) {
   try {
+    const sanitizedEmail = sanitizeEmailInput(email);
+    
+    // Validate password strength
+    const passwordValidation = authSecurity.validatePasswordStrength(password);
+    if (!passwordValidation.isValid) {
+      throw new Error(`Password requirements not met: ${passwordValidation.errors.join(', ')}`);
+    }
+    
     // Format phone number with country code if both are provided
     const phoneNumber = phone && countryCode ? `${countryCode}${phone}` : undefined;
     
     const { data, error } = await supabase.auth.signUp({
-      email,
+      email: sanitizedEmail,
       password,
       phone: phoneNumber,
       options: {
+        emailRedirectTo: `${window.location.origin}/`,
         data: {
           full_name: fullName,
           phone_number: phoneNumber,

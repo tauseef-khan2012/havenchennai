@@ -1,35 +1,11 @@
 
 import React from 'react';
 import { z } from 'zod';
+import { secureContactSchema } from '@/services/security/inputSanitization';
+import { SECURITY_CONFIG } from '@/config/security';
 
-// Enhanced validation schema for contact information
-export const contactValidationSchema = z.object({
-  guestName: z
-    .string()
-    .min(1, 'Name is required')
-    .max(100, 'Name must be less than 100 characters')
-    .regex(/^[a-zA-Z\s]+$/, 'Name can only contain letters and spaces')
-    .transform(val => val.trim()),
-  
-  guestEmail: z
-    .string()
-    .min(1, 'Email is required')
-    .email('Invalid email format')
-    .max(254, 'Email address is too long')
-    .transform(val => val.trim().toLowerCase()),
-  
-  guestPhone: z
-    .string()
-    .min(1, 'Phone number is required')
-    .regex(/^[\+]?[\d\s\-\(\)]{7,15}$/, 'Invalid phone number format')
-    .transform(val => val.trim()),
-  
-  specialRequests: z
-    .string()
-    .max(500, 'Special requests must be less than 500 characters')
-    .optional()
-    .transform(val => val ? val.trim().replace(/[<>]/g, '') : undefined)
-});
+// Enhanced validation schema using security service
+export const contactValidationSchema = secureContactSchema;
 
 export type ContactFormData = z.infer<typeof contactValidationSchema>;
 
@@ -49,29 +25,29 @@ export const validateContactForm = (data: any): { isValid: boolean; errors: stri
   }
 };
 
-// Rate limiting validation
+// Enhanced rate limiting validation
 export const validateRateLimit = (email: string, recentBookings: number): { isValid: boolean; error?: string } => {
-  if (recentBookings >= 3) {
+  if (recentBookings >= SECURITY_CONFIG.MAX_BOOKING_ATTEMPTS_PER_HOUR) {
     return {
       isValid: false,
-      error: 'Rate limit exceeded. Maximum 3 bookings per hour per email address.'
+      error: `Rate limit exceeded. Maximum ${SECURITY_CONFIG.MAX_BOOKING_ATTEMPTS_PER_HOUR} bookings per hour per email address.`
     };
   }
   return { isValid: true };
 };
 
-// Security validation for booking amounts
+// Enhanced security validation for booking amounts
 export const validateBookingAmount = (amount: number): { isValid: boolean; error?: string } => {
-  if (amount <= 0) {
-    return { isValid: false, error: 'Amount must be greater than 0' };
+  if (!Number.isFinite(amount) || amount < SECURITY_CONFIG.MIN_BOOKING_AMOUNT) {
+    return { isValid: false, error: 'Invalid booking amount' };
   }
-  if (amount > 500000) {
-    return { isValid: false, error: 'Amount cannot exceed ₹5,00,000' };
+  if (amount > SECURITY_CONFIG.MAX_BOOKING_AMOUNT) {
+    return { isValid: false, error: `Booking amount cannot exceed ₹${SECURITY_CONFIG.MAX_BOOKING_AMOUNT.toLocaleString()}` };
   }
   return { isValid: true };
 };
 
-// Date validation for bookings
+// Enhanced date validation for bookings
 export const validateBookingDates = (checkIn: Date, checkOut: Date): { isValid: boolean; error?: string } => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -85,13 +61,31 @@ export const validateBookingDates = (checkIn: Date, checkOut: Date): { isValid: 
   }
   
   const maxAdvanceDate = new Date();
-  maxAdvanceDate.setFullYear(maxAdvanceDate.getFullYear() + 2);
+  maxAdvanceDate.setFullYear(maxAdvanceDate.getFullYear() + SECURITY_CONFIG.MAX_ADVANCE_BOOKING_YEARS);
   
   if (checkIn > maxAdvanceDate) {
-    return { isValid: false, error: 'Bookings cannot be made more than 2 years in advance' };
+    return { isValid: false, error: `Bookings cannot be made more than ${SECURITY_CONFIG.MAX_ADVANCE_BOOKING_YEARS} years in advance` };
+  }
+  
+  // Check for reasonable stay duration (max 30 days for security)
+  const daysDiff = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
+  if (daysDiff > 30) {
+    return { isValid: false, error: 'Maximum stay duration is 30 days' };
   }
   
   return { isValid: true };
+};
+
+// Input sanitization for forms
+export const sanitizeFormInput = (input: string, maxLength: number = SECURITY_CONFIG.MAX_TEXT_INPUT_LENGTH): string => {
+  if (!input || typeof input !== 'string') return '';
+  
+  // Remove HTML tags and dangerous content
+  let sanitized = input.replace(SECURITY_CONFIG.HTML_TAG_REGEX, '');
+  sanitized = sanitized.replace(SECURITY_CONFIG.SCRIPT_TAG_REGEX, '');
+  sanitized = sanitized.replace(SECURITY_CONFIG.DANGEROUS_PROTOCOLS, '');
+  
+  return sanitized.trim().substring(0, maxLength);
 };
 
 export default {};
