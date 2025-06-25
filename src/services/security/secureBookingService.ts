@@ -64,48 +64,10 @@ export class SecureBookingService {
         };
       }
 
-      // Use database function for secure validation
-      const { data: ownershipValid, error: functionError } = await supabase
-        .rpc('validate_booking_ownership', {
-          booking_id_param: bookingId,
-          booking_type_param: bookingType,
-          user_id_param: userContext.userId,
-          guest_email_param: userContext.guestEmail
-        });
-
-      if (functionError) {
-        console.error('Booking ownership validation error:', functionError);
-        await DatabaseAuditService.logBookingAccessEvent(
-          bookingId,
-          false,
-          userContext.userId,
-          userContext.guestEmail,
-          { reason: 'validation_error', error: functionError.message }
-        );
-        
-        return {
-          isValid: false,
-          error: 'Unable to validate booking access'
-        };
-      }
-
-      if (!ownershipValid) {
-        await DatabaseAuditService.logBookingAccessEvent(
-          bookingId,
-          false,
-          userContext.userId,
-          userContext.guestEmail,
-          { reason: 'ownership_denied' }
-        );
-        
-        return {
-          isValid: false,
-          error: 'Access denied. This booking does not belong to you.'
-        };
-      }
-
-      // Fetch booking data if validation passes
+      // Validate ownership using direct database queries
       let bookingData;
+      let ownershipValid = false;
+
       if (bookingType === 'property') {
         const { data, error } = await supabase
           .from('bookings')
@@ -126,6 +88,13 @@ export class SecureBookingService {
             isValid: false,
             error: 'Booking not found'
           };
+        }
+
+        // Check ownership
+        if (userContext.userId && data.user_id === userContext.userId) {
+          ownershipValid = true;
+        } else if (userContext.guestEmail && data.guest_email === userContext.guestEmail && !data.user_id) {
+          ownershipValid = true;
         }
 
         bookingData = data;
@@ -151,7 +120,29 @@ export class SecureBookingService {
           };
         }
 
+        // Check ownership
+        if (userContext.userId && data.user_id === userContext.userId) {
+          ownershipValid = true;
+        } else if (userContext.guestEmail && data.guest_email === userContext.guestEmail && !data.user_id) {
+          ownershipValid = true;
+        }
+
         bookingData = data;
+      }
+
+      if (!ownershipValid) {
+        await DatabaseAuditService.logBookingAccessEvent(
+          bookingId,
+          false,
+          userContext.userId,
+          userContext.guestEmail,
+          { reason: 'ownership_denied' }
+        );
+        
+        return {
+          isValid: false,
+          error: 'Access denied. This booking does not belong to you.'
+        };
       }
 
       // Log successful access

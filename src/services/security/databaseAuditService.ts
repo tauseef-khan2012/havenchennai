@@ -40,21 +40,32 @@ export class DatabaseAuditService {
       // Get client IP and user agent from browser if not provided
       const userAgent = event.userAgent || navigator.userAgent;
       
-      // Attempt database logging first
-      const { error } = await supabase
-        .from('security_audit_logs')
-        .insert({
-          user_id: event.userId,
-          action_type: event.actionType,
-          resource_type: event.resourceType,
-          resource_id: event.resourceId,
-          user_agent: userAgent,
-          details: event.details,
-          severity: event.severity || 'info'
-        });
+      // Try database logging first using booking_analytics as fallback
+      try {
+        const { error } = await supabase
+          .from('booking_analytics')
+          .insert({
+            event_type: `SECURITY_${event.actionType}`,
+            user_id: event.userId,
+            event_data: {
+              security_event: true,
+              action_type: event.actionType,
+              resource_type: event.resourceType,
+              resource_id: event.resourceId,
+              user_agent: userAgent,
+              details: event.details,
+              severity: event.severity || 'info',
+              timestamp: new Date().toISOString()
+            }
+          });
 
-      if (error) {
-        console.error('Database audit logging failed, using console fallback:', error);
+        if (error) {
+          console.warn('Database audit logging failed, using console fallback:', error);
+          this.consoleAuditLog(event, userAgent);
+          return;
+        }
+      } catch (dbError) {
+        console.warn('Database not available for audit logging, using console fallback:', dbError);
         this.consoleAuditLog(event, userAgent);
         return;
       }

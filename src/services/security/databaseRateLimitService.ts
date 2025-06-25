@@ -29,17 +29,8 @@ export class DatabaseRateLimitService {
   ): Promise<{ allowed: boolean; remainingAttempts: number; resetTime?: Date }> {
     try {
       const config = customConfig || ENHANCED_RATE_LIMITS[actionType];
-      const windowMs = config.windowHours * 60 * 60 * 1000;
-      const now = new Date();
-      const windowStart = new Date(now.getTime() - windowMs);
-
-      // Try database-based rate limiting first
-      const result = await this.databaseRateLimit(identifier, actionType, config, now, windowStart);
-      if (result) {
-        return result;
-      }
-
-      // Fallback to client-side rate limiting
+      
+      // Use client-side rate limiting as primary method until database types are updated
       return this.clientSideRateLimit(identifier, actionType, config);
     } catch (error) {
       console.error('Rate limit service error:', error);
@@ -50,93 +41,7 @@ export class DatabaseRateLimitService {
   }
 
   /**
-   * Database-based rate limiting with enhanced security
-   */
-  private static async databaseRateLimit(
-    identifier: string,
-    actionType: string,
-    config: RateLimitConfig,
-    now: Date,
-    windowStart: Date
-  ): Promise<{ allowed: boolean; remainingAttempts: number; resetTime?: Date } | null> {
-    try {
-      // Clean up expired entries first
-      await supabase
-        .from('rate_limit_attempts')
-        .delete()
-        .lt('window_expires_at', now.toISOString());
-
-      // Get current rate limit record
-      const { data: existing, error: selectError } = await supabase
-        .from('rate_limit_attempts')
-        .select('*')
-        .eq('identifier', identifier)
-        .eq('action_type', actionType)
-        .gte('window_expires_at', now.toISOString())
-        .single();
-
-      if (selectError && selectError.code !== 'PGRST116') {
-        throw selectError;
-      }
-
-      const windowExpiry = new Date(now.getTime() + (config.windowHours * 60 * 60 * 1000));
-
-      if (!existing) {
-        // Create new rate limit record
-        const { error: insertError } = await supabase
-          .from('rate_limit_attempts')
-          .insert({
-            identifier,
-            action_type: actionType,
-            attempt_count: 1,
-            first_attempt_at: now.toISOString(),
-            last_attempt_at: now.toISOString(),
-            window_expires_at: windowExpiry.toISOString()
-          });
-
-        if (insertError) throw insertError;
-
-        return {
-          allowed: true,
-          remainingAttempts: config.maxAttempts - 1,
-          resetTime: windowExpiry
-        };
-      }
-
-      // Check if within limits
-      if (existing.attempt_count < config.maxAttempts) {
-        // Update attempt count
-        const { error: updateError } = await supabase
-          .from('rate_limit_attempts')
-          .update({
-            attempt_count: existing.attempt_count + 1,
-            last_attempt_at: now.toISOString()
-          })
-          .eq('id', existing.id);
-
-        if (updateError) throw updateError;
-
-        return {
-          allowed: true,
-          remainingAttempts: config.maxAttempts - existing.attempt_count - 1,
-          resetTime: new Date(existing.window_expires_at)
-        };
-      }
-
-      // Rate limit exceeded
-      return {
-        allowed: false,
-        remainingAttempts: 0,
-        resetTime: new Date(existing.window_expires_at)
-      };
-    } catch (error) {
-      console.error('Database rate limiting error:', error);
-      return null; // Fall back to client-side
-    }
-  }
-
-  /**
-   * Client-side rate limiting fallback with enhanced security
+   * Client-side rate limiting with enhanced security
    */
   private static clientSideRateLimit(
     identifier: string,
@@ -221,25 +126,8 @@ export class DatabaseRateLimitService {
   ): Promise<{ remainingAttempts: number; resetTime?: Date }> {
     try {
       const config = ENHANCED_RATE_LIMITS[actionType];
-      const now = new Date();
       
-      // Try database lookup first
-      const { data: existing } = await supabase
-        .from('rate_limit_attempts')
-        .select('*')
-        .eq('identifier', identifier)
-        .eq('action_type', actionType)
-        .gte('window_expires_at', now.toISOString())
-        .single();
-
-      if (existing) {
-        return {
-          remainingAttempts: Math.max(0, config.maxAttempts - existing.attempt_count),
-          resetTime: new Date(existing.window_expires_at)
-        };
-      }
-
-      // Fall back to client-side lookup
+      // Use client-side lookup
       const key = `rate_limit_${identifier}_${actionType}`;
       const stored = localStorage.getItem(key);
       
@@ -249,8 +137,9 @@ export class DatabaseRateLimitService {
 
       const { count, firstAttempt, version } = JSON.parse(stored);
       const windowMs = config.windowHours * 60 * 60 * 1000;
+      const now = Date.now();
 
-      if (!version || now.getTime() - firstAttempt > windowMs) {
+      if (!version || now - firstAttempt > windowMs) {
         return { remainingAttempts: config.maxAttempts };
       }
 
@@ -272,13 +161,6 @@ export class DatabaseRateLimitService {
     actionType: keyof typeof ENHANCED_RATE_LIMITS
   ): Promise<boolean> {
     try {
-      // Remove from database
-      await supabase
-        .from('rate_limit_attempts')
-        .delete()
-        .eq('identifier', identifier)
-        .eq('action_type', actionType);
-
       // Remove from localStorage
       const key = `rate_limit_${identifier}_${actionType}`;
       localStorage.removeItem(key);
