@@ -2,7 +2,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { UUID, BookingType } from '@/types/booking';
+import { UUID, BookingType, Currency } from '@/types/booking';
 import { useRazorpayPayment } from './useRazorpayPayment';
 import { 
   initiatePayment, 
@@ -112,6 +112,9 @@ export const useBookingPayment = () => {
         throw new Error('Invalid payment details');
       }
 
+      // Ensure currency is a valid Currency type
+      const validCurrency: Currency = currency === 'USD' ? 'USD' : 'INR';
+
       // Determine contact details
       const userName = contactDetails?.name || user?.user_metadata?.full_name || 'Guest';
       const userEmail = contactDetails?.email || user?.email || '';
@@ -131,7 +134,7 @@ export const useBookingPayment = () => {
         bookingId,
         bookingType,
         amount,
-        currency,
+        currency: validCurrency,
         userEmail,
         userName,
         bookingReference
@@ -145,7 +148,7 @@ export const useBookingPayment = () => {
       const options = {
         key: razorpayKey,
         amount: amount * 100, // In paise
-        currency,
+        currency: validCurrency,
         name: 'Haven',
         description: `Booking ${bookingReference}`,
         order_id: orderId,

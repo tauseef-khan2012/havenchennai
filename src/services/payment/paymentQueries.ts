@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { PaymentRecord, UUID, BookingType, PaymentStatus } from '@/types/booking';
+import { PaymentRecord, UUID, BookingType, PaymentStatus, Currency } from '@/types/booking';
 
 /**
  * Gets details for a specific payment
@@ -29,7 +29,7 @@ export const getPaymentDetails = async (transactionId: string): Promise<PaymentR
       bookingId: data.booking_id || data.experience_booking_id || '',
       bookingType: data.booking_id ? 'property' : 'experience',
       amount: data.amount,
-      currency: data.currency,
+      currency: (data.currency === 'USD' ? 'USD' : 'INR') as Currency,
       transactionId: data.transaction_id,
       paymentMethod: data.payment_method || '',
       paymentStatus: (data.payment_status as PaymentStatus) || 'Unpaid'
@@ -74,7 +74,7 @@ export const getBookingPayments = async (
       bookingId: item.booking_id || item.experience_booking_id || '',
       bookingType: item.booking_id ? 'property' : 'experience',
       amount: item.amount,
-      currency: item.currency,
+      currency: (item.currency === 'USD' ? 'USD' : 'INR') as Currency,
       transactionId: item.transaction_id,
       paymentMethod: item.payment_method || '',
       paymentStatus: (item.payment_status as PaymentStatus) || 'Unpaid'

@@ -1,10 +1,9 @@
-
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { calculateEnhancedPropertyBookingPrice, EnhancedPriceBreakdown } from '@/services/enhancedPriceService';
 import { DiscountApplication } from '@/services/discountService';
 import { calculateNights } from '@/utils/bookingUtils';
-import { UUID } from '@/types/booking';
+import { UUID, Currency } from '@/types/booking';
 
 export const useBookingPricing = () => {
   const { toast } = useToast();
@@ -81,14 +80,14 @@ export const useBookingPricing = () => {
       const subtotal = basePrice + additionalGuestCharges;
       const gstAmount = subtotal * 0.18;
       
-      const fallbackPricing = {
+      const fallbackPricing: EnhancedPriceBreakdown = {
         basePrice,
         discountAmount: 0,
         subtotalAfterDiscount: subtotal,
         taxPercentage: 18,
         taxAmount: gstAmount,
         totalAmountDue: subtotal + gstAmount,
-        currency: 'INR',
+        currency: 'INR' as Currency,
         gstBreakdown: {
           cgst: gstAmount / 2,
           sgst: gstAmount / 2
