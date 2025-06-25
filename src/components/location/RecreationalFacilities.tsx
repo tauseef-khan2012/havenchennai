@@ -83,7 +83,7 @@ const RecreationalFacilities = () => {
   ];
 
   return (
-    <section className="py-16 bg-haven-beige/20">
+    <section className="pt-8 pb-16 bg-haven-beige/20">
       <div className="container-custom">
         <div className="mb-12 text-center">
           <h2 className="font-serif text-3xl font-bold mb-4">Gsquare Community Amenities</h2>
