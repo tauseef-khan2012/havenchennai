@@ -21,7 +21,6 @@ const MobileNavLinks = ({ isOpen, isActive, user }: MobileNavLinksProps) => {
   if (!isOpen) return null;
 
   const stayPages = [
-    { to: "/stay", label: "Overview" },
     { to: "/stay/amenities", label: "Amenities" },
     { to: "/stay/deck-views", label: "Deck Views" },
     { to: "/stay/location", label: "Location" }

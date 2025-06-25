@@ -12,7 +12,6 @@ const StayDropdown = ({ isActive }: StayDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   
   const stayPages = [
-    { to: "/stay", label: "Overview" },
     { to: "/stay/amenities", label: "Amenities" },
     { to: "/stay/deck-views", label: "Deck Views" },
     { to: "/stay/location", label: "Location" }
@@ -25,7 +24,7 @@ const StayDropdown = ({ isActive }: StayDropdownProps) => {
       onMouseLeave={() => setIsOpen(false)}
     >
       <Link
-        to="/stay"
+        to="/stay/amenities"
         className={cn(
           "text-base font-semibold transition-colors hover:text-haven-teal flex items-center gap-1",
           isActive("/stay") ? "text-haven-teal" : "text-gray-700"

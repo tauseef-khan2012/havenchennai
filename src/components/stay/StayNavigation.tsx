@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Bed, Image, MapPin, Home } from 'lucide-react';
+import { Bed, Image, MapPin } from 'lucide-react';
 
 const StayNavigation = () => {
   const location = useLocation();
@@ -30,18 +30,6 @@ const StayNavigation = () => {
       <div className="container-custom py-2">
         <Tabs defaultValue={currentPath} className="w-full">
           <TabsList className="w-full justify-start bg-transparent p-0 overflow-x-auto flex-nowrap">
-            <TabsTrigger 
-              value="/stay" 
-              className={`flex items-center gap-2 rounded-none border-b-2 px-4 py-2 whitespace-nowrap transition-colors ${
-                currentPath === '/stay' ? 'border-haven-green text-haven-green' : 'border-transparent hover:text-haven-green/70'
-              }`}
-              asChild
-            >
-              <Link to="/stay">
-                <Home className="h-4 w-4" />
-                <span>Overview</span>
-              </Link>
-            </TabsTrigger>
             <TabsTrigger 
               value="/stay/amenities" 
               className={`flex items-center gap-2 rounded-none border-b-2 px-4 py-2 whitespace-nowrap transition-colors ${

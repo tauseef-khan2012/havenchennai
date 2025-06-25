@@ -1,9 +1,9 @@
+
 import { useEffect } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { EnhancedHeroSlider } from '@/components/home/EnhancedHeroSlider';
 import ContainerHomeSection from '@/components/home/ContainerHomeSection';
-import ExperiencesSection from '@/components/home/ExperiencesSection';
 import MasonryGallery from '@/components/home/MasonryGallery';
 import StickyBookingWidget from '@/components/home/StickyBookingWidget';
 import CallToAction from '@/components/home/CallToAction';
@@ -131,10 +131,10 @@ const Index = () => {
         
         <ErrorBoundary fallback={
           <div className="py-8 text-center">
-            <p>Unable to load experiences section</p>
+            <p>Unable to load testimonials section</p>
           </div>
         }>
-          <ExperiencesSection />
+          <FeaturedTestimonials />
         </ErrorBoundary>
         
         <ErrorBoundary fallback={
@@ -143,14 +143,6 @@ const Index = () => {
           </div>
         }>
           <MasonryGallery />
-        </ErrorBoundary>
-        
-        <ErrorBoundary fallback={
-          <div className="py-8 text-center">
-            <p>Unable to load testimonials section</p>
-          </div>
-        }>
-          <FeaturedTestimonials />
         </ErrorBoundary>
         
         <ErrorBoundary>

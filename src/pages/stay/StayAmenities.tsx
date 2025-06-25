@@ -4,6 +4,7 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import StayHero from '@/components/stay/StayHero';
 import StayNavigation from '@/components/stay/StayNavigation';
+import RecreationalFacilities from '@/components/location/RecreationalFacilities';
 import { Badge } from '@/components/ui/badge';
 import { Bed, Monitor, ChefHat, Car, Wifi, Volume2, Coffee, Utensils, Bath, BookOpen } from 'lucide-react';
 
@@ -170,6 +171,9 @@ const StayAmenities = () => {
             </div>
           </div>
         </section>
+
+        {/* Gsquare Community Amenities Section */}
+        <RecreationalFacilities />
       </main>
       <Footer />
     </>
