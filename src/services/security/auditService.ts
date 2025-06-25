@@ -28,6 +28,7 @@ export interface SecurityEventDetails {
 
 /**
  * Security audit logging service
+ * Note: Uses console logging fallback until database migration is complete
  */
 export class AuditService {
   /**
@@ -38,24 +39,57 @@ export class AuditService {
       // Get client IP and user agent from browser if not provided
       const userAgent = event.userAgent || navigator.userAgent;
       
-      // Call the database function to log the event
-      const { error } = await supabase.rpc('log_security_event', {
-        p_user_id: event.userId || null,
-        p_action_type: event.actionType,
-        p_resource_type: event.resourceType || null,
-        p_resource_id: event.resourceId || null,
-        p_ip_address: event.ipAddress || null,
-        p_user_agent: userAgent,
-        p_details: event.details ? JSON.stringify(event.details) : null,
-        p_severity: event.severity || 'info'
-      });
+      // Try to call the database function first
+      try {
+        const { error } = await supabase.rpc('log_security_event', {
+          p_user_id: event.userId || null,
+          p_action_type: event.actionType,
+          p_resource_type: event.resourceType || null,
+          p_resource_id: event.resourceId || null,
+          p_ip_address: event.ipAddress || null,
+          p_user_agent: userAgent,
+          p_details: event.details ? JSON.stringify(event.details) : null,
+          p_severity: event.severity || 'info'
+        });
 
-      if (error) {
-        console.error('Failed to log security event:', error);
+        if (error) {
+          console.warn('Database audit logging failed, using console fallback:', error);
+          this.consoleAuditLog(event, userAgent);
+        }
+      } catch (dbError) {
+        console.warn('Database function not available, using console fallback:', dbError);
+        this.consoleAuditLog(event, userAgent);
       }
     } catch (error) {
       console.error('Security audit logging error:', error);
       // Don't throw - audit logging failures shouldn't break the app
+    }
+  }
+
+  /**
+   * Console-based audit logging fallback
+   */
+  private static consoleAuditLog(event: SecurityEventDetails, userAgent: string): void {
+    const logEntry = {
+      timestamp: new Date().toISOString(),
+      userId: event.userId,
+      actionType: event.actionType,
+      resourceType: event.resourceType,
+      resourceId: event.resourceId,
+      userAgent,
+      details: event.details,
+      severity: event.severity || 'info'
+    };
+
+    switch (event.severity) {
+      case 'critical':
+        console.error('🚨 SECURITY AUDIT [CRITICAL]:', logEntry);
+        break;
+      case 'warning':
+        console.warn('⚠️ SECURITY AUDIT [WARNING]:', logEntry);
+        break;
+      default:
+        console.info('📋 SECURITY AUDIT [INFO]:', logEntry);
     }
   }
 

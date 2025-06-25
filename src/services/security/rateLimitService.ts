@@ -15,6 +15,7 @@ export const DEFAULT_RATE_LIMITS = {
 
 /**
  * Enhanced rate limiting service with database-backed enforcement
+ * Note: Uses client-side fallback until database migration is complete
  */
 export class RateLimitService {
   /**
@@ -28,40 +29,95 @@ export class RateLimitService {
     try {
       const config = customConfig || DEFAULT_RATE_LIMITS[actionType];
       
-      // Call the database function to check rate limit
-      const { data, error } = await supabase.rpc('check_rate_limit', {
-        p_identifier: identifier.toLowerCase().trim(),
-        p_action_type: actionType,
-        p_max_attempts: config.maxAttempts,
-        p_window_hours: config.windowHours
-      });
+      // Try to call the database function first
+      try {
+        const { data, error } = await supabase.rpc('check_rate_limit', {
+          p_identifier: identifier.toLowerCase().trim(),
+          p_action_type: actionType,
+          p_max_attempts: config.maxAttempts,
+          p_window_hours: config.windowHours
+        });
 
-      if (error) {
-        console.error('Rate limit check error:', error);
-        // Fail open - allow the action if we can't check the rate limit
-        return { allowed: true, remainingAttempts: config.maxAttempts };
+        if (error) {
+          console.warn('Database rate limit check failed, using client-side fallback:', error);
+          return this.clientSideRateLimit(identifier, actionType, config);
+        }
+
+        return {
+          allowed: data,
+          remainingAttempts: data ? config.maxAttempts - 1 : 0,
+          resetTime: new Date(Date.now() + config.windowHours * 60 * 60 * 1000)
+        };
+      } catch (dbError) {
+        console.warn('Database function not available, using client-side fallback:', dbError);
+        return this.clientSideRateLimit(identifier, actionType, config);
       }
-
-      // Get current attempt count for remaining calculation
-      const { data: currentCount } = await supabase
-        .from('rate_limits')
-        .select('attempt_count, reset_at')
-        .eq('identifier', identifier.toLowerCase().trim())
-        .eq('action_type', actionType)
-        .single();
-
-      const remainingAttempts = Math.max(0, config.maxAttempts - (currentCount?.attempt_count || 0));
-      const resetTime = currentCount?.reset_at ? new Date(currentCount.reset_at) : undefined;
-
-      return {
-        allowed: data,
-        remainingAttempts,
-        resetTime
-      };
     } catch (error) {
       console.error('Rate limit service error:', error);
       // Fail open for availability
-      return { allowed: true, remainingAttempts: DEFAULT_RATE_LIMITS[actionType].maxAttempts };
+      return { allowed: true, remainingAttempts: config.maxAttempts };
+    }
+  }
+
+  /**
+   * Client-side rate limiting fallback
+   */
+  private static clientSideRateLimit(
+    identifier: string,
+    actionType: string,
+    config: RateLimitConfig
+  ): { allowed: boolean; remainingAttempts: number; resetTime?: Date } {
+    const key = `rate_limit_${identifier}_${actionType}`;
+    const stored = localStorage.getItem(key);
+    const now = Date.now();
+    const windowMs = config.windowHours * 60 * 60 * 1000;
+    
+    if (!stored) {
+      localStorage.setItem(key, JSON.stringify({ count: 1, firstAttempt: now }));
+      return { 
+        allowed: true, 
+        remainingAttempts: config.maxAttempts - 1,
+        resetTime: new Date(now + windowMs)
+      };
+    }
+
+    try {
+      const { count, firstAttempt } = JSON.parse(stored);
+      
+      // Check if window has expired
+      if (now - firstAttempt > windowMs) {
+        localStorage.setItem(key, JSON.stringify({ count: 1, firstAttempt: now }));
+        return { 
+          allowed: true, 
+          remainingAttempts: config.maxAttempts - 1,
+          resetTime: new Date(now + windowMs)
+        };
+      }
+
+      // Check if within limits
+      if (count < config.maxAttempts) {
+        localStorage.setItem(key, JSON.stringify({ count: count + 1, firstAttempt }));
+        return { 
+          allowed: true, 
+          remainingAttempts: config.maxAttempts - count - 1,
+          resetTime: new Date(firstAttempt + windowMs)
+        };
+      }
+
+      // Rate limit exceeded
+      return { 
+        allowed: false, 
+        remainingAttempts: 0,
+        resetTime: new Date(firstAttempt + windowMs)
+      };
+    } catch (parseError) {
+      // Reset on parse error
+      localStorage.setItem(key, JSON.stringify({ count: 1, firstAttempt: now }));
+      return { 
+        allowed: true, 
+        remainingAttempts: config.maxAttempts - 1,
+        resetTime: new Date(now + windowMs)
+      };
     }
   }
 
@@ -75,17 +131,26 @@ export class RateLimitService {
     try {
       const config = DEFAULT_RATE_LIMITS[actionType];
       
-      const { data } = await supabase
-        .from('rate_limits')
-        .select('attempt_count, reset_at')
-        .eq('identifier', identifier.toLowerCase().trim())
-        .eq('action_type', actionType)
-        .single();
+      // Try client-side lookup first
+      const key = `rate_limit_${identifier}_${actionType}`;
+      const stored = localStorage.getItem(key);
+      
+      if (!stored) {
+        return { remainingAttempts: config.maxAttempts };
+      }
 
-      const remainingAttempts = Math.max(0, config.maxAttempts - (data?.attempt_count || 0));
-      const resetTime = data?.reset_at ? new Date(data.reset_at) : undefined;
+      const { count, firstAttempt } = JSON.parse(stored);
+      const windowMs = config.windowHours * 60 * 60 * 1000;
+      const now = Date.now();
 
-      return { remainingAttempts, resetTime };
+      if (now - firstAttempt > windowMs) {
+        return { remainingAttempts: config.maxAttempts };
+      }
+
+      return { 
+        remainingAttempts: Math.max(0, config.maxAttempts - count),
+        resetTime: new Date(firstAttempt + windowMs)
+      };
     } catch (error) {
       console.error('Rate limit status error:', error);
       return { remainingAttempts: DEFAULT_RATE_LIMITS[actionType].maxAttempts };
