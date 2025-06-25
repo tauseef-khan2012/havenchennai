@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -7,13 +8,14 @@ import {
   GuestInfo
 } from '@/types/booking';
 import { createBooking } from '@/services/bookingService';
-import { createGuestBooking } from '@/services/booking/data/createGuestBooking';
+import { EnhancedGuestBookingService } from '@/services/security';
 import { checkPropertyAvailability } from '@/services/availabilityService';
 import { calculateEnhancedPropertyBookingPrice } from '@/services/enhancedPriceService';
+import { AuditService } from '@/services/security/auditService';
 
 /**
- * Enhanced hook for creating bookings with comprehensive validation
- * Now supports both authenticated users and guest bookings
+ * Enhanced hook for creating bookings with comprehensive security validation
+ * Now supports both authenticated users and guest bookings with security enhancements
  */
 export const useBookingCreation = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -21,7 +23,7 @@ export const useBookingCreation = () => {
   const { user } = useAuth();
 
   /**
-   * Create a booking with comprehensive validation and error handling
+   * Create a booking with comprehensive validation and enhanced security
    * Works for both authenticated users and guests
    */
   const makeBooking = useCallback(async (
@@ -132,8 +134,14 @@ export const useBookingCreation = () => {
         }
         
         bookingResult = await createBooking(bookingData);
+        
+        // Log authenticated booking creation
+        await AuditService.logBookingEvent('BOOKING_CREATED', bookingResult.bookingId, user.id, {
+          bookingType: type,
+          authenticationMethod: 'authenticated_user'
+        });
       } else {
-        // Guest booking - no authentication required
+        // Enhanced guest booking with security checks
         const guestBookingData = {
           type,
           guestName: details.guestName!,
@@ -149,7 +157,16 @@ export const useBookingCreation = () => {
           numberOfAttendees: details.numberOfAttendees
         };
         
-        bookingResult = await createGuestBooking(guestBookingData);
+        const secureResult = await EnhancedGuestBookingService.createSecureGuestBooking(guestBookingData);
+        
+        if (!secureResult.success || !secureResult.bookingId || !secureResult.bookingReference) {
+          throw new Error(secureResult.error || 'Failed to create guest booking');
+        }
+        
+        bookingResult = {
+          bookingId: secureResult.bookingId as UUID,
+          bookingReference: secureResult.bookingReference
+        };
       }
       
       toast({
@@ -161,6 +178,20 @@ export const useBookingCreation = () => {
     } catch (error) {
       console.error('Error creating booking:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
+      // Log failed booking attempt
+      await AuditService.logSecurityEvent({
+        userId: user?.id,
+        actionType: 'BOOKING_CREATED',
+        resourceType: 'booking_failure',
+        details: {
+          error: errorMessage,
+          bookingType: type,
+          guestEmail: details.guestEmail,
+          authenticationMethod: user ? 'authenticated_user' : 'guest'
+        },
+        severity: 'warning'
+      });
       
       toast({
         title: 'Booking creation failed',

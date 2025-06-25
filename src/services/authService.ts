@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { 
   AuthProvider, 
@@ -9,6 +8,9 @@ import {
 } from '@/types/auth';
 import { authSecurity } from '@/services/security/authSecurity';
 import { sanitizeEmailInput } from '@/services/security/inputSanitization';
+import { RateLimitService } from '@/services/security/rateLimitService';
+import { AuditService } from '@/services/security/auditService';
+import { InputValidator } from '@/services/security/inputValidation';
 
 // Cache user profiles to reduce database queries
 const profileCache = new Map<string, any>();
@@ -16,9 +18,20 @@ const CACHE_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
 
 export async function signInWithEmail({ email, password, rememberMe = false }: SignInCredentials) {
   try {
-    const sanitizedEmail = sanitizeEmailInput(email);
+    const emailValidation = InputValidator.validateEmail(email);
+    if (!emailValidation.isValid) {
+      throw new Error(emailValidation.error);
+    }
     
-    // Check if email is locked out
+    const sanitizedEmail = emailValidation.sanitized;
+    
+    // Enhanced rate limiting check
+    const rateLimitCheck = await RateLimitService.checkRateLimit(sanitizedEmail, 'LOGIN_ATTEMPT');
+    if (!rateLimitCheck.allowed) {
+      throw new Error('Too many login attempts. Please try again later.');
+    }
+    
+    // Check if email is locked out (legacy system)
     if (authSecurity.isEmailLockedOut(sanitizedEmail)) {
       const remaining = authSecurity.getRemainingAttempts(sanitizedEmail);
       throw new Error(`Account temporarily locked. ${remaining} attempts remaining. Please try again later.`);
@@ -31,12 +44,24 @@ export async function signInWithEmail({ email, password, rememberMe = false }: S
 
     if (error) {
       authSecurity.recordLoginAttempt(sanitizedEmail, false);
+      
+      // Log failed login attempt
+      await AuditService.logAuthEvent('LOGIN_FAILURE', undefined, {
+        email: sanitizedEmail,
+        error: error.message
+      });
+      
       throw createAuthError(error.message, error);
     }
 
     // Record successful login
     authSecurity.recordLoginAttempt(sanitizedEmail, true);
     authSecurity.clearLoginAttempts(sanitizedEmail);
+    
+    // Log successful login
+    await AuditService.logAuthEvent('LOGIN_SUCCESS', data.user?.id, {
+      email: sanitizedEmail
+    });
     
     return data;
   } catch (error: any) {
@@ -79,7 +104,18 @@ export async function signInWithProvider(provider: AuthProvider) {
 
 export async function signUp({ email, password, fullName, phone, countryCode, acceptTerms }: SignUpCredentials) {
   try {
-    const sanitizedEmail = sanitizeEmailInput(email);
+    const emailValidation = InputValidator.validateEmail(email);
+    if (!emailValidation.isValid) {
+      throw new Error(emailValidation.error);
+    }
+    
+    const sanitizedEmail = emailValidation.sanitized;
+    
+    // Rate limiting for signup attempts
+    const rateLimitCheck = await RateLimitService.checkRateLimit(sanitizedEmail, 'LOGIN_ATTEMPT');
+    if (!rateLimitCheck.allowed) {
+      throw new Error('Too many signup attempts. Please try again later.');
+    }
     
     // Validate password strength
     const passwordValidation = authSecurity.validatePasswordStrength(password);
@@ -87,8 +123,21 @@ export async function signUp({ email, password, fullName, phone, countryCode, ac
       throw new Error(`Password requirements not met: ${passwordValidation.errors.join(', ')}`);
     }
     
+    // Validate and sanitize name
+    const nameValidation = InputValidator.validateName(fullName, 'Full name');
+    if (!nameValidation.isValid) {
+      throw new Error(nameValidation.error);
+    }
+    
     // Format phone number with country code if both are provided
-    const phoneNumber = phone && countryCode ? `${countryCode}${phone}` : undefined;
+    let phoneNumber: string | undefined;
+    if (phone && countryCode) {
+      const phoneValidation = InputValidator.validatePhone(`${countryCode}${phone}`);
+      if (!phoneValidation.isValid) {
+        throw new Error(phoneValidation.error);
+      }
+      phoneNumber = phoneValidation.sanitized;
+    }
     
     const { data, error } = await supabase.auth.signUp({
       email: sanitizedEmail,
@@ -97,14 +146,39 @@ export async function signUp({ email, password, fullName, phone, countryCode, ac
       options: {
         emailRedirectTo: `${window.location.origin}/`,
         data: {
-          full_name: fullName,
+          full_name: nameValidation.sanitized,
           phone_number: phoneNumber,
           registration_source: 'website',
         },
       },
     });
 
-    if (error) throw createAuthError(error.message, error);
+    if (error) {
+      // Log failed signup attempt
+      await AuditService.logSecurityEvent({
+        actionType: 'LOGIN_FAILURE',
+        resourceType: 'signup',
+        details: {
+          email: sanitizedEmail,
+          error: error.message
+        },
+        severity: 'warning'
+      });
+      
+      throw createAuthError(error.message, error);
+    }
+    
+    // Log successful signup
+    await AuditService.logSecurityEvent({
+      userId: data.user?.id,
+      actionType: 'LOGIN_SUCCESS',
+      resourceType: 'signup',
+      details: {
+        email: sanitizedEmail
+      },
+      severity: 'info'
+    });
+    
     return data;
   } catch (error: any) {
     console.error('Sign up error:', error);
@@ -126,11 +200,33 @@ export async function signOut() {
 
 export async function resetPassword(email: string) {
   try {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    const emailValidation = InputValidator.validateEmail(email);
+    if (!emailValidation.isValid) {
+      throw new Error(emailValidation.error);
+    }
+    
+    // Rate limiting for password reset
+    const rateLimitCheck = await RateLimitService.checkRateLimit(emailValidation.sanitized, 'PASSWORD_RESET');
+    if (!rateLimitCheck.allowed) {
+      throw new Error('Too many password reset attempts. Please try again later.');
+    }
+    
+    const { error } = await supabase.auth.resetPasswordForEmail(emailValidation.sanitized, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
 
     if (error) throw createAuthError(error.message, error);
+    
+    // Log password reset request
+    await AuditService.logSecurityEvent({
+      actionType: 'LOGIN_SUCCESS', // Using existing enum value
+      resourceType: 'password_reset',
+      details: {
+        email: emailValidation.sanitized
+      },
+      severity: 'info'
+    });
+    
     return true;
   } catch (error: any) {
     console.error('Reset password error:', error);
