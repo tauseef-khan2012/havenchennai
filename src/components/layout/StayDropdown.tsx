@@ -17,11 +17,19 @@ const StayDropdown = ({ isActive }: StayDropdownProps) => {
     { to: "/stay/location", label: "Location" }
   ];
   
+  const handleMouseEnter = () => {
+    setIsOpen(true);
+  };
+  
+  const handleMouseLeave = () => {
+    setIsOpen(false);
+  };
+  
   return (
     <div 
       className="relative"
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <Link
         to="/stay/amenities"
@@ -38,7 +46,11 @@ const StayDropdown = ({ isActive }: StayDropdownProps) => {
       </Link>
       
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-2 z-50">
+        <div 
+          className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border py-2 z-50"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
           {stayPages.map((page) => (
             <Link
               key={page.to}
