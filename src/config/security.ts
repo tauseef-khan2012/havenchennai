@@ -13,6 +13,8 @@ export const SECURITY_CONFIG = {
   MIN_BOOKING_AMOUNT: 100, // Minimum booking amount in INR
   MAX_BOOKING_AMOUNT: 1000000, // Maximum booking amount in INR (10 lakh)
   MAX_GUESTS: 20,
+  MAX_BOOKING_ATTEMPTS_PER_HOUR: 3, // Maximum booking attempts per hour per email
+  MAX_ADVANCE_BOOKING_YEARS: 2, // Maximum years in advance for booking
 
   // Validation patterns
   PHONE_PATTERN: /^[\+]?[\d\s\-\(\)]{7,25}$/,
@@ -21,6 +23,7 @@ export const SECURITY_CONFIG = {
   // Security patterns for sanitization
   HTML_TAG_REGEX: /<[^>]*>/g,
   SCRIPT_TAG_REGEX: /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+  DANGEROUS_PROTOCOLS: /^(javascript:|data:|vbscript:)/gi,
   
   // Rate limiting defaults
   DEFAULT_RATE_LIMITS: {

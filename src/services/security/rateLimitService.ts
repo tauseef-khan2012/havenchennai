@@ -31,7 +31,7 @@ export class RateLimitService {
       
       // Try to call the database function first
       try {
-        const { data, error } = await supabase.rpc('check_rate_limit', {
+        const { data, error } = await supabase.rpc('check_rate_limit' as any, {
           p_identifier: identifier.toLowerCase().trim(),
           p_action_type: actionType,
           p_max_attempts: config.maxAttempts,
@@ -55,6 +55,7 @@ export class RateLimitService {
     } catch (error) {
       console.error('Rate limit service error:', error);
       // Fail open for availability
+      const config = customConfig || DEFAULT_RATE_LIMITS[actionType];
       return { allowed: true, remainingAttempts: config.maxAttempts };
     }
   }

@@ -41,7 +41,7 @@ export class AuditService {
       
       // Try to call the database function first
       try {
-        const { error } = await supabase.rpc('log_security_event', {
+        const { error } = await supabase.rpc('log_security_event' as any, {
           p_user_id: event.userId || null,
           p_action_type: event.actionType,
           p_resource_type: event.resourceType || null,
