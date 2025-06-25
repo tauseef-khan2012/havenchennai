@@ -14,8 +14,8 @@ export const DEFAULT_RATE_LIMITS = {
 } as const;
 
 /**
- * Enhanced rate limiting service with database-backed enforcement
- * Note: Uses client-side fallback until database migration is complete
+ * Enhanced rate limiting service with client-side enforcement
+ * Note: Currently uses localStorage fallback until database migration is complete
  */
 export class RateLimitService {
   /**
@@ -29,29 +29,8 @@ export class RateLimitService {
     try {
       const config = customConfig || DEFAULT_RATE_LIMITS[actionType];
       
-      // Try to call the database function first
-      try {
-        const { data, error } = await supabase.rpc('check_rate_limit' as any, {
-          p_identifier: identifier.toLowerCase().trim(),
-          p_action_type: actionType,
-          p_max_attempts: config.maxAttempts,
-          p_window_hours: config.windowHours
-        });
-
-        if (error) {
-          console.warn('Database rate limit check failed, using client-side fallback:', error);
-          return this.clientSideRateLimit(identifier, actionType, config);
-        }
-
-        return {
-          allowed: data,
-          remainingAttempts: data ? config.maxAttempts - 1 : 0,
-          resetTime: new Date(Date.now() + config.windowHours * 60 * 60 * 1000)
-        };
-      } catch (dbError) {
-        console.warn('Database function not available, using client-side fallback:', dbError);
-        return this.clientSideRateLimit(identifier, actionType, config);
-      }
+      // Use client-side rate limiting (fallback mode)
+      return this.clientSideRateLimit(identifier, actionType, config);
     } catch (error) {
       console.error('Rate limit service error:', error);
       // Fail open for availability

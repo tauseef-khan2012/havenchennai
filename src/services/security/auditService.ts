@@ -28,7 +28,7 @@ export interface SecurityEventDetails {
 
 /**
  * Security audit logging service
- * Note: Uses console logging fallback until database migration is complete
+ * Note: Currently uses console logging fallback until database migration is complete
  */
 export class AuditService {
   /**
@@ -39,27 +39,8 @@ export class AuditService {
       // Get client IP and user agent from browser if not provided
       const userAgent = event.userAgent || navigator.userAgent;
       
-      // Try to call the database function first
-      try {
-        const { error } = await supabase.rpc('log_security_event' as any, {
-          p_user_id: event.userId || null,
-          p_action_type: event.actionType,
-          p_resource_type: event.resourceType || null,
-          p_resource_id: event.resourceId || null,
-          p_ip_address: event.ipAddress || null,
-          p_user_agent: userAgent,
-          p_details: event.details ? JSON.stringify(event.details) : null,
-          p_severity: event.severity || 'info'
-        });
-
-        if (error) {
-          console.warn('Database audit logging failed, using console fallback:', error);
-          this.consoleAuditLog(event, userAgent);
-        }
-      } catch (dbError) {
-        console.warn('Database function not available, using console fallback:', dbError);
-        this.consoleAuditLog(event, userAgent);
-      }
+      // Use console-based audit logging (fallback mode)
+      this.consoleAuditLog(event, userAgent);
     } catch (error) {
       console.error('Security audit logging error:', error);
       // Don't throw - audit logging failures shouldn't break the app
