@@ -16,7 +16,7 @@ import {
   CreditCard
 } from 'lucide-react';
 import { PropertyImageSlider } from './PropertyImageSlider';
-import { CalendarDatePicker } from './calendar/CalendarDatePicker';
+import { DualDatePicker } from './DualDatePicker';
 import { GuestSelector } from './calendar/GuestSelector';
 import { EnhancedBookingSummary } from './EnhancedBookingSummary';
 import { SimplePriceBreakdown } from '@/services/simplePricingService';
@@ -128,7 +128,7 @@ export const BookingContent: React.FC<BookingContentProps> = ({
             <CardContent className="space-y-6">
               <div>
                 <h3 className="text-lg font-medium text-haven-beige mb-4">Choose Dates</h3>
-                <CalendarDatePicker
+                <DualDatePicker
                   selectedCheckIn={selectedCheckIn}
                   selectedCheckOut={selectedCheckOut}
                   onDateRangeSelect={handleDateRangeSelect}
