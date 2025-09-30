@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,13 @@ import { blogPosts } from '@/data/blogData';
 const BlogPost = () => {
   const { slug } = useParams();
   const post = blogPosts.find(p => p.slug === slug);
+
+  // Sanitize HTML content to prevent XSS attacks
+  const sanitizedContent = post ? DOMPurify.sanitize(post.content, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'a', 'blockquote', 'code', 'pre', 'img', 'div', 'span'],
+    ALLOWED_ATTR: ['href', 'target', 'rel', 'class', 'src', 'alt', 'title'],
+    ALLOW_DATA_ATTR: false
+  }) : '';
 
   if (!post) {
     return (
@@ -80,7 +88,7 @@ const BlogPost = () => {
 
               {/* Article Content */}
               <article className="prose prose-lg max-w-none">
-                <div dangerouslySetInnerHTML={{ __html: post.content }} />
+                <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />
               </article>
 
               {/* Related Posts */}
