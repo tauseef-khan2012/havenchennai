@@ -178,7 +178,9 @@ export type Database = {
           currency: string
           customer_notes: string | null
           discounts_total: number | null
+          guest_access_verified_at: string | null
           guest_email: string | null
+          guest_email_verified: boolean | null
           guest_name: string | null
           guest_phone: string | null
           id: string
@@ -220,7 +222,9 @@ export type Database = {
           currency?: string
           customer_notes?: string | null
           discounts_total?: number | null
+          guest_access_verified_at?: string | null
           guest_email?: string | null
+          guest_email_verified?: boolean | null
           guest_name?: string | null
           guest_phone?: string | null
           id?: string
@@ -262,7 +266,9 @@ export type Database = {
           currency?: string
           customer_notes?: string | null
           discounts_total?: number | null
+          guest_access_verified_at?: string | null
           guest_email?: string | null
+          guest_email_verified?: boolean | null
           guest_name?: string | null
           guest_phone?: string | null
           id?: string
@@ -382,7 +388,9 @@ export type Database = {
           created_at: string
           currency: string
           experience_instance_id: string
+          guest_access_verified_at: string | null
           guest_email: string | null
+          guest_email_verified: boolean | null
           guest_name: string | null
           guest_phone: string | null
           id: string
@@ -414,7 +422,9 @@ export type Database = {
           created_at?: string
           currency?: string
           experience_instance_id: string
+          guest_access_verified_at?: string | null
           guest_email?: string | null
+          guest_email_verified?: boolean | null
           guest_name?: string | null
           guest_phone?: string | null
           id?: string
@@ -446,7 +456,9 @@ export type Database = {
           created_at?: string
           currency?: string
           experience_instance_id?: string
+          guest_access_verified_at?: string | null
           guest_email?: string | null
+          guest_email_verified?: boolean | null
           guest_name?: string | null
           guest_phone?: string | null
           id?: string
@@ -634,6 +646,63 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      guest_access_tokens: {
+        Row: {
+          access_token: string
+          booking_id: string | null
+          booking_reference: string
+          created_at: string
+          experience_booking_id: string | null
+          expires_at: string
+          guest_email: string
+          id: string
+          ip_address: unknown | null
+          used_at: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          access_token: string
+          booking_id?: string | null
+          booking_reference: string
+          created_at?: string
+          experience_booking_id?: string | null
+          expires_at: string
+          guest_email: string
+          id?: string
+          ip_address?: unknown | null
+          used_at?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          access_token?: string
+          booking_id?: string | null
+          booking_reference?: string
+          created_at?: string
+          experience_booking_id?: string | null
+          expires_at?: string
+          guest_email?: string
+          id?: string
+          ip_address?: unknown | null
+          used_at?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guest_access_tokens_booking_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guest_access_tokens_experience_booking_fkey"
+            columns: ["experience_booking_id"]
+            isOneToOne: false
+            referencedRelation: "experience_bookings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       inquiries: {
         Row: {
@@ -1239,7 +1308,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      validate_guest_booking_access: {
+        Args: { _booking_reference: string; _guest_email: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
