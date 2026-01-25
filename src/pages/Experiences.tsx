@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import ExperienceHero from '@/components/experiences/ExperienceHero';
@@ -11,22 +11,28 @@ import { experiencesData } from '@/data/experiencesData';
 const Experiences = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  
-  // Get unique categories for filter
-  const categories = ['All', ...new Set(experiencesData.map(exp => exp.category))];
-  
-  // Filter experiences based on search and category
-  const filteredExperiences = experiencesData.filter(experience => {
-    const matchesSearch = experience.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         experience.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === '' || selectedCategory === 'All' || experience.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
 
-  const clearFilters = () => {
+  // Get unique categories for filter
+  const categories = useMemo(() =>
+    ['All', ...new Set(experiencesData.map(exp => exp.category))],
+    []
+  );
+
+  // Filter experiences based on search and category
+  const filteredExperiences = useMemo(() =>
+    experiencesData.filter(experience => {
+      const matchesSearch = experience.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           experience.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory === '' || selectedCategory === 'All' || experience.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    }),
+    [searchTerm, selectedCategory]
+  );
+
+  const clearFilters = useCallback(() => {
     setSearchTerm('');
     setSelectedCategory('');
-  };
+  }, []);
 
   return (
     <>

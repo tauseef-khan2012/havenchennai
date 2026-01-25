@@ -33,11 +33,14 @@ export const calculateAddonExperiencesTotal = async (
   }
   
   let total = 0;
-  
+
   if (experienceInstances) {
+    // Create a Map for O(1) lookups instead of O(n) .find()
+    const addonMap = new Map(selectedAddonExperiences.map(a => [a.instanceId, a]));
+
     for (const instance of experienceInstances) {
-      const addon = selectedAddonExperiences.find(a => a.instanceId === instance.id);
-      
+      const addon = addonMap.get(instance.id);
+
       if (addon) {
         if (instance.flat_fee_price_override !== null) {
           total += instance.flat_fee_price_override;

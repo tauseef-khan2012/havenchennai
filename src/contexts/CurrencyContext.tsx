@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 
 export interface Currency {
   code: string;
@@ -45,18 +45,18 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, []);
 
-  const setCurrency = (currency: Currency) => {
+  const setCurrency = useCallback((currency: Currency) => {
     setCurrentCurrency(currency);
     localStorage.setItem('selectedCurrency', currency.code);
-  };
+  }, []);
 
-  const convertPrice = (amount: number, fromCurrency: string = 'INR'): number => {
+  const convertPrice = useCallback((amount: number, fromCurrency: string = 'INR'): number => {
     // Convert from source currency to INR, then to target currency
     const inrAmount = amount / EXCHANGE_RATES[fromCurrency];
     return inrAmount * EXCHANGE_RATES[currentCurrency.code];
-  };
+  }, [currentCurrency.code]);
 
-  const formatPrice = (amount: number, fromCurrency: string = 'INR'): string => {
+  const formatPrice = useCallback((amount: number, fromCurrency: string = 'INR'): string => {
     const convertedAmount = convertPrice(amount, fromCurrency);
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -64,15 +64,17 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(convertedAmount);
-  };
+  }, [currentCurrency.code, convertPrice]);
+
+  const value = useMemo(() => ({
+    currentCurrency,
+    setCurrency,
+    convertPrice,
+    formatPrice
+  }), [currentCurrency, setCurrency, convertPrice, formatPrice]);
 
   return (
-    <CurrencyContext.Provider value={{
-      currentCurrency,
-      setCurrency,
-      convertPrice,
-      formatPrice
-    }}>
+    <CurrencyContext.Provider value={value}>
       {children}
     </CurrencyContext.Provider>
   );

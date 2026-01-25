@@ -134,12 +134,29 @@ export const validateDiscountCode = async (
 
 /**
  * Records the usage of a discount code
+ *
+ * Note: This uses an atomic increment via RPC function to prevent race conditions.
+ * If the RPC function doesn't exist, it will fall back to the read-then-write pattern.
+ * To create the RPC function, run the migration in supabase/migrations/increment_discount_usage.sql
  */
 export const recordDiscountUsage = async (
   code: string,
   bookingId: UUID
 ): Promise<boolean> => {
   try {
+    // Try to use atomic increment RPC function first
+    const { data: rpcData, error: rpcError } = await supabase
+      .rpc('increment_discount_usage', {
+        discount_code: code.toUpperCase()
+      });
+
+    if (!rpcError) {
+      return rpcData === true;
+    }
+
+    // Fallback to read-then-write if RPC doesn't exist
+    console.warn('RPC function not found, using fallback method. Consider adding the migration.');
+
     // First, get the current used_count
     const { data: discountCode, error: fetchError } = await supabase
       .from('discount_codes')
@@ -155,7 +172,7 @@ export const recordDiscountUsage = async (
     // Increment the used_count
     const { error: updateError } = await supabase
       .from('discount_codes')
-      .update({ 
+      .update({
         used_count: (discountCode.used_count || 0) + 1
       })
       .eq('code', code.toUpperCase());

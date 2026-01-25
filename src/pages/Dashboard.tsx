@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -48,7 +48,7 @@ const Dashboard = () => {
   }, [profile]);
 
   // Fetch stay bookings
-  const fetchStayBookings = async () => {
+  const fetchStayBookings = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -70,7 +70,7 @@ const Dashboard = () => {
         .order('check_in_date', { ascending: true });
 
       if (error) throw error;
-      
+
       setStayBookings(data || []);
     } catch (error) {
       console.error('Error fetching stay bookings:', error);
@@ -78,10 +78,10 @@ const Dashboard = () => {
     } finally {
       setLoadingStayBookings(false);
     }
-  };
+  }, [user]);
 
   // Fetch experience bookings
-  const fetchExperienceBookings = async () => {
+  const fetchExperienceBookings = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -105,7 +105,7 @@ const Dashboard = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      
+
       setExperienceBookings(data || []);
     } catch (error) {
       console.error('Error fetching experience bookings:', error);
@@ -113,15 +113,17 @@ const Dashboard = () => {
     } finally {
       setLoadingExperienceBookings(false);
     }
-  };
-
-  useEffect(() => {
-    fetchStayBookings();
   }, [user]);
 
+  // Fetch both bookings in parallel
   useEffect(() => {
-    fetchExperienceBookings();
-  }, [user]);
+    if (!user) return;
+
+    Promise.all([
+      fetchStayBookings(),
+      fetchExperienceBookings()
+    ]);
+  }, [user, fetchStayBookings, fetchExperienceBookings]);
 
   const handleProfileUpdate = async (e) => {
     e.preventDefault();

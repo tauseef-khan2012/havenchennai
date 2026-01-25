@@ -1,5 +1,5 @@
 
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useMemo } from 'react';
 import { useAuthProvider } from '@/hooks/useAuthProvider';
 import { useAuthActions } from '@/hooks/useAuthActions';
 import {
@@ -39,7 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshSession: refreshSessionAction
   } = useAuthActions(updateState, handleError, navigate, toast, refreshProfile);
 
-  const value: AuthContextType = {
+  const value = useMemo<AuthContextType>(() => ({
     ...state,
     signIn,
     signInWithOtp,
@@ -51,7 +51,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshSession: refreshSessionAction,
     resendConfirmationEmail,
     resetPassword,
-  };
+  }), [
+    state,
+    signIn,
+    signInWithOtp,
+    verifyOtp,
+    signInWithProvider,
+    signUp,
+    signOut,
+    refreshProfile,
+    refreshSessionAction,
+    resendConfirmationEmail,
+    resetPassword,
+  ]);
 
   return (
     <AuthContext.Provider value={value}>

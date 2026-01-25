@@ -16,6 +16,54 @@ interface ChannelBookingOption {
   available: boolean;
 }
 
+// In-memory cache for external rates
+interface CachedRates {
+  data: any[];
+  timestamp: number;
+}
+
+const ratesCache = new Map<string, CachedRates>();
+const CACHE_TTL_MS = 3600000; // 1 hour
+
+/**
+ * Gets external rates from cache or database
+ */
+const getCachedExternalRates = async (
+  propertyId: UUID,
+  platform: string,
+  checkInDate: Date,
+  checkOutDate: Date
+): Promise<any[] | null> => {
+  const cacheKey = `${propertyId}-${platform}-${checkInDate.toISOString()}-${checkOutDate.toISOString()}`;
+  const cached = ratesCache.get(cacheKey);
+
+  // Return cached data if still valid
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+    return cached.data;
+  }
+
+  // Fetch from database
+  const { data: rates, error } = await supabase
+    .from('external_rates')
+    .select('rate_per_night, is_available')
+    .eq('property_id', propertyId)
+    .eq('platform', platform)
+    .gte('date', checkInDate.toISOString().split('T')[0])
+    .lte('date', checkOutDate.toISOString().split('T')[0]);
+
+  if (error) {
+    console.error(`Error fetching ${platform} rates:`, error);
+    return null;
+  }
+
+  // Cache the result
+  if (rates) {
+    ratesCache.set(cacheKey, { data: rates, timestamp: Date.now() });
+  }
+
+  return rates;
+};
+
 /**
  * Syncs availability data to an external channel
  */
@@ -69,23 +117,17 @@ export const getChannelBookingOptions = async (
     // Fetch Airbnb rates (simulate for demo)
     try {
       await fetchAndStoreAirbnbRates(propertyId, 'demo-listing-123', checkInDate, checkOutDate);
-      
-      // Get average Airbnb rate
-      const { data: airbnbRates, error: airbnbError } = await supabase
-        .from('external_rates')
-        .select('rate_per_night, is_available')
-        .eq('property_id', propertyId)
-        .eq('platform', 'airbnb')
-        .gte('date', checkInDate.toISOString().split('T')[0])
-        .lte('date', checkOutDate.toISOString().split('T')[0]);
-      
-      if (!airbnbError && airbnbRates && airbnbRates.length > 0) {
+
+      // Get average Airbnb rate with caching
+      const airbnbRates = await getCachedExternalRates(propertyId, 'airbnb', checkInDate, checkOutDate);
+
+      if (airbnbRates && airbnbRates.length > 0) {
         const availableRates = airbnbRates.filter(rate => rate.is_available);
         if (availableRates.length > 0) {
           const nights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 3600 * 24));
           const avgRate = availableRates.reduce((sum, rate) => sum + rate.rate_per_night, 0) / availableRates.length;
           const totalAirbnbPrice = avgRate * nights;
-          
+
           options.push({
             platform: 'airbnb',
             price: totalAirbnbPrice,
